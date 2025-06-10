@@ -1,0 +1,242 @@
+{
+  "name": "qt-live-preview",
+  "displayName": "QT Live Preview",
+  "description": "Live preview for Qt6 Widgets and QML applications with hot reload - Full Qt6 module support",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": ["Other", "Debuggers", "Extension Packs"],
+  "activationEvents": [
+    "onLanguage:qml",
+    "onLanguage:cpp",
+    "onLanguage:javascript",
+    "workspaceContains:**/*.pro",
+    "workspaceContains:**/*.qml",
+    "workspaceContains:**/*.ui",
+    "workspaceContains:**/CMakeLists.txt"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "qtLivePreview.createProject",
+        "title": "Create QT6 Project",
+        "category": "QT Live Preview"
+      },
+      {
+        "command": "qtLivePreview.createModuleProject",
+        "title": "Create QT6 Module Project",
+        "category": "QT Live Preview"
+      },
+      {
+        "command": "qtLivePreview.startPreview",
+        "title": "Start Live Preview",
+        "category": "QT Live Preview"
+      },
+      {
+        "command": "qtLivePreview.stopPreview",
+        "title": "Stop Live Preview",
+        "category": "QT Live Preview"
+      },
+      {
+        "command": "qtLivePreview.toggleHotReload",
+        "title": "Toggle Hot Reload",
+        "category": "QT Live Preview"
+      },
+      {
+        "command": "qtLivePreview.buildProject",
+        "title": "Build QT6 Project",
+        "category": "QT Live Preview"
+      },
+      {
+        "command": "qtLivePreview.runProject",
+        "title": "Run QT6 Project",
+        "category": "QT Live Preview"
+      },
+      {
+        "command": "qtLivePreview.debugProject",
+        "title": "Debug QT6 Project",
+        "category": "QT Live Preview"
+      },
+      {
+        "command": "qtLivePreview.configureQt",
+        "title": "Configure Qt6 Installation",
+        "category": "QT Live Preview"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "qtLivePreview.startPreview",
+          "when": "resourceExtname == .qml || resourceExtname == .ui",
+          "group": "qtpreview"
+        },
+        {
+          "command": "qtLivePreview.buildProject",
+          "when": "resourceFilename == CMakeLists.txt",
+          "group": "qtpreview"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "qtLivePreview.startPreview",
+          "when": "resourceExtname == .qml || resourceExtname == .ui",
+          "group": "qtpreview"
+        },
+        {
+          "command": "qtLivePreview.runProject",
+          "when": "resourceExtname == .cpp || resourceExtname == .qml",
+          "group": "qtpreview"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "qtLivePreview.createProject",
+          "when": "true"
+        },
+        {
+          "command": "qtLivePreview.createModuleProject",
+          "when": "true"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "QT Live Preview",
+      "properties": {
+        "qtLivePreview.qt6Path": {
+          "type": "string",
+          "default": "",
+          "description": "Path to Qt6 installation directory (e.g., C:/Qt/6.5.0/msvc2019_64)"
+        },
+        "qtLivePreview.cmakePath": {
+          "type": "string",
+          "default": "cmake",
+          "description": "Path to CMake executable"
+        },
+        "qtLivePreview.autoReload": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable automatic hot reload"
+        },
+        "qtLivePreview.errorReporting": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable error detection and reporting"
+        },
+        "qtLivePreview.enabledModules": {
+          "type": "array",
+          "default": ["Core", "Widgets", "Quick", "QuickControls2"],
+          "description": "Qt6 modules to enable by default",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Core", "Widgets", "Quick", "QuickControls2", "Network", "Sql", 
+              "Multimedia", "WebEngine", "WebEngineWidgets", "Charts", "DataVisualization",
+              "Bluetooth", "SerialPort", "Positioning", "Sensors", "WebSockets",
+              "Concurrent", "PrintSupport", "Svg", "OpenGL", "Test", "Help",
+              "Designer", "UiTools", "Xml", "DBus", "RemoteObjects", "SCXML",
+              "StateMachine", "3DCore", "3DRender", "3DInput", "3DLogic",
+              "3DAnimation", "3DExtras", "Gamepad", "Location", "Labs"
+            ]
+          }
+        },
+        "qtLivePreview.buildConfiguration": {
+          "type": "string",
+          "default": "Debug",
+          "enum": ["Debug", "Release", "RelWithDebInfo", "MinSizeRel"],
+          "description": "Default build configuration"
+        },
+        "qtLivePreview.qmlEngine": {
+          "type": "string",
+          "default": "qml",
+          "description": "QML engine executable (qml or qmlscene)"
+        }
+      }
+    },
+    "views": {
+      "explorer": [
+        {
+          "id": "qtLivePreview.projectExplorer",
+          "name": "Qt6 Project",
+          "when": "workspaceHasQtProject",
+          "contextualTitle": "Qt6 Project Explorer"
+        }
+      ],
+      "qtLivePreview": [
+        {
+          "type": "webview",
+          "id": "qtLivePreview.preview",
+          "name": "Live Preview",
+          "when": "true"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "panel": [
+        {
+          "id": "qtLivePreview",
+          "title": "Qt6 Live Preview",
+          "icon": "$(preview)"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "qtLivePreview.projectExplorer",
+        "contents": "No Qt6 project found.\n[Create Qt6 Project](command:qtLivePreview.createProject)\n[Configure Qt6](command:qtLivePreview.configureQt)"
+      }
+    ],
+    "languages": [
+      {
+        "id": "qml",
+        "aliases": ["QML", "qml"],
+        "extensions": [".qml"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "qml",
+        "scopeName": "source.qml",
+        "path": "./syntaxes/qml.tmLanguage.json"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/node": "16.x",
+    "@types/vscode": "^1.74.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "eslint": "^8.28.0",
+    "typescript": "^4.9.4",
+    "@vscode/test-electron": "^2.2.0"
+  },
+  "dependencies": {
+    "chokidar": "^3.5.3",
+    "xml2js": "^0.6.2",
+    "tree-kill": "^1.2.2",
+    "which": "^3.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/algoscienceacademy/qt-live-preview.git"
+  },
+  "keywords": [
+    "qt", "qt6", "qml", "widgets", "live-preview", "hot-reload", 
+    "cpp", "cmake", "gui", "development"
+  ],
+  "icon": "images/icon.png",
+  "galleryBanner": {
+    "color": "#41CD52",
+    "theme": "light"
+  }
+}
