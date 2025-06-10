@@ -1,6 +1,7 @@
 {
   "name": "qt-live-preview",
   "displayName": "QT Live Preview",
+  "publisher": "algoscienceacademy",
   "description": "Live preview for Qt6 Widgets and QML applications with hot reload - Full Qt6 module support",
   "version": "1.0.0",
   "engines": {
