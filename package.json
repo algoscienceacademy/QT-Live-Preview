@@ -64,6 +64,16 @@
         "command": "qtLivePreview.configureQt",
         "title": "Configure Qt6 Installation",
         "category": "QT Live Preview"
+      },
+      {
+        "command": "qtLivePreview.analyzeQML",
+        "title": "Analyze QML File",
+        "category": "QT Live Preview"
+      },
+      {
+        "command": "qtLivePreview.clearQMLErrors",
+        "title": "Clear QML Errors",
+        "category": "QT Live Preview"
       }
     ],
     "menus": {
@@ -77,6 +87,11 @@
           "command": "qtLivePreview.buildProject",
           "when": "resourceFilename == CMakeLists.txt",
           "group": "qtpreview"
+        },
+        {
+          "command": "qtLivePreview.analyzeQML",
+          "when": "resourceExtname == .qml",
+          "group": "qtpreview"
         }
       ],
       "editor/context": [
@@ -88,6 +103,11 @@
         {
           "command": "qtLivePreview.runProject",
           "when": "resourceExtname == .cpp || resourceExtname == .qml",
+          "group": "qtpreview"
+        },
+        {
+          "command": "qtLivePreview.analyzeQML",
+          "when": "resourceExtname == .qml",
           "group": "qtpreview"
         }
       ],

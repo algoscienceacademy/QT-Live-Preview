@@ -4,12 +4,14 @@ import { LivePreviewProvider } from './livePreviewProvider';
 import { HotReloadManager } from './hotReloadManager';
 import { ErrorReporter } from './errorReporter';
 import { BuildManager } from './buildManager';
+import { QMLErrorDetector } from './qmlErrorDetector';
 
 let projectManager: QTProjectManager;
 let previewProvider: LivePreviewProvider;
 let hotReloadManager: HotReloadManager;
 let errorReporter: ErrorReporter;
 let buildManager: BuildManager;
+let qmlErrorDetector: QMLErrorDetector;
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('QT Live Preview extension is now active!');
@@ -19,6 +21,7 @@ export function activate(context: vscode.ExtensionContext) {
     hotReloadManager = new HotReloadManager(previewProvider);
     errorReporter = new ErrorReporter();
     buildManager = new BuildManager();
+    qmlErrorDetector = new QMLErrorDetector();
 
     // Connect components
     previewProvider.setBuildManager(buildManager);
@@ -128,6 +131,28 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
 
+    // Auto-analyze QML files when opened or changed
+    const analyzeQMLFile = async (document: vscode.TextDocument) => {
+        if (document.languageId === 'qml' || document.fileName.endsWith('.qml')) {
+            await qmlErrorDetector.analyzeQMLFile(document.uri);
+        }
+    };
+
+    // Register QML file watchers
+    const onDidOpenTextDocument = vscode.workspace.onDidOpenTextDocument(analyzeQMLFile);
+    const onDidSaveTextDocument = vscode.workspace.onDidSaveTextDocument(analyzeQMLFile);
+    const onDidChangeTextDocument = vscode.workspace.onDidChangeTextDocument(async (event) => {
+        if (event.document.languageId === 'qml' || event.document.fileName.endsWith('.qml')) {
+            // Debounce analysis to avoid too frequent checks
+            setTimeout(() => {
+                qmlErrorDetector.analyzeQMLFile(event.document.uri);
+            }, 1000);
+        }
+    });
+
+    // Analyze currently open QML files
+    vscode.workspace.textDocuments.forEach(analyzeQMLFile);
+
     // Set context for Qt project detection
     const workspaceFolders = vscode.workspace.workspaceFolders;
     if (workspaceFolders) {
@@ -136,6 +161,13 @@ export function activate(context: vscode.ExtensionContext) {
         );
         vscode.commands.executeCommand('setContext', 'workspaceHasQtProject', hasQtProject);
     }
+
+    context.subscriptions.push(
+        onDidOpenTextDocument,
+        onDidSaveTextDocument,
+        onDidChangeTextDocument,
+        qmlErrorDetector
+    );
 }
 
 export function deactivate() {
@@ -147,5 +179,8 @@ export function deactivate() {
     }
     if (buildManager) {
         buildManager.dispose();
+    }
+    if (qmlErrorDetector) {
+        qmlErrorDetector.dispose();
     }
 }
