@@ -1,0 +1,313 @@
+{
+    "name": "QML",
+    "scopeName": "source.qml",
+    "fileTypes": ["qml"],
+    "patterns": [
+        {
+            "include": "#comments"
+        },
+        {
+            "include": "#imports"
+        },
+        {
+            "include": "#pragma"
+        },
+        {
+            "include": "#qml-object"
+        },
+        {
+            "include": "#javascript"
+        }
+    ],
+    "repository": {
+        "comments": {
+            "patterns": [
+                {
+                    "name": "comment.line.double-slash.qml",
+                    "match": "//.*$"
+                },
+                {
+                    "name": "comment.block.qml",
+                    "begin": "/\\*",
+                    "end": "\\*/"
+                }
+            ]
+        },
+        "imports": {
+            "patterns": [
+                {
+                    "name": "meta.import.qml",
+                    "match": "\\b(import)\\s+([\\w\\.]+)\\s+(\\d+\\.\\d+)(?:\\s+(as)\\s+(\\w+))?",
+                    "captures": {
+                        "1": {"name": "keyword.control.import.qml"},
+                        "2": {"name": "entity.name.namespace.qml"},
+                        "3": {"name": "constant.numeric.version.qml"},
+                        "4": {"name": "keyword.control.as.qml"},
+                        "5": {"name": "entity.name.alias.qml"}
+                    }
+                }
+            ]
+        },
+        "pragma": {
+            "patterns": [
+                {
+                    "name": "meta.pragma.qml",
+                    "match": "\\b(pragma)\\s+(\\w+)",
+                    "captures": {
+                        "1": {"name": "keyword.control.pragma.qml"},
+                        "2": {"name": "entity.name.pragma.qml"}
+                    }
+                }
+            ]
+        },
+        "qml-object": {
+            "patterns": [
+                {
+                    "name": "meta.qml-object.qml",
+                    "begin": "\\b([A-Z][\\w]*)\\s*\\{",
+                    "beginCaptures": {
+                        "1": {"name": "entity.name.type.qml"}
+                    },
+                    "end": "\\}",
+                    "patterns": [
+                        {
+                            "include": "#qml-object-content"
+                        }
+                    ]
+                }
+            ]
+        },
+        "qml-object-content": {
+            "patterns": [
+                {
+                    "include": "#comments"
+                },
+                {
+                    "include": "#property-declaration"
+                },
+                {
+                    "include": "#signal-declaration"
+                },
+                {
+                    "include": "#function-declaration"
+                },
+                {
+                    "include": "#property-binding"
+                },
+                {
+                    "include": "#signal-handler"
+                },
+                {
+                    "include": "#qml-object"
+                },
+                {
+                    "include": "#javascript"
+                }
+            ]
+        },
+        "property-declaration": {
+            "patterns": [
+                {
+                    "name": "meta.property.declaration.qml",
+                    "match": "\\b(property)\\s+(\\w+)\\s+(\\w+)(?:\\s*:\\s*(.*))?",
+                    "captures": {
+                        "1": {"name": "keyword.other.property.qml"},
+                        "2": {"name": "storage.type.qml"},
+                        "3": {"name": "variable.other.property.qml"},
+                        "4": {"name": "source.js"}
+                    }
+                },
+                {
+                    "name": "meta.property.alias.qml",
+                    "match": "\\b(property)\\s+(alias)\\s+(\\w+)\\s*:\\s*(.*)$",
+                    "captures": {
+                        "1": {"name": "keyword.other.property.qml"},
+                        "2": {"name": "storage.type.alias.qml"},
+                        "3": {"name": "variable.other.property.qml"},
+                        "4": {"name": "entity.name.property.qml"}
+                    }
+                }
+            ]
+        },
+        "signal-declaration": {
+            "patterns": [
+                {
+                    "name": "meta.signal.declaration.qml",
+                    "match": "\\b(signal)\\s+(\\w+)(?:\\(([^)]*)\\))?",
+                    "captures": {
+                        "1": {"name": "keyword.other.signal.qml"},
+                        "2": {"name": "entity.name.function.signal.qml"},
+                        "3": {"name": "variable.parameter.qml"}
+                    }
+                }
+            ]
+        },
+        "function-declaration": {
+            "patterns": [
+                {
+                    "name": "meta.function.declaration.qml",
+                    "match": "\\b(function)\\s+(\\w+)\\s*\\(([^)]*)\\)",
+                    "captures": {
+                        "1": {"name": "keyword.other.function.qml"},
+                        "2": {"name": "entity.name.function.qml"},
+                        "3": {"name": "variable.parameter.qml"}
+                    }
+                }
+            ]
+        },
+        "property-binding": {
+            "patterns": [
+                {
+                    "name": "meta.property.binding.qml",
+                    "begin": "\\b(\\w+(?:\\.\\w+)*)\\s*:",
+                    "beginCaptures": {
+                        "1": {"name": "support.type.property-name.qml"}
+                    },
+                    "end": "(?=\\n|;|\\})",
+                    "patterns": [
+                        {
+                            "include": "#javascript"
+                        },
+                        {
+                            "include": "#strings"
+                        },
+                        {
+                            "include": "#numbers"
+                        },
+                        {
+                            "include": "#qml-object"
+                        }
+                    ]
+                }
+            ]
+        },
+        "signal-handler": {
+            "patterns": [
+                {
+                    "name": "meta.signal.handler.qml",
+                    "match": "\\b(on[A-Z]\\w*)\\s*:",
+                    "captures": {
+                        "1": {"name": "support.function.signal-handler.qml"}
+                    }
+                }
+            ]
+        },
+        "javascript": {
+            "patterns": [
+                {
+                    "include": "#strings"
+                },
+                {
+                    "include": "#numbers"
+                },
+                {
+                    "include": "#keywords"
+                },
+                {
+                    "include": "#operators"
+                },
+                {
+                    "include": "#qt-globals"
+                }
+            ]
+        },
+        "strings": {
+            "patterns": [
+                {
+                    "name": "string.quoted.double.qml",
+                    "begin": "\"",
+                    "end": "\"",
+                    "patterns": [
+                        {
+                            "name": "constant.character.escape.qml",
+                            "match": "\\\\."
+                        }
+                    ]
+                },
+                {
+                    "name": "string.quoted.single.qml",
+                    "begin": "'",
+                    "end": "'",
+                    "patterns": [
+                        {
+                            "name": "constant.character.escape.qml",
+                            "match": "\\\\."
+                        }
+                    ]
+                }
+            ]
+        },
+        "numbers": {
+            "patterns": [
+                {
+                    "name": "constant.numeric.decimal.qml",
+                    "match": "\\b\\d+\\.\\d+\\b"
+                },
+                {
+                    "name": "constant.numeric.integer.qml",
+                    "match": "\\b\\d+\\b"
+                },
+                {
+                    "name": "constant.numeric.hex.qml",
+                    "match": "\\b0[xX][0-9a-fA-F]+\\b"
+                }
+            ]
+        },
+        "keywords": {
+            "patterns": [
+                {
+                    "name": "keyword.control.qml",
+                    "match": "\\b(if|else|for|while|do|break|continue|return|switch|case|default|try|catch|finally|throw|typeof|instanceof|new|delete|void|var|let|const)\\b"
+                },
+                {
+                    "name": "keyword.other.qml",
+                    "match": "\\b(readonly|default|required)\\b"
+                },
+                {
+                    "name": "constant.language.boolean.qml",
+                    "match": "\\b(true|false)\\b"
+                },
+                {
+                    "name": "constant.language.null.qml",
+                    "match": "\\b(null|undefined)\\b"
+                }
+            ]
+        },
+        "operators": {
+            "patterns": [
+                {
+                    "name": "keyword.operator.assignment.qml",
+                    "match": "(=|\\+=|-=|\\*=|/=|%=|<<=|>>=|>>>=|&=|\\|=|\\^=)"
+                },
+                {
+                    "name": "keyword.operator.comparison.qml",
+                    "match": "(==|!=|===|!==|<=|>=|<|>)"
+                },
+                {
+                    "name": "keyword.operator.logical.qml",
+                    "match": "(&&|\\|\\||!)"
+                },
+                {
+                    "name": "keyword.operator.arithmetic.qml",
+                    "match": "(\\+|\\-|\\*|/|%|\\+\\+|\\-\\-)"
+                }
+            ]
+        },
+        "qt-globals": {
+            "patterns": [
+                {
+                    "name": "support.class.qt.qml",
+                    "match": "\\b(Qt|Component|Connections|Binding|Timer)\\b"
+                },
+                {
+                    "name": "support.function.qt.qml",
+                    "match": "\\b(qsTr|qsTranslate|Qt\\.createComponent|Qt\\.createQmlObject|console\\.log|console\\.debug|console\\.warn|console\\.error)\\b"
+                },
+                {
+                    "name": "support.constant.qt.qml",
+                    "match": "\\b(Qt\\.\\w+)\\b"
+                }
+            ]
+        }
+    }
+}

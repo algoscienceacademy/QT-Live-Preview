@@ -8,7 +8,9 @@ interface QMLError {
     message: string;
     severity: vscode.DiagnosticSeverity;
     source: string;
-    type: 'syntax' | 'semantic' | 'import' | 'property' | 'binding';
+    type: 'syntax' | 'semantic' | 'import' | 'property' | 'binding' | 'performance' | 'best-practice' | 'accessibility';
+    quickFix?: string;
+    codeActions?: vscode.CodeAction[];
 }
 
 export class QMLErrorDetector {
@@ -16,6 +18,9 @@ export class QMLErrorDetector {
     private _outputChannel: vscode.OutputChannel;
     private _qmlElements: Set<string> = new Set();
     private _qmlProperties: Map<string, string[]> = new Map();
+    private _qmlSignals: Map<string, string[]> = new Map();
+    private _qmlMethods: Map<string, string[]> = new Map();
+    private _qtModules: Map<string, string[]> = new Map();
 
     constructor() {
         this._diagnosticCollection = vscode.languages.createDiagnosticCollection('qmlLivePreview');
@@ -24,32 +29,93 @@ export class QMLErrorDetector {
     }
 
     private initializeQMLKnowledge() {
-        // Common QML elements
+        // Extended QML elements with Qt6 components
         this._qmlElements = new Set([
+            // Basic Items
             'Item', 'Rectangle', 'Text', 'Image', 'MouseArea', 'ListView', 'GridView',
             'Column', 'Row', 'Grid', 'Flow', 'StackView', 'SwipeView', 'TabBar',
+            
+            // Controls
             'Button', 'TextField', 'TextArea', 'ComboBox', 'CheckBox', 'RadioButton',
-            'Slider', 'ProgressBar', 'SpinBox', 'ScrollView', 'Flickable',
+            'Slider', 'ProgressBar', 'SpinBox', 'ScrollView', 'Flickable', 'Switch',
+            'RangeSlider', 'Tumbler', 'Calendar', 'DatePicker', 'Dial', 'DelayButton',
+            
+            // Windows & Dialogs
             'Window', 'ApplicationWindow', 'Dialog', 'Popup', 'Menu', 'MenuBar',
             'ToolBar', 'StatusBar', 'SplitView', 'Drawer', 'Frame', 'GroupBox',
-            'Label', 'Switch', 'RangeSlider', 'Tumbler', 'Calendar', 'DatePicker',
+            'Label', 'Pane', 'Page', 'PageIndicator', 'ScrollIndicator',
+            
+            // Animation
             'Timer', 'Animation', 'PropertyAnimation', 'NumberAnimation', 'ColorAnimation',
             'RotationAnimation', 'ScaleAnimation', 'PathAnimation', 'SequentialAnimation',
-            'ParallelAnimation', 'PauseAnimation', 'PropertyChanges', 'State', 'Transition'
+            'ParallelAnimation', 'PauseAnimation', 'PropertyChanges', 'State', 'Transition',
+            'Behavior', 'SpringAnimation', 'SmoothedAnimation', 'Vector3dAnimation',
+            
+            // Models & Views
+            'ListModel', 'XmlListModel', 'ObjectModel', 'DelegateModel', 'Repeater',
+            'PathView', 'TableView', 'TreeView', 'ListView', 'GridView',
+            
+            // Layouts
+            'ColumnLayout', 'RowLayout', 'GridLayout', 'StackLayout', 'Layout',
+            
+            // Graphics Effects
+            'OpacityMask', 'ColorOverlay', 'Glow', 'DropShadow', 'FastBlur',
+            'GaussianBlur', 'RadialGradient', 'LinearGradient', 'ConicalGradient',
+            
+            // Multimedia
+            'MediaPlayer', 'VideoOutput', 'Audio', 'Camera', 'CameraCapture',
+            
+            // Input
+            'Keys', 'FocusScope', 'KeyNavigation', 'Shortcut'
         ]);
 
-        // Common properties for QML elements
+        // Enhanced properties with type information
         this._qmlProperties = new Map([
-            ['Item', ['x', 'y', 'z', 'width', 'height', 'opacity', 'visible', 'enabled', 'anchors', 'rotation', 'scale', 'transformOrigin', 'clip', 'focus', 'activeFocus']],
-            ['Rectangle', ['color', 'border', 'radius', 'gradient', 'antialiasing']],
-            ['Text', ['text', 'font', 'color', 'horizontalAlignment', 'verticalAlignment', 'wrapMode', 'elide', 'textFormat', 'lineHeight']],
-            ['Image', ['source', 'fillMode', 'horizontalAlignment', 'verticalAlignment', 'smooth', 'cache', 'asynchronous', 'autoTransform']],
-            ['MouseArea', ['acceptedButtons', 'hoverEnabled', 'pressAndHoldInterval', 'preventStealing', 'propagateComposedEvents', 'cursorShape']],
-            ['Button', ['text', 'checkable', 'checked', 'autoExclusive', 'autoRepeat', 'down', 'pressed', 'icon', 'display']],
-            ['TextField', ['text', 'placeholderText', 'readOnly', 'validator', 'inputMask', 'echoMode', 'maximumLength', 'selectByMouse']],
-            ['ListView', ['model', 'delegate', 'currentIndex', 'currentItem', 'orientation', 'spacing', 'cacheBuffer', 'snapMode']],
+            ['Item', ['x', 'y', 'z', 'width', 'height', 'opacity', 'visible', 'enabled', 'anchors', 'rotation', 'scale', 'transformOrigin', 'clip', 'focus', 'activeFocus', 'parent', 'children', 'data', 'resources', 'states', 'transitions']],
+            ['Rectangle', ['color', 'border', 'radius', 'gradient', 'antialiasing', 'border.width', 'border.color']],
+            ['Text', ['text', 'font', 'color', 'horizontalAlignment', 'verticalAlignment', 'wrapMode', 'elide', 'textFormat', 'lineHeight', 'font.family', 'font.pixelSize', 'font.pointSize', 'font.bold', 'font.italic', 'font.underline', 'font.strikeout', 'font.weight']],
+            ['Image', ['source', 'fillMode', 'horizontalAlignment', 'verticalAlignment', 'smooth', 'cache', 'asynchronous', 'autoTransform', 'sourceSize', 'mirror', 'mipmap']],
+            ['MouseArea', ['acceptedButtons', 'hoverEnabled', 'pressAndHoldInterval', 'preventStealing', 'propagateComposedEvents', 'cursorShape', 'drag', 'containsMouse', 'pressed', 'pressedButtons']],
+            ['Button', ['text', 'checkable', 'checked', 'autoExclusive', 'autoRepeat', 'down', 'pressed', 'icon', 'display', 'flat', 'highlighted']],
+            ['TextField', ['text', 'placeholderText', 'readOnly', 'validator', 'inputMask', 'echoMode', 'maximumLength', 'selectByMouse', 'selectedText', 'selectionStart', 'selectionEnd', 'cursorPosition', 'persistentSelection']],
+            ['ListView', ['model', 'delegate', 'currentIndex', 'currentItem', 'orientation', 'spacing', 'cacheBuffer', 'snapMode', 'highlightItem', 'highlightFollowsCurrentItem', 'highlightMoveDuration']],
             ['GridView', ['model', 'delegate', 'cellWidth', 'cellHeight', 'flow', 'snapMode', 'cacheBuffer']],
-            ['Window', ['title', 'modality', 'flags', 'minimumWidth', 'minimumHeight', 'maximumWidth', 'maximumHeight']]
+            ['Window', ['title', 'modality', 'flags', 'minimumWidth', 'minimumHeight', 'maximumWidth', 'maximumHeight', 'screen', 'visibility']],
+            ['ApplicationWindow', ['header', 'footer', 'menuBar', 'overlay', 'background']],
+            ['Animation', ['duration', 'easing', 'loops', 'paused', 'running', 'alwaysRunToEnd']],
+            ['PropertyAnimation', ['target', 'property', 'from', 'to', 'duration', 'easing.type']],
+            ['Timer', ['interval', 'repeat', 'running', 'triggeredOnStart']]
+        ]);
+
+        // QML Signals
+        this._qmlSignals = new Map([
+            ['MouseArea', ['clicked', 'doubleClicked', 'pressed', 'released', 'entered', 'exited', 'positionChanged', 'pressAndHold']],
+            ['Button', ['clicked', 'pressed', 'released', 'toggled']],
+            ['TextField', ['textChanged', 'editingFinished', 'accepted']],
+            ['Timer', ['triggered']],
+            ['Animation', ['started', 'stopped', 'finished']],
+            ['ListView', ['currentIndexChanged', 'currentItemChanged']],
+            ['Item', ['childrenChanged', 'parentChanged', 'visibleChanged', 'enabledChanged']]
+        ]);
+
+        // QML Methods
+        this._qmlMethods = new Map([
+            ['Item', ['forceActiveFocus', 'mapFromItem', 'mapToItem', 'childAt']],
+            ['ListView', ['positionViewAtIndex', 'incrementCurrentIndex', 'decrementCurrentIndex']],
+            ['Animation', ['start', 'stop', 'pause', 'resume']],
+            ['Timer', ['start', 'stop', 'restart']],
+            ['TextField', ['selectAll', 'cut', 'copy', 'paste']]
+        ]);
+
+        // Qt Modules
+        this._qtModules = new Map([
+            ['QtQuick', ['Item', 'Rectangle', 'Text', 'Image', 'MouseArea', 'ListView', 'GridView']],
+            ['QtQuick.Controls', ['Button', 'TextField', 'ComboBox', 'CheckBox', 'RadioButton']],
+            ['QtQuick.Layouts', ['ColumnLayout', 'RowLayout', 'GridLayout']],
+            ['QtQuick.Window', ['Window', 'ApplicationWindow']],
+            ['QtMultimedia', ['MediaPlayer', 'VideoOutput', 'Audio']],
+            ['QtQuick.Dialogs', ['FileDialog', 'ColorDialog', 'FontDialog']],
+            ['QtCharts', ['ChartView', 'LineSeries', 'AreaSeries', 'BarSeries']]
         ]);
     }
 
@@ -58,19 +124,24 @@ export class QMLErrorDetector {
             const content = fs.readFileSync(uri.fsPath, 'utf8');
             const errors: QMLError[] = [];
 
-            // Perform various error checks
+            // Comprehensive error checking
             errors.push(...this.checkSyntaxErrors(content));
             errors.push(...this.checkImportErrors(content));
             errors.push(...this.checkPropertyErrors(content));
             errors.push(...this.checkBindingErrors(content));
             errors.push(...this.checkBraceMatching(content));
             errors.push(...this.checkStringLiterals(content));
-            errors.push(...this.checkComments(content));
             errors.push(...this.checkAnchors(content));
             errors.push(...this.checkSignalSlots(content));
+            errors.push(...this.checkPerformanceIssues(content));
+            errors.push(...this.checkBestPractices(content));
+            errors.push(...this.checkAccessibility(content));
+            errors.push(...this.checkModernQtUsage(content));
+            errors.push(...this.checkTypeErrors(content));
+            errors.push(...this.checkNamingConventions(content));
 
-            // Update diagnostics
-            this.updateDiagnostics(uri, errors);
+            // Update diagnostics with enhanced coloring
+            this.updateDiagnosticsWithColors(uri, errors);
             
             return errors;
         } catch (error) {
@@ -522,28 +593,384 @@ export class QMLErrorDetector {
         return errors;
     }
 
-    private updateDiagnostics(uri: vscode.Uri, errors: QMLError[]) {
+    private checkPerformanceIssues(content: string): QMLError[] {
+        const errors: QMLError[] = [];
+        const lines = content.split('\n');
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            
+            // Check for performance anti-patterns
+            if (line.includes('Qt.createComponent') && !line.includes('asynchronous')) {
+                errors.push({
+                    line: i,
+                    column: line.indexOf('Qt.createComponent'),
+                    message: 'Consider using asynchronous component creation for better performance',
+                    severity: vscode.DiagnosticSeverity.Information,
+                    source: 'QML Performance',
+                    type: 'performance',
+                    quickFix: 'Add Component.Asynchronous'
+                });
+            }
+
+            // Check for expensive bindings
+            if (line.includes('Math.') && line.includes(':')) {
+                errors.push({
+                    line: i,
+                    column: line.indexOf('Math.'),
+                    message: 'Complex math operations in bindings can affect performance. Consider caching the result.',
+                    severity: vscode.DiagnosticSeverity.Warning,
+                    source: 'QML Performance',
+                    type: 'performance'
+                });
+            }
+
+            // Check for string concatenation in bindings
+            if (line.includes('+') && line.includes('"') && line.includes(':')) {
+                errors.push({
+                    line: i,
+                    column: line.indexOf('+'),
+                    message: 'String concatenation in bindings can be expensive. Consider using template literals or pre-computing.',
+                    severity: vscode.DiagnosticSeverity.Information,
+                    source: 'QML Performance',
+                    type: 'performance'
+                });
+            }
+
+            // Check for unnecessary clips
+            if (line.includes('clip: true')) {
+                errors.push({
+                    line: i,
+                    column: line.indexOf('clip'),
+                    message: 'Clipping can impact performance. Use only when necessary.',
+                    severity: vscode.DiagnosticSeverity.Information,
+                    source: 'QML Performance',
+                    type: 'performance'
+                });
+            }
+        }
+
+        return errors;
+    }
+
+    private checkBestPractices(content: string): QMLError[] {
+        const errors: QMLError[] = [];
+        const lines = content.split('\n');
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            
+            // Check for magic numbers
+            const magicNumberMatch = line.match(/:\s*(\d{2,})/);
+            if (magicNumberMatch && !line.includes('width') && !line.includes('height')) {
+                const number = parseInt(magicNumberMatch[1]);
+                if (number > 50 && number !== 100) {
+                    errors.push({
+                        line: i,
+                        column: line.indexOf(magicNumberMatch[1]),
+                        message: `Consider using a named constant instead of magic number ${number}`,
+                        severity: vscode.DiagnosticSeverity.Information,
+                        source: 'QML Best Practice',
+                        type: 'best-practice'
+                    });
+                }
+            }
+
+            // Check for hardcoded colors
+            if (line.includes('color:') && (line.includes('"#') || line.includes('"red') || line.includes('"blue'))) {
+                errors.push({
+                    line: i,
+                    column: line.indexOf('color:'),
+                    message: 'Consider using theme colors or constants instead of hardcoded colors',
+                    severity: vscode.DiagnosticSeverity.Information,
+                    source: 'QML Best Practice',
+                    type: 'best-practice'
+                });
+            }
+
+            // Check for missing id when needed
+            if (line.includes('MouseArea') && !content.includes('id:')) {
+                errors.push({
+                    line: i,
+                    column: 0,
+                    message: 'Consider adding an id to MouseArea for better debugging and testing',
+                    severity: vscode.DiagnosticSeverity.Information,
+                    source: 'QML Best Practice',
+                    type: 'best-practice'
+                });
+            }
+
+            // Check for inline styles
+            if (line.includes('font.pixelSize:') && line.includes('14')) {
+                errors.push({
+                    line: i,
+                    column: line.indexOf('font.pixelSize'),
+                    message: 'Consider using theme font sizes or constants',
+                    severity: vscode.DiagnosticSeverity.Information,
+                    source: 'QML Best Practice',
+                    type: 'best-practice'
+                });
+            }
+        }
+
+        return errors;
+    }
+
+    private checkAccessibility(content: string): QMLError[] {
+        const errors: QMLError[] = [];
+        const lines = content.split('\n');
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            
+            // Check for missing accessibility properties
+            if (line.includes('Button') || line.includes('TextField')) {
+                const hasAccessibleName = content.includes('Accessible.name');
+                const hasAccessibleDescription = content.includes('Accessible.description');
+                
+                if (!hasAccessibleName) {
+                    errors.push({
+                        line: i,
+                        column: 0,
+                        message: 'Interactive elements should have Accessible.name for screen readers',
+                        severity: vscode.DiagnosticSeverity.Warning,
+                        source: 'QML Accessibility',
+                        type: 'accessibility'
+                    });
+                }
+            }
+
+            // Check for images without alt text
+            if (line.includes('Image') && line.includes('source:')) {
+                if (!content.includes('Accessible.name') && !content.includes('Accessible.description')) {
+                    errors.push({
+                        line: i,
+                        column: 0,
+                        message: 'Images should have accessible descriptions for screen readers',
+                        severity: vscode.DiagnosticSeverity.Warning,
+                        source: 'QML Accessibility',
+                        type: 'accessibility'
+                    });
+                }
+            }
+
+            // Check for proper focus handling
+            if (line.includes('Keys.onPressed') && !content.includes('focus:')) {
+                errors.push({
+                    line: i,
+                    column: 0,
+                    message: 'Elements handling key events should be focusable',
+                    severity: vscode.DiagnosticSeverity.Warning,
+                    source: 'QML Accessibility',
+                    type: 'accessibility'
+                });
+            }
+        }
+
+        return errors;
+    }
+
+    private checkModernQtUsage(content: string): QMLError[] {
+        const errors: QMLError[] = [];
+        const lines = content.split('\n');
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            
+            // Check for outdated Qt versions in imports
+            if (line.includes('import QtQuick 2.1') || line.includes('import QtQuick 2.0')) {
+                errors.push({
+                    line: i,
+                    column: 0,
+                    message: 'Consider updating to QtQuick 2.15 or later for better features and performance',
+                    severity: vscode.DiagnosticSeverity.Warning,
+                    source: 'QML Modern Qt',
+                    type: 'best-practice'
+                });
+            }
+
+            // Check for deprecated properties
+            if (line.includes('smooth:')) {
+                errors.push({
+                    line: i,
+                    column: line.indexOf('smooth:'),
+                    message: 'The "smooth" property is deprecated. Smoothing is enabled by default in Qt6.',
+                    severity: vscode.DiagnosticSeverity.Warning,
+                    source: 'QML Modern Qt',
+                    type: 'best-practice'
+                });
+            }
+
+            // Check for old-style connections
+            if (line.includes('Connections') && line.includes('target:')) {
+                errors.push({
+                    line: i,
+                    column: 0,
+                    message: 'Consider using inline signal handlers instead of Connections for better performance',
+                    severity: vscode.DiagnosticSeverity.Information,
+                    source: 'QML Modern Qt',
+                    type: 'best-practice'
+                });
+            }
+        }
+
+        return errors;
+    }
+
+    private checkTypeErrors(content: string): QMLError[] {
+        const errors: QMLError[] = [];
+        const lines = content.split('\n');
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            
+            // Check for type mismatches
+            if (line.includes('width:') || line.includes('height:')) {
+                const valueMatch = line.match(/:\s*["']([^"']+)["']/);
+                if (valueMatch && isNaN(Number(valueMatch[1]))) {
+                    errors.push({
+                        line: i,
+                        column: line.indexOf(valueMatch[0]),
+                        message: 'Width and height should be numeric values, not strings',
+                        severity: vscode.DiagnosticSeverity.Error,
+                        source: 'QML Type Error',
+                        type: 'semantic'
+                    });
+                }
+            }
+
+            // Check for boolean type errors
+            if (line.includes('visible:') || line.includes('enabled:')) {
+                const stringBoolMatch = line.match(/:\s*["'](true|false)["']/);
+                if (stringBoolMatch) {
+                    errors.push({
+                        line: i,
+                        column: line.indexOf(stringBoolMatch[0]),
+                        message: 'Boolean values should not be in quotes',
+                        severity: vscode.DiagnosticSeverity.Error,
+                        source: 'QML Type Error',
+                        type: 'semantic'
+                    });
+                }
+            }
+        }
+
+        return errors;
+    }
+
+    private checkNamingConventions(content: string): QMLError[] {
+        const errors: QMLError[] = [];
+        const lines = content.split('\n');
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            
+            // Check id naming conventions
+            const idMatch = line.match(/id:\s*(\w+)/);
+            if (idMatch) {
+                const id = idMatch[1];
+                if (id[0] === id[0].toUpperCase()) {
+                    errors.push({
+                        line: i,
+                        column: line.indexOf(id),
+                        message: 'QML id should start with lowercase letter (camelCase)',
+                        severity: vscode.DiagnosticSeverity.Warning,
+                        source: 'QML Naming',
+                        type: 'best-practice'
+                    });
+                }
+            }
+
+            // Check property naming
+            const propertyMatch = line.match(/property\s+\w+\s+(\w+)/);
+            if (propertyMatch) {
+                const propName = propertyMatch[1];
+                if (propName[0] === propName[0].toUpperCase()) {
+                    errors.push({
+                        line: i,
+                        column: line.indexOf(propName),
+                        message: 'Property names should start with lowercase letter (camelCase)',
+                        severity: vscode.DiagnosticSeverity.Warning,
+                        source: 'QML Naming',
+                        type: 'best-practice'
+                    });
+                }
+            }
+        }
+
+        return errors;
+    }
+
+    private updateDiagnosticsWithColors(uri: vscode.Uri, errors: QMLError[]) {
         const diagnostics: vscode.Diagnostic[] = errors.map(error => {
             const range = new vscode.Range(
                 new vscode.Position(error.line, error.column),
-                new vscode.Position(error.line, error.column + 10)
+                new vscode.Position(error.line, error.column + 15)
             );
 
             const diagnostic = new vscode.Diagnostic(range, error.message, error.severity);
             diagnostic.source = error.source;
             diagnostic.code = error.type;
 
+            // Add color-coded tags for different error types
+            switch (error.type) {
+                case 'syntax':
+                    diagnostic.tags = [vscode.DiagnosticTag.Unnecessary];
+                    break;
+                case 'performance':
+                    diagnostic.tags = [vscode.DiagnosticTag.Deprecated];
+                    break;
+                case 'accessibility':
+                    // No specific tag, but will be colored differently
+                    break;
+                case 'best-practice':
+                    diagnostic.tags = [vscode.DiagnosticTag.Unnecessary];
+                    break;
+            }
+
             return diagnostic;
         });
 
         this._diagnosticCollection.set(uri, diagnostics);
         
-        // Log to output channel
+        // Enhanced colorful logging
         if (errors.length > 0) {
-            this._outputChannel.appendLine(`\n=== QML Analysis: ${path.basename(uri.fsPath)} ===`);
-            errors.forEach(error => {
-                this._outputChannel.appendLine(`Line ${error.line + 1}: [${error.type}] ${error.message}`);
+            this._outputChannel.appendLine(`\n🎨 === QML Analysis: ${path.basename(uri.fsPath)} ===`);
+            this._outputChannel.appendLine(`📊 Found ${errors.length} issues:`);
+            
+            const errorsByType = errors.reduce((acc, error) => {
+                acc[error.type] = (acc[error.type] || 0) + 1;
+                return acc;
+            }, {} as Record<string, number>);
+
+            Object.entries(errorsByType).forEach(([type, count]) => {
+                const emoji = this.getEmojiForType(type);
+                this._outputChannel.appendLine(`${emoji} ${type}: ${count} issues`);
             });
+
+            this._outputChannel.appendLine('\n📝 Details:');
+            errors.forEach(error => {
+                const emoji = this.getEmojiForType(error.type);
+                const severity = error.severity === vscode.DiagnosticSeverity.Error ? '🔴' :
+                               error.severity === vscode.DiagnosticSeverity.Warning ? '🟡' : '🔵';
+                this._outputChannel.appendLine(`${severity} Line ${error.line + 1}: ${emoji} [${error.type}] ${error.message}`);
+            });
+        } else {
+            this._outputChannel.appendLine(`\n✅ QML file ${path.basename(uri.fsPath)} has no issues!`);
+        }
+    }
+
+    private getEmojiForType(type: string): string {
+        switch (type) {
+            case 'syntax': return '🔧';
+            case 'semantic': return '🧠';
+            case 'import': return '📦';
+            case 'property': return '🏷️';
+            case 'binding': return '🔗';
+            case 'performance': return '⚡';
+            case 'best-practice': return '💡';
+            case 'accessibility': return '♿';
+            default: return '📋';
         }
     }
 

@@ -5,6 +5,7 @@ import { HotReloadManager } from './hotReloadManager';
 import { ErrorReporter } from './errorReporter';
 import { BuildManager } from './buildManager';
 import { QMLErrorDetector } from './qmlErrorDetector';
+import { QMLCodeActionProvider } from './qmlCodeActionProvider';
 
 let projectManager: QTProjectManager;
 let previewProvider: LivePreviewProvider;
@@ -12,6 +13,7 @@ let hotReloadManager: HotReloadManager;
 let errorReporter: ErrorReporter;
 let buildManager: BuildManager;
 let qmlErrorDetector: QMLErrorDetector;
+let qmlCodeActionProvider: QMLCodeActionProvider;
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('QT Live Preview extension is now active!');
@@ -22,6 +24,7 @@ export function activate(context: vscode.ExtensionContext) {
     errorReporter = new ErrorReporter();
     buildManager = new BuildManager();
     qmlErrorDetector = new QMLErrorDetector();
+    qmlCodeActionProvider = new QMLCodeActionProvider();
 
     // Connect components
     previewProvider.setBuildManager(buildManager);
@@ -118,6 +121,33 @@ export function activate(context: vscode.ExtensionContext) {
         debugProjectCmd,
         configureQtCmd,
         stopProjectCmd
+    );
+
+    // Register QML language features
+    const qmlCodeActions = vscode.languages.registerCodeActionsProvider(
+        { scheme: 'file', language: 'qml' },
+        qmlCodeActionProvider
+    );
+    
+    // Enhanced QML commands
+    const analyzeQMLCmd = vscode.commands.registerCommand('qtLivePreview.analyzeQML', async (uri?: vscode.Uri) => {
+        const targetUri = uri || vscode.window.activeTextEditor?.document.uri;
+        if (targetUri && targetUri.fsPath.endsWith('.qml')) {
+            const errors = await qmlErrorDetector.analyzeQMLFile(targetUri);
+            vscode.window.showInformationMessage(`🎨 QML Analysis complete: ${errors.length} issues found`);
+        }
+    });
+
+    const clearQMLErrorsCmd = vscode.commands.registerCommand('qtLivePreview.clearQMLErrors', () => {
+        qmlErrorDetector.clearDiagnostics();
+        vscode.window.showInformationMessage('🧹 QML errors cleared');
+    });
+
+    context.subscriptions.push(
+        // ...existing subscriptions...
+        qmlCodeActions,
+        analyzeQMLCmd,
+        clearQMLErrorsCmd
     );
 
     // Auto-start preview for QML files
