@@ -3,7 +3,7 @@
   "displayName": "QT Live Preview",
   "publisher": "algoscienceacademy",
   "description": "Live preview for Qt6 Widgets and QML applications with hot reload - Full Qt6 module support",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -74,6 +74,39 @@
         "command": "qtLivePreview.clearQMLErrors",
         "title": "Clear QML Errors",
         "category": "QT Live Preview"
+      },
+      {
+        "command": "qtUIDesigner.openDesigner",
+        "title": "Open UI Designer",
+        "category": "QT Live Preview"
+      },
+      {
+        "command": "qtUIDesigner.newDesign",
+        "title": "New UI Design",
+        "category": "QT Live Preview"
+      },
+      {
+        "command": "qtUIDesigner.openInDesigner",
+        "title": "Open in UI Designer",
+        "category": "QT Live Preview"
+      },
+      {
+        "command": "qtUIDesigner.startRealtimeSync",
+        "title": "Start Real-time Sync",
+        "category": "QT Live Preview",
+        "icon": "$(sync)"
+      },
+      {
+        "command": "qtUIDesigner.stopRealtimeSync",
+        "title": "Stop Real-time Sync",
+        "category": "QT Live Preview",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "qtUIDesigner.toggleRealtimeSync",
+        "title": "Toggle Real-time Sync",
+        "category": "QT Live Preview",
+        "icon": "$(sync-ignored)"
       }
     ],
     "menus": {
@@ -92,6 +125,11 @@
           "command": "qtLivePreview.analyzeQML",
           "when": "resourceExtname == .qml",
           "group": "qtpreview"
+        },
+        {
+          "command": "qtUIDesigner.openInDesigner",
+          "when": "resourceExtname == .qml || resourceExtname == .ui",
+          "group": "qtpreview"
         }
       ],
       "editor/context": [
@@ -109,6 +147,11 @@
           "command": "qtLivePreview.analyzeQML",
           "when": "resourceExtname == .qml",
           "group": "qtpreview"
+        },
+        {
+          "command": "qtUIDesigner.openInDesigner",
+          "when": "resourceExtname == .qml || resourceExtname == .ui",
+          "group": "qtpreview"
         }
       ],
       "commandPalette": [
@@ -119,6 +162,26 @@
         {
           "command": "qtLivePreview.createModuleProject",
           "when": "true"
+        },
+        {
+          "command": "qtUIDesigner.openDesigner",
+          "when": "true"
+        },
+        {
+          "command": "qtUIDesigner.newDesign",
+          "when": "true"
+        },
+        {
+          "command": "qtUIDesigner.startRealtimeSync",
+          "when": "resourceExtname == .qml"
+        },
+        {
+          "command": "qtUIDesigner.stopRealtimeSync",
+          "when": "resourceExtname == .qml"
+        },
+        {
+          "command": "qtUIDesigner.toggleRealtimeSync",
+          "when": "resourceExtname == .qml"
         }
       ]
     },
@@ -189,6 +252,12 @@
           "type": "webview",
           "id": "qtLivePreview.preview",
           "name": "Live Preview",
+          "when": "true"
+        },
+        {
+          "type": "webview",
+          "id": "qtUIDesigner.designer",
+          "name": "UI Designer",
           "when": "true"
         }
       ]

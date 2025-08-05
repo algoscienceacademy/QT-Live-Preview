@@ -2,15 +2,32 @@
 
 ![Qt Logo](images/icon.png)
 
-A comprehensive Visual Studio Code extension for Qt6 development with live preview, hot reload, and full module support for both Qt Widgets and QML applications.
+A comprehensive Visual Studio Code extension for Qt6 development with live preview, hot reload, **visual drag-and-drop UI designer with real-time sync**, and full module support for both Qt Widgets and QML applications.
+
+> 🔥 **NEW**: Real-time bidirectional sync between code editor and visual UI designer, just like Qt Designer and Slint extension!
 
 ## 🚀 Features
+
+### ⚡ Real-time Bidirectional Sync
+- **Code ↔ Designer Sync**: Changes in code instantly appear in designer, and vice versa
+- **Live Updates**: Drag widgets in designer → code updates automatically
+- **Property Sync**: Edit properties in designer → see code changes in real-time
+- **Seamless Experience**: Switch between code and visual design without losing context
 
 ### 🔥 Live Preview & Hot Reload
 - **Real-time Preview**: Instantly see changes in your QML and Qt Widgets applications
 - **Hot Reload**: Automatic reloading when files are modified
 - **Error Detection**: Real-time syntax validation and error reporting
 - **Multi-format Support**: Works with `.qml`, `.ui`, and `.cpp` files
+
+### 🎨 Visual UI Designer
+- **Drag & Drop Interface**: Visual design tool similar to Qt Designer and Slint extension
+- **Component Palette**: Rich set of Qt widgets and controls (30+ components)
+- **Property Editor**: Real-time property editing with immediate visual feedback
+- **Template Library**: Pre-built layouts and UI patterns (7 templates)
+- **Code Generation**: Automatic QML code generation from visual designs
+- **UI Export**: Export designs to `.ui` files for Qt Designer compatibility
+- **Undo/Redo**: Full undo/redo support for design operations
 
 ### 🛠️ Project Management
 - **Project Templates**: Pre-built templates for various Qt6 application types
@@ -20,7 +37,7 @@ A comprehensive Visual Studio Code extension for Qt6 development with live previ
 
 ### 📱 Application Types Supported
 - **Qt Widgets Applications**: Traditional desktop GUI applications
-- **QML Applications**: Modern, declarative UI applications
+- **QML Applications**: Modern, declarative UI applications with **visual designer**
 - **Qt Quick Controls**: Mobile-ready applications with Material Design
 - **Multimedia Applications**: Audio/video players and recorders
 - **Network Applications**: Client-server applications
@@ -109,6 +126,14 @@ code .
    - **Qt 3D Application**
 4. Choose Qt6 modules to include
 5. Enter project name and location
+
+### Use the Visual UI Designer
+1. Open Command Palette (Ctrl+Shift+P)
+2. Type `Qt Live Preview: Open UI Designer`
+3. Drag widgets from the palette to the canvas
+4. Edit properties in the properties panel
+5. Save design to generate QML code automatically
+6. Use templates for common layouts
 
 ### Start Live Preview
 1. Open a `.qml` or `.ui` file
@@ -246,6 +271,11 @@ code .
 | `Qt Live Preview: Run QT6 Project` | Run the current project |
 | `Qt Live Preview: Debug QT6 Project` | Debug the current project |
 | `Qt Live Preview: Configure Qt6 Installation` | Configure Qt6 paths |
+| `Qt Live Preview: Open UI Designer` | Open the visual UI designer |
+| `Qt Live Preview: New UI Design` | Create a new UI design |
+| `Qt Live Preview: Open in UI Designer` | Open current file in designer |
+| `Qt Live Preview: Analyze QML File` | Analyze QML syntax and structure |
+| `Qt Live Preview: Clear QML Errors` | Clear error markers from QML files |
 
 ## 🔍 File Support
 
@@ -255,12 +285,54 @@ code .
 - Hot reload
 - Error detection
 - Auto-completion (with Qt6 modules)
+- **Visual UI Designer**: Drag-and-drop interface design
 
 ### UI Files (.ui)
 - Qt Designer form files
 - Preview support
 - Hot reload
 - Form-to-code generation
+- **Open in UI Designer**: Edit visually
+
+## 🎨 Visual UI Designer
+
+The Qt Live Preview extension includes a powerful visual UI designer that works similarly to Qt Designer and the Slint VS Code extension.
+
+### Features
+- **Drag & Drop Interface**: Drag widgets from the palette directly onto the canvas
+- **Rich Widget Palette**: Comprehensive set of Qt widgets organized by category:
+  - **Basic Widgets**: Button, Label, TextField, TextArea
+  - **Layout Containers**: Row, Column, Grid layouts
+  - **Input Controls**: CheckBox, RadioButton, Slider, ProgressBar, ComboBox
+  - **Advanced Widgets**: ListView, TreeView, TabView, ScrollView
+- **Real-time Property Editing**: Edit widget properties with immediate visual feedback
+- **Template Library**: Pre-built UI templates for common patterns:
+  - Form layouts
+  - Navigation drawers
+  - Tab views
+  - Dashboard layouts
+  - Master-detail views
+  - Login forms
+  - Media player interfaces
+- **Code Generation**: Automatically generates clean, modern QML code
+- **Export Options**: Export to QML files or UI files for Qt Designer compatibility
+- **Undo/Redo Support**: Full history management for design operations
+- **Grid Snapping**: Optional grid for precise widget alignment
+- **Live Preview Integration**: Seamlessly integrates with the live preview system
+
+### How to Use
+1. **Open Designer**: Use Command Palette → `Qt Live Preview: Open UI Designer`
+2. **Create Design**: Drag widgets from the palette to the canvas
+3. **Edit Properties**: Select widgets and edit properties in the properties panel
+4. **Use Templates**: Start with pre-built templates for common layouts
+5. **Save & Preview**: Save your design to generate QML code and see live preview
+6. **Export**: Export to UI files for Qt Designer compatibility
+
+### Keyboard Shortcuts
+- **Ctrl+S**: Save design
+- **Ctrl+Z**: Undo
+- **Ctrl+Shift+Z**: Redo
+- **Delete**: Delete selected widget
 
 ### C++ Files (.cpp, .h)
 - Qt6 class templates

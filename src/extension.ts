@@ -6,6 +6,7 @@ import { ErrorReporter } from './errorReporter';
 import { BuildManager } from './buildManager';
 import { QMLErrorDetector } from './qmlErrorDetector';
 import { QMLCodeActionProvider } from './qmlCodeActionProvider';
+import { QtUIDesigner } from './qtUIDesigner';
 
 let projectManager: QTProjectManager;
 let previewProvider: LivePreviewProvider;
@@ -14,6 +15,7 @@ let errorReporter: ErrorReporter;
 let buildManager: BuildManager;
 let qmlErrorDetector: QMLErrorDetector;
 let qmlCodeActionProvider: QMLCodeActionProvider;
+let qtUIDesigner: QtUIDesigner;
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('QT Live Preview extension is now active!');
@@ -25,6 +27,7 @@ export function activate(context: vscode.ExtensionContext) {
     buildManager = new BuildManager();
     qmlErrorDetector = new QMLErrorDetector();
     qmlCodeActionProvider = new QMLCodeActionProvider();
+    qtUIDesigner = new QtUIDesigner(context.extensionUri);
 
     // Connect components
     previewProvider.setBuildManager(buildManager);
@@ -76,6 +79,35 @@ export function activate(context: vscode.ExtensionContext) {
         buildManager.stopApplication();
     });
 
+    // UI Designer commands
+    const openDesignerCmd = vscode.commands.registerCommand('qtUIDesigner.openDesigner', () => {
+        qtUIDesigner.openDesigner();
+    });
+
+    const newDesignCmd = vscode.commands.registerCommand('qtUIDesigner.newDesign', () => {
+        qtUIDesigner.openDesigner();
+    });
+
+    const openInDesignerCmd = vscode.commands.registerCommand('qtUIDesigner.openInDesigner', (uri?: vscode.Uri) => {
+        const targetUri = uri || vscode.window.activeTextEditor?.document.uri;
+        if (targetUri) {
+            qtUIDesigner.openDesigner(targetUri);
+        }
+    });
+
+    // Real-time sync commands
+    const startSyncCmd = vscode.commands.registerCommand('qtUIDesigner.startRealtimeSync', () => {
+        qtUIDesigner.startRealtimeSync();
+    });
+
+    const stopSyncCmd = vscode.commands.registerCommand('qtUIDesigner.stopRealtimeSync', () => {
+        qtUIDesigner.stopRealtimeSync();
+    });
+
+    const toggleSyncCmd = vscode.commands.registerCommand('qtUIDesigner.toggleRealtimeSync', () => {
+        qtUIDesigner.toggleRealtimeSync();
+    });
+
     // Setup webview message handling after provider is registered
     const setupWebviewHandling = () => {
         if (previewProvider._view) {
@@ -104,6 +136,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Register webview provider and setup handling
     const webviewProvider = vscode.window.registerWebviewViewProvider('qtLivePreview.preview', previewProvider);
+    const uiDesignerProvider = vscode.window.registerWebviewViewProvider('qtUIDesigner.designer', qtUIDesigner);
     
     // Setup webview handling after a delay to ensure provider is ready
     setTimeout(setupWebviewHandling, 1000);
@@ -111,6 +144,7 @@ export function activate(context: vscode.ExtensionContext) {
     // Register all commands
     context.subscriptions.push(
         webviewProvider,
+        uiDesignerProvider,
         createProjectCmd,
         createModuleProjectCmd,
         startPreviewCmd,
@@ -120,7 +154,13 @@ export function activate(context: vscode.ExtensionContext) {
         runProjectCmd,
         debugProjectCmd,
         configureQtCmd,
-        stopProjectCmd
+        stopProjectCmd,
+        openDesignerCmd,
+        newDesignCmd,
+        openInDesignerCmd,
+        startSyncCmd,
+        stopSyncCmd,
+        toggleSyncCmd
     );
 
     // Register QML language features
