@@ -493,7 +493,7 @@ npm test
 vsce package
 
 # Install packaged extension locally
-code --install-extension qt-live-preview-1.0.0.vsix
+code --install-extension qt-live-preview-4.0.3.vsix
 ```
 
 ### Project Structure

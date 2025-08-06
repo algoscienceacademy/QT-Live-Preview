@@ -290,6 +290,248 @@ export class ModernQtDesigner {
             height: calc(100vh - 104px);
         }
 
+        /* Center Panel Styles */
+        .center-panel {
+            flex: 1;
+            background: var(--primary-bg);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .center-tabs {
+            background: var(--tertiary-bg);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            padding: 0 16px;
+        }
+
+        .center-tab {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition-fast);
+        }
+
+        .center-tab.active {
+            color: var(--accent-blue);
+            border-bottom-color: var(--accent-blue);
+            background: var(--secondary-bg);
+        }
+
+        .center-tab:hover:not(.active) {
+            color: var(--text-primary);
+            background: var(--quaternary-bg);
+        }
+
+        /* Design Area */
+        .design-area {
+            flex: 1;
+            background: var(--primary-bg);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .design-area.hidden {
+            display: none;
+        }
+
+        /* Preview Area */
+        .preview-area {
+            flex: 1;
+            background: var(--primary-bg);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-area.hidden {
+            display: none;
+        }
+
+        .preview-header {
+            background: var(--tertiary-bg);
+            border-bottom: 1px solid var(--border-light);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .preview-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .preview-btn {
+            background: var(--quaternary-bg);
+            border: 1px solid var(--border-light);
+            color: var(--text-primary);
+            padding: 6px 12px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 11px;
+            transition: var(--transition-fast);
+        }
+
+        .preview-btn:hover {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .preview-content {
+            flex: 1;
+            background: white;
+            margin: 16px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-medium);
+            overflow: hidden;
+        }
+
+        /* Split View */
+        .split-view {
+            flex: 1;
+            display: flex;
+        }
+
+        .split-view.hidden {
+            display: none;
+        }
+
+        .split-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .split-divider {
+            width: 4px;
+            background: var(--border-light);
+            cursor: col-resize;
+            transition: var(--transition-fast);
+        }
+
+        .split-divider:hover {
+            background: var(--accent-blue);
+        }
+
+        .pane-header {
+            background: var(--tertiary-bg);
+            padding: 8px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .pane-content {
+            flex: 1;
+            background: var(--primary-bg);
+            position: relative;
+        }
+
+        .canvas-container-small {
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle, var(--border-light) 1px, transparent 1px);
+            background-size: 20px 20px;
+            overflow: auto;
+        }
+
+        .design-canvas-small {
+            position: relative;
+            margin: 20px;
+            min-width: 400px;
+            min-height: 300px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-medium);
+            overflow: hidden;
+            transform: scale(0.7);
+            transform-origin: top left;
+        }
+
+        .canvas-content-small {
+            min-height: 300px;
+            position: relative;
+            background: white;
+        }
+
+        .preview-content-small {
+            flex: 1;
+            background: white;
+            margin: 16px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-medium);
+            overflow: hidden;
+        }
+
+        /* Code View */
+        .code-view {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .code-view.hidden {
+            display: none;
+        }
+
+        .code-tabs {
+            background: var(--tertiary-bg);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            padding: 0 16px;
+        }
+
+        .code-tab {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: var(--transition-fast);
+        }
+
+        .code-tab.active {
+            color: var(--accent-blue);
+            border-bottom-color: var(--accent-blue);
+        }
+
+        .code-tab:hover:not(.active) {
+            color: var(--text-primary);
+        }
+
+        .code-editor-container {
+            flex: 1;
+            padding: 16px;
+            background: var(--secondary-bg);
+        }
+
+        .code-editor {
+            width: 100%;
+            height: 100%;
+            background: var(--primary-bg);
+            border: 1px solid var(--border-light);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+            padding: 16px;
+            resize: none;
+            outline: none;
+        }
+
         /* Widget Palette */
         .widget-palette {
             width: 280px;
@@ -462,9 +704,9 @@ export class ModernQtDesigner {
             display: none;
         }
 
-        /* Properties Panel */
+        /* Enhanced Properties Panel */
         .properties-panel {
-            width: 300px;
+            width: 320px;
             background: var(--secondary-bg);
             border-left: 1px solid var(--border-light);
             display: flex;
@@ -482,26 +724,87 @@ export class ModernQtDesigner {
             font-size: 14px;
             font-weight: 600;
             color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .properties-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
             margin-bottom: 8px;
+        }
+
+        .properties-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .prop-btn {
+            background: var(--quaternary-bg);
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            padding: 4px 8px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 10px;
+            transition: var(--transition-fast);
+        }
+
+        .prop-btn:hover {
+            background: var(--accent-blue);
+            color: white;
         }
 
         .properties-content {
             flex: 1;
             overflow-y: auto;
-            padding: 16px;
+            padding: 8px;
         }
 
         .property-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
+            background: var(--tertiary-bg);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .property-group-header {
+            padding: 10px 12px;
+            background: var(--quaternary-bg);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition-fast);
+        }
+
+        .property-group-header:hover {
+            background: var(--accent-blue);
+            color: white;
         }
 
         .property-group-title {
             font-size: 12px;
             font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: var(--text-primary);
+        }
+
+        .group-toggle {
+            font-size: 10px;
+            color: var(--text-muted);
+            transition: transform var(--transition-fast);
+        }
+
+        .property-group-header.collapsed .group-toggle {
+            transform: rotate(-90deg);
+        }
+
+        .property-group-content {
+            padding: 12px;
+            background: var(--tertiary-bg);
+        }
+
+        .property-group-content.collapsed {
+            display: none;
         }
 
         .property-item {
@@ -511,10 +814,22 @@ export class ModernQtDesigner {
             margin-bottom: 8px;
         }
 
+        .property-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .property-row .property-item {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
         .property-label {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-secondary);
-            min-width: 80px;
+            min-width: 70px;
+            font-weight: 500;
         }
 
         .property-input {
@@ -526,6 +841,131 @@ export class ModernQtDesigner {
             color: var(--text-primary);
             font-size: 11px;
             margin-left: 8px;
+            transition: var(--transition-fast);
+        }
+
+        .property-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.2);
+        }
+
+        .property-checkbox {
+            width: 16px;
+            height: 16px;
+            margin-left: 8px;
+            accent-color: var(--accent-blue);
+        }
+
+        .property-textarea {
+            flex: 1;
+            padding: 8px;
+            background: var(--quaternary-bg);
+            border: 1px solid var(--border-light);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            font-size: 11px;
+            margin-left: 8px;
+            min-height: 60px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .code-textarea {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            min-height: 80px;
+        }
+
+        .font-selector {
+            display: flex;
+            gap: 4px;
+            flex: 1;
+            margin-left: 8px;
+        }
+
+        .font-family {
+            flex: 2;
+            margin-left: 0;
+        }
+
+        .font-size {
+            flex: 1;
+            margin-left: 0;
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 4px;
+            flex: 1;
+            margin-left: 8px;
+        }
+
+        .color-input {
+            width: 30px;
+            height: 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            margin-left: 0;
+        }
+
+        .color-text {
+            flex: 1;
+            margin-left: 0;
+        }
+
+        .signals-slots-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .add-connection-btn {
+            background: var(--accent-green);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 500;
+            transition: var(--transition-fast);
+        }
+
+        .add-connection-btn:hover {
+            background: var(--accent-blue);
+        }
+
+        .connections-list {
+            background: var(--quaternary-bg);
+            border-radius: var(--border-radius);
+            padding: 8px;
+            min-height: 60px;
+            border: 1px solid var(--border-light);
+        }
+
+        .style-preset-buttons {
+            display: flex;
+            gap: 4px;
+            margin-top: 8px;
+        }
+
+        .preset-btn {
+            background: var(--quaternary-bg);
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: 500;
+            transition: var(--transition-fast);
+            flex: 1;
+        }
+
+        .preset-btn:hover {
+            background: var(--accent-blue);
+            color: white;
         }
 
         /* Status Bar */
@@ -913,87 +1353,299 @@ export class ModernQtDesigner {
                 </div>
             </div>
 
-            <!-- Design Canvas -->
-            <div class="design-area">
-                <div class="tab-container">
-                    <button class="tab active">MainWindow.ui</button>
-                    <button class="tab">Dialog.ui</button>
-                    <button class="tab">+</button>
+            <!-- Center Panel with Design + Live Preview -->
+            <div class="center-panel">
+                <div class="center-tabs">
+                    <button class="center-tab active" onclick="showDesignView()">🎨 Design</button>
+                    <button class="center-tab" onclick="showPreviewView()">▶️ Live Preview</button>
+                    <button class="center-tab" onclick="showSplitView()">🔄 Split View</button>
+                    <button class="center-tab" onclick="showCodeView()">💻 Code</button>
                 </div>
-                <div class="canvas-container">
-                    <div class="design-canvas" id="designCanvas">
-                        <div class="canvas-header">
-                            <span>MainWindow - 800x600</span>
-                            <span>Qt Widget Application</span>
-                        </div>
-                        <div class="canvas-content" id="canvasContent">
-                            <div class="drop-zone" id="dropZone">
-                                <div>🎨 Drop widgets here to start designing</div>
-                                <div style="font-size: 12px; margin-top: 8px; opacity: 0.7;">
-                                    Drag widgets from the palette on the left
+                
+                <!-- Design View -->
+                <div class="design-area" id="designView">
+                    <div class="tab-container">
+                        <button class="tab active">MainWindow.ui</button>
+                        <button class="tab">Dialog.ui</button>
+                        <button class="tab">+</button>
+                    </div>
+                    <div class="canvas-container">
+                        <div class="design-canvas" id="designCanvas">
+                            <div class="canvas-header">
+                                <span>MainWindow - 800x600</span>
+                                <span>Qt Widget Application</span>
+                            </div>
+                            <div class="canvas-content" id="canvasContent">
+                                <div class="drop-zone" id="dropZone">
+                                    <div>🎨 Drop widgets here to start designing</div>
+                                    <div style="font-size: 12px; margin-top: 8px; opacity: 0.7;">
+                                        Drag widgets from the palette on the left
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Live Preview View -->
+                <div class="preview-area hidden" id="previewView">
+                    <div class="preview-header">
+                        <span>🔴 Live Preview</span>
+                        <div class="preview-controls">
+                            <button class="preview-btn" onclick="refreshPreview()">🔄 Refresh</button>
+                            <button class="preview-btn" onclick="toggleAutoRefresh()">⚡ Auto</button>
+                            <button class="preview-btn" onclick="openExternalPreview()">🪟 External</button>
+                        </div>
+                    </div>
+                    <div class="preview-content" id="previewContent">
+                        <iframe id="previewFrame" src="about:blank" style="width: 100%; height: 100%; border: none;"></iframe>
+                    </div>
+                </div>
+
+                <!-- Split View -->
+                <div class="split-view hidden" id="splitView">
+                    <div class="split-pane left-pane">
+                        <div class="pane-header">🎨 Design</div>
+                        <div class="pane-content">
+                            <div class="canvas-container-small">
+                                <div class="design-canvas-small" id="designCanvasSmall">
+                                    <div class="canvas-content-small" id="canvasContentSmall">
+                                        <!-- Design content will be mirrored here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="split-divider"></div>
+                    <div class="split-pane right-pane">
+                        <div class="pane-header">▶️ Live Preview</div>
+                        <div class="pane-content">
+                            <div class="preview-content-small" id="previewContentSmall">
+                                <iframe id="previewFrameSmall" src="about:blank" style="width: 100%; height: 100%; border: none;"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Code View -->
+                <div class="code-view hidden" id="codeView">
+                    <div class="code-tabs">
+                        <button class="code-tab active" onclick="showQMLCode()">QML</button>
+                        <button class="code-tab" onclick="showCppCode()">C++</button>
+                        <button class="code-tab" onclick="showUICode()">UI File</button>
+                    </div>
+                    <div class="code-editor-container">
+                        <textarea id="codeEditor" class="code-editor" readonly></textarea>
+                    </div>
+                </div>
             </div>
 
-            <!-- Properties Panel -->
+            <!-- Enhanced Properties Panel -->
             <div class="properties-panel">
                 <div class="properties-header">
                     <div class="properties-title">Properties</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">No widget selected</div>
+                    <div class="properties-subtitle" id="propertiesSubtitle">No widget selected</div>
+                    <div class="properties-actions">
+                        <button class="prop-btn" onclick="resetProperties()" title="Reset to defaults">🔄</button>
+                        <button class="prop-btn" onclick="copyProperties()" title="Copy properties">📋</button>
+                        <button class="prop-btn" onclick="pasteProperties()" title="Paste properties">📋+</button>
+                    </div>
                 </div>
                 <div class="properties-content" id="propertiesContent">
+                    <!-- Object Properties -->
                     <div class="property-group">
-                        <div class="property-group-title">Object</div>
-                        <div class="property-item">
-                            <span class="property-label">objectName</span>
-                            <input type="text" class="property-input" value="" placeholder="Enter object name">
+                        <div class="property-group-header" onclick="togglePropertyGroup(this)">
+                            <span class="property-group-title">🔧 Object</span>
+                            <span class="group-toggle">▼</span>
                         </div>
-                        <div class="property-item">
-                            <span class="property-label">className</span>
-                            <input type="text" class="property-input" value="" readonly>
+                        <div class="property-group-content">
+                            <div class="property-item">
+                                <span class="property-label">objectName</span>
+                                <input type="text" class="property-input" id="prop-objectName" placeholder="Enter object name">
+                            </div>
+                            <div class="property-item">
+                                <span class="property-label">className</span>
+                                <input type="text" class="property-input" id="prop-className" readonly>
+                            </div>
+                            <div class="property-item">
+                                <span class="property-label">parent</span>
+                                <select class="property-input" id="prop-parent">
+                                    <option value="">None</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     
+                    <!-- Geometry Properties -->
                     <div class="property-group">
-                        <div class="property-group-title">Geometry</div>
-                        <div class="property-item">
-                            <span class="property-label">x</span>
-                            <input type="number" class="property-input" value="0">
+                        <div class="property-group-header" onclick="togglePropertyGroup(this)">
+                            <span class="property-group-title">📐 Geometry</span>
+                            <span class="group-toggle">▼</span>
                         </div>
-                        <div class="property-item">
-                            <span class="property-label">y</span>
-                            <input type="number" class="property-input" value="0">
-                        </div>
-                        <div class="property-item">
-                            <span class="property-label">width</span>
-                            <input type="number" class="property-input" value="100">
-                        </div>
-                        <div class="property-item">
-                            <span class="property-label">height</span>
-                            <input type="number" class="property-input" value="30">
+                        <div class="property-group-content">
+                            <div class="property-row">
+                                <div class="property-item">
+                                    <span class="property-label">x</span>
+                                    <input type="number" class="property-input" id="prop-x" value="0">
+                                </div>
+                                <div class="property-item">
+                                    <span class="property-label">y</span>
+                                    <input type="number" class="property-input" id="prop-y" value="0">
+                                </div>
+                            </div>
+                            <div class="property-row">
+                                <div class="property-item">
+                                    <span class="property-label">width</span>
+                                    <input type="number" class="property-input" id="prop-width" value="100" min="1">
+                                </div>
+                                <div class="property-item">
+                                    <span class="property-label">height</span>
+                                    <input type="number" class="property-input" id="prop-height" value="30" min="1">
+                                </div>
+                            </div>
+                            <div class="property-item">
+                                <span class="property-label">sizePolicy</span>
+                                <select class="property-input" id="prop-sizePolicy">
+                                    <option value="Fixed">Fixed</option>
+                                    <option value="Expanding">Expanding</option>
+                                    <option value="Preferred">Preferred</option>
+                                    <option value="Minimum">Minimum</option>
+                                    <option value="Maximum">Maximum</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
+                    <!-- Appearance Properties -->
                     <div class="property-group">
-                        <div class="property-group-title">Appearance</div>
-                        <div class="property-item">
-                            <span class="property-label">text</span>
-                            <input type="text" class="property-input" value="">
+                        <div class="property-group-header" onclick="togglePropertyGroup(this)">
+                            <span class="property-group-title">🎨 Appearance</span>
+                            <span class="group-toggle">▼</span>
                         </div>
-                        <div class="property-item">
-                            <span class="property-label">font</span>
-                            <input type="text" class="property-input" value="Segoe UI, 9pt">
+                        <div class="property-group-content">
+                            <div class="property-item">
+                                <span class="property-label">text</span>
+                                <input type="text" class="property-input" id="prop-text" placeholder="Enter text">
+                            </div>
+                            <div class="property-item">
+                                <span class="property-label">font</span>
+                                <div class="font-selector">
+                                    <select class="property-input font-family" id="prop-fontFamily">
+                                        <option>Segoe UI</option>
+                                        <option>Arial</option>
+                                        <option>Times New Roman</option>
+                                        <option>Courier New</option>
+                                    </select>
+                                    <input type="number" class="property-input font-size" id="prop-fontSize" value="9" min="6" max="72">
+                                </div>
+                            </div>
+                            <div class="property-row">
+                                <div class="property-item">
+                                    <span class="property-label">bold</span>
+                                    <input type="checkbox" class="property-checkbox" id="prop-bold">
+                                </div>
+                                <div class="property-item">
+                                    <span class="property-label">italic</span>
+                                    <input type="checkbox" class="property-checkbox" id="prop-italic">
+                                </div>
+                            </div>
+                            <div class="property-item">
+                                <span class="property-label">textAlign</span>
+                                <select class="property-input" id="prop-textAlign">
+                                    <option value="AlignLeft">Left</option>
+                                    <option value="AlignCenter">Center</option>
+                                    <option value="AlignRight">Right</option>
+                                    <option value="AlignJustify">Justify</option>
+                                </select>
+                            </div>
+                            <div class="property-item">
+                                <span class="property-label">backgroundColor</span>
+                                <div class="color-picker">
+                                    <input type="color" class="color-input" id="prop-backgroundColor" value="#ffffff">
+                                    <input type="text" class="property-input color-text" id="prop-backgroundColorText" value="#ffffff">
+                                </div>
+                            </div>
+                            <div class="property-item">
+                                <span class="property-label">textColor</span>
+                                <div class="color-picker">
+                                    <input type="color" class="color-input" id="prop-textColor" value="#000000">
+                                    <input type="text" class="property-input color-text" id="prop-textColorText" value="#000000">
+                                </div>
+                            </div>
                         </div>
-                        <div class="property-item">
-                            <span class="property-label">enabled</span>
-                            <input type="checkbox" class="property-input" checked>
+                    </div>
+
+                    <!-- Behavior Properties -->
+                    <div class="property-group">
+                        <div class="property-group-header" onclick="togglePropertyGroup(this)">
+                            <span class="property-group-title">⚙️ Behavior</span>
+                            <span class="group-toggle">▼</span>
                         </div>
-                        <div class="property-item">
-                            <span class="property-label">visible</span>
-                            <input type="checkbox" class="property-input" checked>
+                        <div class="property-group-content">
+                            <div class="property-row">
+                                <div class="property-item">
+                                    <span class="property-label">enabled</span>
+                                    <input type="checkbox" class="property-checkbox" id="prop-enabled" checked>
+                                </div>
+                                <div class="property-item">
+                                    <span class="property-label">visible</span>
+                                    <input type="checkbox" class="property-checkbox" id="prop-visible" checked>
+                                </div>
+                            </div>
+                            <div class="property-item">
+                                <span class="property-label">toolTip</span>
+                                <input type="text" class="property-input" id="prop-toolTip" placeholder="Enter tooltip text">
+                            </div>
+                            <div class="property-item">
+                                <span class="property-label">whatsThis</span>
+                                <textarea class="property-textarea" id="prop-whatsThis" placeholder="Enter help text"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Widget-Specific Properties -->
+                    <div class="property-group" id="specificPropertiesGroup" style="display: none;">
+                        <div class="property-group-header" onclick="togglePropertyGroup(this)">
+                            <span class="property-group-title" id="specificPropertiesTitle">🔍 Specific</span>
+                            <span class="group-toggle">▼</span>
+                        </div>
+                        <div class="property-group-content" id="specificPropertiesContent">
+                            <!-- Widget-specific properties will be added here dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Signals & Slots -->
+                    <div class="property-group">
+                        <div class="property-group-header" onclick="togglePropertyGroup(this)">
+                            <span class="property-group-title">📡 Signals & Slots</span>
+                            <span class="group-toggle">▼</span>
+                        </div>
+                        <div class="property-group-content">
+                            <div class="signals-slots-container">
+                                <button class="add-connection-btn" onclick="addSignalSlotConnection()">+ Add Connection</button>
+                                <div class="connections-list" id="connectionsList">
+                                    <!-- Signal-slot connections will be listed here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Style Sheet -->
+                    <div class="property-group">
+                        <div class="property-group-header" onclick="togglePropertyGroup(this)">
+                            <span class="property-group-title">🎭 Style Sheet</span>
+                            <span class="group-toggle">▼</span>
+                        </div>
+                        <div class="property-group-content">
+                            <div class="property-item">
+                                <span class="property-label">styleSheet</span>
+                                <textarea class="property-textarea code-textarea" id="prop-styleSheet" placeholder="Enter CSS-like styling"></textarea>
+                            </div>
+                            <div class="style-preset-buttons">
+                                <button class="preset-btn" onclick="applyStylePreset('modern')">Modern</button>
+                                <button class="preset-btn" onclick="applyStylePreset('classic')">Classic</button>
+                                <button class="preset-btn" onclick="applyStylePreset('dark')">Dark</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1018,6 +1670,931 @@ export class ModernQtDesigner {
     <script>
         // Modern Qt Designer JavaScript
         const vscode = acquireVsCodeApi();
+        
+        // =============================================================================
+        // ONCLICK FUNCTION HANDLERS FOR TOOLBAR AND MENU ITEMS
+        // =============================================================================
+        
+        // Menu Functions
+        function showFileMenu() { 
+            console.log('File menu clicked'); 
+        }
+        function showEditMenu() { 
+            console.log('Edit menu clicked'); 
+        }
+        function showViewMenu() { 
+            console.log('View menu clicked'); 
+        }
+        function showFormMenu() { 
+            console.log('Form menu clicked'); 
+        }
+        function showToolsMenu() { 
+            console.log('Tools menu clicked'); 
+        }
+        function showTemplatesMenu() { 
+            console.log('Templates menu clicked'); 
+        }
+        function showHelpMenu() { 
+            console.log('Help menu clicked'); 
+        }
+        function showSettings() { 
+            alert('Settings panel coming soon!'); 
+        }
+        function toggleTheme() { 
+            document.body.classList.toggle('light-theme');
+            updateStatusBar('Theme toggled');
+        }
+
+        // File Operations
+        function newDesign() {
+            if (widgets.length > 0 && !confirm('Create new design? Current work will be lost.')) {
+                return;
+            }
+            clearDesign();
+            updateStatusBar('New design created');
+        }
+
+        function openDesign() {
+            // Trigger file open dialog via VS Code
+            vscode.postMessage({ command: 'openDesign' });
+        }
+
+        function saveDesign() {
+            const qmlCode = generateQMLCode();
+            const designData = {
+                qml: qmlCode,
+                widgets: widgets,
+                metadata: {
+                    created: new Date().toISOString(),
+                    designer: 'Modern Qt Designer Studio'
+                }
+            };
+            
+            vscode.postMessage({
+                command: 'saveDesign',
+                data: designData
+            });
+            updateStatusBar('Design saved');
+        }
+
+        function exportDesign() {
+            const qmlCode = generateQMLCode();
+            const cppCode = generateCppCode();
+            
+            vscode.postMessage({
+                command: 'exportDesign',
+                data: { qml: qmlCode, cpp: cppCode },
+                format: 'qml'
+            });
+            updateStatusBar('Design exported');
+        }
+
+        // Edit Operations
+        function undoAction() {
+            undo();
+        }
+
+        function redoAction() {
+            redo();
+        }
+
+        function cutSelection() {
+            if (selectedWidget) {
+                copySelection();
+                deleteSelection();
+            }
+        }
+
+        function copySelection() {
+            if (selectedWidget) {
+                localStorage.setItem('qtDesignerClipboard', JSON.stringify({
+                    type: selectedWidget.dataset.widget,
+                    width: selectedWidget.style.width,
+                    height: selectedWidget.style.height,
+                    text: selectedWidget.textContent
+                }));
+                updateStatusBar('Widget copied to clipboard');
+            }
+        }
+
+        function pasteSelection() {
+            const clipboardData = localStorage.getItem('qtDesignerClipboard');
+            if (clipboardData) {
+                const widgetData = JSON.parse(clipboardData);
+                // Create widget at mouse position or center
+                createWidget(widgetData.type, 100, 100);
+                updateStatusBar('Widget pasted from clipboard');
+            }
+        }
+
+        function deleteSelection() {
+            if (selectedWidget) {
+                deleteWidget(selectedWidget);
+            }
+        }
+
+        // Tool Functions
+        function selectTool() {
+            setActiveTool('select');
+            updateStatusBar('Selection tool active');
+        }
+
+        function signalSlotTool() {
+            toggleSignalSlotMode();
+            updateStatusBar('Signal/Slot connection mode toggled');
+        }
+
+        function layoutTool() {
+            setActiveTool('layout');
+            showLayoutOptions();
+        }
+
+        function alignTool() {
+            setActiveTool('align');
+            showAlignmentOptions();
+        }
+
+        function setActiveTool(toolName) {
+            // Remove active class from all toolbar buttons
+            document.querySelectorAll('.toolbar-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            // Add active class to clicked button (if event is available)
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+        }
+
+        // Template Functions
+        function loadTemplate(templateName) {
+            vscode.postMessage({
+                command: 'loadTemplate',
+                template: templateName
+            });
+            updateStatusBar(\`Loading \${templateName} template...\`);
+        }
+
+        // Preview and Code Generation
+        function previewDesign() {
+            const qmlCode = generateQMLCode();
+            vscode.postMessage({
+                command: 'previewDesign',
+                data: { qml: qmlCode }
+            });
+            updateStatusBar('Starting live preview...');
+        }
+
+        function generateQMLCode() {
+            const widgetElements = document.querySelectorAll('.dropped-widget');
+            if (widgetElements.length === 0) {
+                return \`import QtQuick 2.15
+import QtQuick.Controls 2.15
+
+ApplicationWindow {
+    width: 640
+    height: 480
+    visible: true
+    title: "Untitled Design"
+    
+    // Add your content here
+}\`;
+            }
+
+            let qml = \`import QtQuick 2.15
+import QtQuick.Controls 2.15
+
+ApplicationWindow {
+    width: 640
+    height: 480
+    visible: true
+    title: "Generated Design"
+
+\`;
+
+            widgetElements.forEach(widget => {
+                const widgetType = widget.dataset.widget;
+                const x = parseInt(widget.style.left) || 0;
+                const y = parseInt(widget.style.top) || 0;
+                const width = parseInt(widget.style.width) || 100;
+                const height = parseInt(widget.style.height) || 30;
+                const text = widget.textContent || '';
+
+                // Convert Qt widget to QML equivalent
+                let qmlWidget = '';
+                switch(widgetType) {
+                    case 'QPushButton':
+                        qmlWidget = \`    Button {
+        x: \${x}
+        y: \${y}
+        width: \${width}
+        height: \${height}
+        text: "\${text}"
+    }\`;
+                        break;
+                    case 'QLabel':
+                        qmlWidget = \`    Text {
+        x: \${x}
+        y: \${y}
+        width: \${width}
+        height: \${height}
+        text: "\${text}"
+        font.pixelSize: 12
+    }\`;
+                        break;
+                    case 'QLineEdit':
+                        qmlWidget = \`    TextField {
+        x: \${x}
+        y: \${y}
+        width: \${width}
+        height: \${height}
+        placeholderText: "\${text}"
+    }\`;
+                        break;
+                    case 'QCheckBox':
+                        qmlWidget = \`    CheckBox {
+        x: \${x}
+        y: \${y}
+        width: \${width}
+        height: \${height}
+        text: "\${text}"
+    }\`;
+                        break;
+                    default:
+                        qmlWidget = \`    Rectangle {
+        x: \${x}
+        y: \${y}
+        width: \${width}
+        height: \${height}
+        color: "lightgray"
+        border.color: "gray"
+        
+        Text {
+            anchors.centerIn: parent
+            text: "\${text}"
+        }
+    }\`;
+                }
+                qml += qmlWidget + '\\n\\n';
+            });
+
+            qml += '}';
+            return qml;
+        }
+
+        function generateCppCode() {
+            return \`#include <QApplication>
+#include <QMainWindow>
+#include <QVBoxLayout>
+#include <QWidget>
+#include <QPushButton>
+#include <QLabel>
+#include <QLineEdit>
+
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+
+    QMainWindow window;
+    window.setWindowTitle("Generated Design");
+    window.resize(640, 480);
+
+    QWidget *centralWidget = new QWidget(&window);
+    window.setCentralWidget(centralWidget);
+
+    // Add widgets here
+    // TODO: Generate widget creation code
+
+    window.show();
+    return app.exec();
+}\`;
+        }
+
+        function generateQMLCodeBtn() {
+            vscode.postMessage({
+                command: 'generateCode',
+                type: 'qml',
+                data: { qml: generateQMLCode() }
+            });
+        }
+
+        function generateCppCodeBtn() {
+            vscode.postMessage({
+                command: 'generateCode',
+                type: 'cpp',
+                data: { cpp: generateCppCode() }
+            });
+        }
+
+        // Layout Functions
+        function showLayoutOptions() {
+            alert('Layout options: Horizontal, Vertical, Grid, Form');
+        }
+
+        function showAlignmentOptions() {
+            alert('Alignment options: Left, Center, Right, Top, Middle, Bottom');
+        }
+
+        function layoutHorizontally() {
+            if (widgets.length < 2) return;
+            // Implement horizontal layout
+            updateStatusBar('Widgets laid out horizontally');
+        }
+
+        function layoutVertically() {
+            if (widgets.length < 2) return;
+            // Implement vertical layout
+            updateStatusBar('Widgets laid out vertically');
+        }
+
+        // Toggle category function for widget palette
+        function toggleCategory(header) {
+            const category = header.parentElement;
+            const content = category.querySelector('.widget-grid');
+            const icon = header.querySelector('.category-icon');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'grid';
+                icon.textContent = '▼';
+            } else {
+                content.style.display = 'none';
+                icon.textContent = '▶';
+            }
+        }
+
+        // Status bar update function
+        function updateStatusBar(message = 'Ready') {
+            const statusBar = document.querySelector('.status-bar');
+            if (statusBar) {
+                statusBar.textContent = message;
+            }
+        }
+
+        // =============================================================================
+        // VIEW MANAGEMENT FUNCTIONS
+        // =============================================================================
+        
+        let currentView = 'design';
+        let autoRefreshEnabled = false;
+        let previewTimer = null;
+
+        function showDesignView() {
+            switchView('design');
+        }
+
+        function showPreviewView() {
+            switchView('preview');
+            updatePreview();
+        }
+
+        function showSplitView() {
+            switchView('split');
+            updatePreview();
+            syncDesignToSmallCanvas();
+        }
+
+        function showCodeView() {
+            switchView('code');
+            updateCodeView();
+        }
+
+        function switchView(viewName) {
+            // Hide all views
+            document.getElementById('designView').classList.add('hidden');
+            document.getElementById('previewView').classList.add('hidden');
+            document.getElementById('splitView').classList.add('hidden');
+            document.getElementById('codeView').classList.add('hidden');
+
+            // Remove active class from all tabs
+            document.querySelectorAll('.center-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected view and activate tab
+            currentView = viewName;
+            switch(viewName) {
+                case 'design':
+                    document.getElementById('designView').classList.remove('hidden');
+                    document.querySelectorAll('.center-tab')[0].classList.add('active');
+                    break;
+                case 'preview':
+                    document.getElementById('previewView').classList.remove('hidden');
+                    document.querySelectorAll('.center-tab')[1].classList.add('active');
+                    break;
+                case 'split':
+                    document.getElementById('splitView').classList.remove('hidden');
+                    document.querySelectorAll('.center-tab')[2].classList.add('active');
+                    break;
+                case 'code':
+                    document.getElementById('codeView').classList.remove('hidden');
+                    document.querySelectorAll('.center-tab')[3].classList.add('active');
+                    break;
+            }
+            updateStatusBar(\`Switched to \${viewName} view\`);
+        }
+
+        // =============================================================================
+        // LIVE PREVIEW FUNCTIONS
+        // =============================================================================
+
+        function updatePreview() {
+            const qmlCode = generateQMLCode();
+            const previewFrame = document.getElementById('previewFrame');
+            const previewFrameSmall = document.getElementById('previewFrameSmall');
+            
+            // Create a preview HTML page
+            const previewHTML = \`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        body { 
+                            margin: 0; 
+                            padding: 20px; 
+                            font-family: 'Segoe UI', sans-serif;
+                            background: #f0f0f0;
+                        }
+                        .qml-preview {
+                            background: white;
+                            border-radius: 8px;
+                            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                            padding: 20px;
+                            max-width: 800px;
+                            margin: 0 auto;
+                        }
+                        .widget-preview {
+                            display: inline-block;
+                            position: relative;
+                            margin: 5px;
+                            padding: 8px 12px;
+                            border: 1px solid #ddd;
+                            border-radius: 4px;
+                            background: #f9f9f9;
+                            cursor: pointer;
+                            transition: all 0.2s;
+                        }
+                        .widget-preview:hover {
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                            transform: translateY(-1px);
+                        }
+                        .button-preview {
+                            background: #007acc;
+                            color: white;
+                            border: none;
+                            padding: 8px 16px;
+                            border-radius: 4px;
+                            cursor: pointer;
+                        }
+                        .text-preview {
+                            background: transparent;
+                            border: none;
+                            color: #333;
+                        }
+                        .input-preview {
+                            background: white;
+                            border: 1px solid #ccc;
+                            padding: 6px 8px;
+                            border-radius: 3px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="qml-preview">
+                        <h3>Live Preview</h3>
+                        <div id="preview-content">
+                            \${generatePreviewHTML()}
+                        </div>
+                    </div>
+                </body>
+                </html>
+            \`;
+
+            if (previewFrame) {
+                previewFrame.srcdoc = previewHTML;
+            }
+            if (previewFrameSmall) {
+                previewFrameSmall.srcdoc = previewHTML;
+            }
+        }
+
+        function generatePreviewHTML() {
+            const widgets = document.querySelectorAll('.dropped-widget');
+            let html = '';
+            
+            widgets.forEach(widget => {
+                const widgetType = widget.dataset.widget;
+                const text = widget.textContent || 'Widget';
+                const x = parseInt(widget.style.left) || 0;
+                const y = parseInt(widget.style.top) || 0;
+                
+                let previewElement = '';
+                switch(widgetType) {
+                    case 'QPushButton':
+                        previewElement = \`<button class="widget-preview button-preview" style="position: absolute; left: \${x}px; top: \${y}px;">\${text}</button>\`;
+                        break;
+                    case 'QLabel':
+                        previewElement = \`<div class="widget-preview text-preview" style="position: absolute; left: \${x}px; top: \${y}px;">\${text}</div>\`;
+                        break;
+                    case 'QLineEdit':
+                        previewElement = \`<input class="widget-preview input-preview" style="position: absolute; left: \${x}px; top: \${y}px;" placeholder="\${text}" />\`;
+                        break;
+                    case 'QCheckBox':
+                        previewElement = \`<label class="widget-preview" style="position: absolute; left: \${x}px; top: \${y}px;"><input type="checkbox" /> \${text}</label>\`;
+                        break;
+                    default:
+                        previewElement = \`<div class="widget-preview" style="position: absolute; left: \${x}px; top: \${y}px;">\${text}</div>\`;
+                }
+                html += previewElement;
+            });
+            
+            return html || '<p>No widgets to preview. Drag widgets to the design canvas.</p>';
+        }
+
+        function refreshPreview() {
+            updatePreview();
+            updateStatusBar('Preview refreshed');
+        }
+
+        function toggleAutoRefresh() {
+            autoRefreshEnabled = !autoRefreshEnabled;
+            const btn = event.target;
+            
+            if (autoRefreshEnabled) {
+                btn.textContent = '⚡ Auto (ON)';
+                btn.style.background = 'var(--accent-green)';
+                startAutoRefresh();
+            } else {
+                btn.textContent = '⚡ Auto (OFF)';
+                btn.style.background = 'var(--quaternary-bg)';
+                stopAutoRefresh();
+            }
+            updateStatusBar(\`Auto-refresh \${autoRefreshEnabled ? 'enabled' : 'disabled'}\`);
+        }
+
+        function startAutoRefresh() {
+            if (previewTimer) clearInterval(previewTimer);
+            previewTimer = setInterval(() => {
+                if (currentView === 'preview' || currentView === 'split') {
+                    updatePreview();
+                }
+            }, 1000); // Refresh every second
+        }
+
+        function stopAutoRefresh() {
+            if (previewTimer) {
+                clearInterval(previewTimer);
+                previewTimer = null;
+            }
+        }
+
+        function openExternalPreview() {
+            const qmlCode = generateQMLCode();
+            vscode.postMessage({
+                command: 'openExternalPreview',
+                data: { qml: qmlCode }
+            });
+            updateStatusBar('Opening external preview...');
+        }
+
+        function syncDesignToSmallCanvas() {
+            const mainCanvas = document.getElementById('canvasContent');
+            const smallCanvas = document.getElementById('canvasContentSmall');
+            if (mainCanvas && smallCanvas) {
+                smallCanvas.innerHTML = mainCanvas.innerHTML;
+            }
+        }
+
+        // =============================================================================
+        // CODE VIEW FUNCTIONS
+        // =============================================================================
+
+        function updateCodeView() {
+            showQMLCode(); // Default to QML
+        }
+
+        function showQMLCode() {
+            const qmlCode = generateQMLCode();
+            const codeEditor = document.getElementById('codeEditor');
+            codeEditor.value = qmlCode;
+            
+            // Update active tab
+            document.querySelectorAll('.code-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.code-tab')[0].classList.add('active');
+        }
+
+        function showCppCode() {
+            const cppCode = generateCppCode();
+            const codeEditor = document.getElementById('codeEditor');
+            codeEditor.value = cppCode;
+            
+            // Update active tab
+            document.querySelectorAll('.code-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.code-tab')[1].classList.add('active');
+        }
+
+        function showUICode() {
+            const uiCode = generateUICode();
+            const codeEditor = document.getElementById('codeEditor');
+            codeEditor.value = uiCode;
+            
+            // Update active tab
+            document.querySelectorAll('.code-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.code-tab')[2].classList.add('active');
+        }
+
+        function generateUICode() {
+            const widgets = document.querySelectorAll('.dropped-widget');
+            let ui = \`<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Generated Design</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+\`;
+
+            widgets.forEach(widget => {
+                const widgetType = widget.dataset.widget;
+                const id = widget.dataset.id;
+                const x = parseInt(widget.style.left) || 0;
+                const y = parseInt(widget.style.top) || 0;
+                const width = parseInt(widget.style.width) || 100;
+                const height = parseInt(widget.style.height) || 30;
+                const text = widget.textContent || '';
+
+                ui += \`   <widget class="\${widgetType}" name="\${id}">
+    <property name="geometry">
+     <rect>
+      <x>\${x}</x>
+      <y>\${y}</y>
+      <width>\${width}</width>
+      <height>\${height}</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>\${text}</string>
+    </property>
+   </widget>
+\`;
+            });
+
+            ui += \`  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>\`;
+            return ui;
+        }
+
+        // =============================================================================
+        // ENHANCED PROPERTIES PANEL FUNCTIONS
+        // =============================================================================
+
+        function togglePropertyGroup(header) {
+            const content = header.nextElementSibling;
+            const toggle = header.querySelector('.group-toggle');
+            
+            if (content.classList.contains('collapsed')) {
+                content.classList.remove('collapsed');
+                header.classList.remove('collapsed');
+                toggle.textContent = '▼';
+            } else {
+                content.classList.add('collapsed');
+                header.classList.add('collapsed');
+                toggle.textContent = '▶';
+            }
+        }
+
+        function updatePropertiesPanel(widget) {
+            const subtitle = document.getElementById('propertiesSubtitle');
+            const specificGroup = document.getElementById('specificPropertiesGroup');
+            
+            if (!widget) {
+                subtitle.textContent = 'No widget selected';
+                specificGroup.style.display = 'none';
+                clearPropertyInputs();
+                return;
+            }
+
+            const widgetType = widget.dataset.widget;
+            subtitle.textContent = \`\${widgetType} selected\`;
+            
+            // Update basic properties
+            document.getElementById('prop-objectName').value = widget.dataset.id || '';
+            document.getElementById('prop-className').value = widgetType;
+            document.getElementById('prop-x').value = parseInt(widget.style.left) || 0;
+            document.getElementById('prop-y').value = parseInt(widget.style.top) || 0;
+            document.getElementById('prop-width').value = parseInt(widget.style.width) || 100;
+            document.getElementById('prop-height').value = parseInt(widget.style.height) || 30;
+            document.getElementById('prop-text').value = widget.textContent || '';
+            
+            // Update widget-specific properties
+            updateSpecificProperties(widget, widgetType);
+            
+            // Show specific properties group
+            specificGroup.style.display = 'block';
+        }
+
+        function updateSpecificProperties(widget, widgetType) {
+            const specificContent = document.getElementById('specificPropertiesContent');
+            const specificTitle = document.getElementById('specificPropertiesTitle');
+            
+            specificTitle.textContent = \`🔍 \${widgetType} Properties\`;
+            specificContent.innerHTML = '';
+            
+            // Add widget-specific properties based on type
+            switch(widgetType) {
+                case 'QPushButton':
+                    addSpecificProperty('checkable', 'checkbox', false);
+                    addSpecificProperty('checked', 'checkbox', false);
+                    addSpecificProperty('autoDefault', 'checkbox', false);
+                    addSpecificProperty('default', 'checkbox', false);
+                    break;
+                case 'QLineEdit':
+                    addSpecificProperty('placeholderText', 'text', 'Enter text...');
+                    addSpecificProperty('maxLength', 'number', 32767);
+                    addSpecificProperty('readOnly', 'checkbox', false);
+                    addSpecificProperty('echoMode', 'select', ['Normal', 'NoEcho', 'Password', 'PasswordEchoOnEdit']);
+                    break;
+                case 'QLabel':
+                    addSpecificProperty('wordWrap', 'checkbox', false);
+                    addSpecificProperty('scaledContents', 'checkbox', false);
+                    addSpecificProperty('indent', 'number', -1);
+                    addSpecificProperty('margin', 'number', 0);
+                    break;
+                case 'QProgressBar':
+                    addSpecificProperty('minimum', 'number', 0);
+                    addSpecificProperty('maximum', 'number', 100);
+                    addSpecificProperty('value', 'number', 0);
+                    addSpecificProperty('textVisible', 'checkbox', true);
+                    addSpecificProperty('orientation', 'select', ['Horizontal', 'Vertical']);
+                    break;
+            }
+        }
+
+        function addSpecificProperty(name, type, defaultValue) {
+            const specificContent = document.getElementById('specificPropertiesContent');
+            const propertyDiv = document.createElement('div');
+            propertyDiv.className = 'property-item';
+            
+            let inputElement = '';
+            switch(type) {
+                case 'checkbox':
+                    inputElement = \`<input type="checkbox" class="property-checkbox" id="specific-\${name}" \${defaultValue ? 'checked' : ''}>\`;
+                    break;
+                case 'number':
+                    inputElement = \`<input type="number" class="property-input" id="specific-\${name}" value="\${defaultValue}">\`;
+                    break;
+                case 'select':
+                    const options = Array.isArray(defaultValue) ? defaultValue : [defaultValue];
+                    const optionElements = options.map(opt => \`<option value="\${opt}">\${opt}</option>\`).join('');
+                    inputElement = \`<select class="property-input" id="specific-\${name}">\${optionElements}</select>\`;
+                    break;
+                default:
+                    inputElement = \`<input type="text" class="property-input" id="specific-\${name}" value="\${defaultValue}">\`;
+            }
+            
+            propertyDiv.innerHTML = \`
+                <span class="property-label">\${name}</span>
+                \${inputElement}
+            \`;
+            
+            specificContent.appendChild(propertyDiv);
+        }
+
+        function clearPropertyInputs() {
+            document.querySelectorAll('.property-input, .property-checkbox').forEach(input => {
+                if (input.type === 'checkbox') {
+                    input.checked = false;
+                } else if (input.type === 'number') {
+                    input.value = 0;
+                } else {
+                    input.value = '';
+                }
+            });
+        }
+
+        function resetProperties() {
+            if (!selectedWidget) return;
+            
+            const widgetType = selectedWidget.dataset.widget;
+            const template = widgetTemplates[widgetType];
+            
+            if (template) {
+                // Reset to template defaults
+                selectedWidget.textContent = template.defaultText;
+                selectedWidget.style.width = template.defaultSize.width + 'px';
+                selectedWidget.style.height = template.defaultSize.height + 'px';
+                
+                updatePropertiesPanel(selectedWidget);
+                updateStatusBar('Properties reset to defaults');
+            }
+        }
+
+        function copyProperties() {
+            if (!selectedWidget) return;
+            
+            const properties = extractWidgetProperties(selectedWidget);
+            localStorage.setItem('qtDesignerProperties', JSON.stringify(properties));
+            updateStatusBar('Properties copied');
+        }
+
+        function pasteProperties() {
+            if (!selectedWidget) return;
+            
+            const propertiesData = localStorage.getItem('qtDesignerProperties');
+            if (propertiesData) {
+                const properties = JSON.parse(propertiesData);
+                applyWidgetProperties(selectedWidget, properties);
+                updatePropertiesPanel(selectedWidget);
+                updateStatusBar('Properties pasted');
+            }
+        }
+
+        function extractWidgetProperties(widget) {
+            return {
+                text: widget.textContent,
+                width: widget.style.width,
+                height: widget.style.height,
+                backgroundColor: widget.style.backgroundColor,
+                color: widget.style.color,
+                fontFamily: widget.style.fontFamily,
+                fontSize: widget.style.fontSize,
+                fontWeight: widget.style.fontWeight,
+                fontStyle: widget.style.fontStyle
+            };
+        }
+
+        function applyWidgetProperties(widget, properties) {
+            if (properties.text !== undefined) widget.textContent = properties.text;
+            if (properties.width) widget.style.width = properties.width;
+            if (properties.height) widget.style.height = properties.height;
+            if (properties.backgroundColor) widget.style.backgroundColor = properties.backgroundColor;
+            if (properties.color) widget.style.color = properties.color;
+            if (properties.fontFamily) widget.style.fontFamily = properties.fontFamily;
+            if (properties.fontSize) widget.style.fontSize = properties.fontSize;
+            if (properties.fontWeight) widget.style.fontWeight = properties.fontWeight;
+            if (properties.fontStyle) widget.style.fontStyle = properties.fontStyle;
+        }
+
+        function addSignalSlotConnection() {
+            const connectionsList = document.getElementById('connectionsList');
+            const connectionDiv = document.createElement('div');
+            connectionDiv.className = 'connection-item';
+            connectionDiv.innerHTML = \`
+                <select class="signal-select">
+                    <option>clicked()</option>
+                    <option>textChanged()</option>
+                    <option>valueChanged()</option>
+                </select>
+                <span>→</span>
+                <select class="slot-select">
+                    <option>close()</option>
+                    <option>show()</option>
+                    <option>hide()</option>
+                </select>
+                <button onclick="removeConnection(this)">×</button>
+            \`;
+            connectionsList.appendChild(connectionDiv);
+        }
+
+        function removeConnection(btn) {
+            btn.parentElement.remove();
+        }
+
+        function applyStylePreset(preset) {
+            if (!selectedWidget) return;
+            
+            switch(preset) {
+                case 'modern':
+                    selectedWidget.style.borderRadius = '8px';
+                    selectedWidget.style.backgroundColor = '#007acc';
+                    selectedWidget.style.color = 'white';
+                    selectedWidget.style.border = 'none';
+                    break;
+                case 'classic':
+                    selectedWidget.style.borderRadius = '0px';
+                    selectedWidget.style.backgroundColor = '#f0f0f0';
+                    selectedWidget.style.color = 'black';
+                    selectedWidget.style.border = '1px solid #ccc';
+                    break;
+                case 'dark':
+                    selectedWidget.style.borderRadius = '4px';
+                    selectedWidget.style.backgroundColor = '#2d2d30';
+                    selectedWidget.style.color = '#d4d4d4';
+                    selectedWidget.style.border = '1px solid #464647';
+                    break;
+            }
+            updateStatusBar(\`Applied \${preset} style preset\`);
+        }
         
         // Global state
         let selectedWidget = null;
@@ -1357,35 +2934,171 @@ export class ModernQtDesigner {
 
         // Setup property panel events
         function setupPropertyPanel() {
-            const propertyInputs = document.querySelectorAll('.property-input');
+            // Basic property inputs
+            const propertyInputs = [
+                { id: 'prop-objectName', property: 'id' },
+                { id: 'prop-x', property: 'left', unit: 'px' },
+                { id: 'prop-y', property: 'top', unit: 'px' },
+                { id: 'prop-width', property: 'width', unit: 'px' },
+                { id: 'prop-height', property: 'height', unit: 'px' },
+                { id: 'prop-text', property: 'textContent' }
+            ];
             
-            propertyInputs.forEach((input, index) => {
-                input.addEventListener('change', () => {
-                    if (!selectedWidget) return;
-                    
-                    switch(index) {
-                        case 0: // objectName
-                            selectedWidget.dataset.id = input.value;
-                            break;
-                        case 2: // x
-                            selectedWidget.style.left = input.value + 'px';
-                            break;
-                        case 3: // y
-                            selectedWidget.style.top = input.value + 'px';
-                            break;
-                        case 4: // width
-                            selectedWidget.style.width = input.value + 'px';
-                            break;
-                        case 5: // height
-                            selectedWidget.style.height = input.value + 'px';
-                            break;
-                        case 6: // text
-                            selectedWidget.textContent = input.value;
-                            break;
-                    }
-                    saveState();
-                });
+            propertyInputs.forEach(({ id, property, unit }) => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('change', () => {
+                        if (!selectedWidget) return;
+                        
+                        const value = input.value;
+                        if (property === 'id') {
+                            selectedWidget.dataset.id = value;
+                        } else if (property === 'textContent') {
+                            selectedWidget.textContent = value;
+                        } else {
+                            selectedWidget.style[property] = value + (unit || '');
+                        }
+                        saveState();
+                        
+                        // Update preview if auto-refresh is enabled
+                        if (autoRefreshEnabled && (currentView === 'preview' || currentView === 'split')) {
+                            updatePreview();
+                        }
+                    });
+                }
             });
+
+            // Appearance properties
+            setupAppearanceProperties();
+            
+            // Behavior properties
+            setupBehaviorProperties();
+            
+            // Color pickers
+            setupColorPickers();
+            
+            // Font properties
+            setupFontProperties();
+        }
+
+        function setupAppearanceProperties() {
+            const backgroundColorInput = document.getElementById('prop-backgroundColor');
+            const textColorInput = document.getElementById('prop-textColor');
+            
+            if (backgroundColorInput) {
+                backgroundColorInput.addEventListener('change', () => {
+                    if (selectedWidget) {
+                        selectedWidget.style.backgroundColor = backgroundColorInput.value;
+                        document.getElementById('prop-backgroundColorText').value = backgroundColorInput.value;
+                        saveState();
+                    }
+                });
+            }
+            
+            if (textColorInput) {
+                textColorInput.addEventListener('change', () => {
+                    if (selectedWidget) {
+                        selectedWidget.style.color = textColorInput.value;
+                        document.getElementById('prop-textColorText').value = textColorInput.value;
+                        saveState();
+                    }
+                });
+            }
+        }
+
+        function setupBehaviorProperties() {
+            const enabledInput = document.getElementById('prop-enabled');
+            const visibleInput = document.getElementById('prop-visible');
+            
+            if (enabledInput) {
+                enabledInput.addEventListener('change', () => {
+                    if (selectedWidget) {
+                        selectedWidget.style.opacity = enabledInput.checked ? '1' : '0.5';
+                        selectedWidget.style.pointerEvents = enabledInput.checked ? 'auto' : 'none';
+                        saveState();
+                    }
+                });
+            }
+            
+            if (visibleInput) {
+                visibleInput.addEventListener('change', () => {
+                    if (selectedWidget) {
+                        selectedWidget.style.display = visibleInput.checked ? 'flex' : 'none';
+                        saveState();
+                    }
+                });
+            }
+        }
+
+        function setupColorPickers() {
+            // Sync color picker with text input
+            const colorInputs = [
+                { color: 'prop-backgroundColor', text: 'prop-backgroundColorText' },
+                { color: 'prop-textColor', text: 'prop-textColorText' }
+            ];
+            
+            colorInputs.forEach(({ color, text }) => {
+                const colorInput = document.getElementById(color);
+                const textInput = document.getElementById(text);
+                
+                if (colorInput && textInput) {
+                    textInput.addEventListener('change', () => {
+                        if (isValidColor(textInput.value)) {
+                            colorInput.value = textInput.value;
+                            colorInput.dispatchEvent(new Event('change'));
+                        }
+                    });
+                }
+            });
+        }
+
+        function setupFontProperties() {
+            const fontFamilyInput = document.getElementById('prop-fontFamily');
+            const fontSizeInput = document.getElementById('prop-fontSize');
+            const boldInput = document.getElementById('prop-bold');
+            const italicInput = document.getElementById('prop-italic');
+            
+            if (fontFamilyInput) {
+                fontFamilyInput.addEventListener('change', () => {
+                    if (selectedWidget) {
+                        selectedWidget.style.fontFamily = fontFamilyInput.value;
+                        saveState();
+                    }
+                });
+            }
+            
+            if (fontSizeInput) {
+                fontSizeInput.addEventListener('change', () => {
+                    if (selectedWidget) {
+                        selectedWidget.style.fontSize = fontSizeInput.value + 'pt';
+                        saveState();
+                    }
+                });
+            }
+            
+            if (boldInput) {
+                boldInput.addEventListener('change', () => {
+                    if (selectedWidget) {
+                        selectedWidget.style.fontWeight = boldInput.checked ? 'bold' : 'normal';
+                        saveState();
+                    }
+                });
+            }
+            
+            if (italicInput) {
+                italicInput.addEventListener('change', () => {
+                    if (selectedWidget) {
+                        selectedWidget.style.fontStyle = italicInput.checked ? 'italic' : 'normal';
+                        saveState();
+                    }
+                });
+            }
+        }
+
+        function isValidColor(color) {
+            const s = new Option().style;
+            s.color = color;
+            return s.color !== '';
         }
 
         // Setup keyboard shortcuts
