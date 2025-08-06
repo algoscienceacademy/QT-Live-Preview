@@ -9,6 +9,7 @@ import { QMLCodeActionProvider } from './qmlCodeActionProvider';
 import { QtUIDesigner } from './qtUIDesigner';
 import { CombinedDesignerPreview } from './combinedDesignerPreview';
 import { FullQtDesigner } from './fullQtDesigner';
+import { ModernQtDesigner } from './modernQtDesigner';
 import { QMLSyncEngine } from './qmlSyncEngine';
 
 let projectManager: QTProjectManager;
@@ -21,6 +22,7 @@ let qmlCodeActionProvider: QMLCodeActionProvider;
 let qtUIDesigner: QtUIDesigner;
 let combinedDesigner: CombinedDesignerPreview;
 let fullQtDesigner: FullQtDesigner;
+let modernQtDesigner: ModernQtDesigner;
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('QT Live Preview extension is now active!');
@@ -41,6 +43,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Initialize full Qt Designer
     fullQtDesigner = new FullQtDesigner(context.extensionUri);
+    modernQtDesigner = new ModernQtDesigner(context.extensionUri);
 
     // Register commands
     const createProjectCmd = vscode.commands.registerCommand('qtLivePreview.createProject', () => {
@@ -124,7 +127,11 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Full Qt Designer commands (Professional Designer + Live Preview + Properties)
     const openFullDesignerCmd = vscode.commands.registerCommand('qtFullDesigner.openDesigner', () => {
-        fullQtDesigner.openFullDesigner(false);
+        modernQtDesigner.openDesigner();
+    });
+
+    const openModernDesignerCmd = vscode.commands.registerCommand('qtModernDesigner.openDesigner', () => {
+        modernQtDesigner.openDesigner();
     });
 
     const openExternalDesignerCmd = vscode.commands.registerCommand('qtFullDesigner.openExternalDesigner', () => {
@@ -201,6 +208,7 @@ export function activate(context: vscode.ExtensionContext) {
         newCombinedDesignCmd,
         openInCombinedDesignerCmd,
         openFullDesignerCmd,
+        openModernDesignerCmd,
         openExternalDesignerCmd
     );
 
