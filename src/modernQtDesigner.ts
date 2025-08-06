@@ -8,10 +8,24 @@ export class ModernQtDesigner {
         this._extensionUri = extensionUri;
     }
 
-    public async openDesigner() {
+    public async openDesigner(uri?: vscode.Uri) {
+        // If a URI is provided, load the file content
+        let initialContent = '';
+        let fileName = 'untitled.qml';
+        
+        if (uri) {
+            try {
+                const document = await vscode.workspace.openTextDocument(uri);
+                initialContent = document.getText();
+                fileName = uri.fsPath.split(/[/\\]/).pop() || 'untitled.qml';
+            } catch (error) {
+                vscode.window.showErrorMessage(`Failed to load file: ${error}`);
+            }
+        }
+
         this._designerPanel = vscode.window.createWebviewPanel(
             'modernQtDesigner',
-            '🎨 Professional Qt Designer Studio',
+            `🎨 Modern Qt Designer Studio - ${fileName}`,
             vscode.ViewColumn.Active,
             {
                 enableScripts: true,
@@ -20,7 +34,7 @@ export class ModernQtDesigner {
             }
         );
 
-        this._designerPanel.webview.html = this.getWebviewContent();
+        this._designerPanel.webview.html = this.getWebviewContent(initialContent, fileName);
 
         // Handle messages from the webview
         this._designerPanel.webview.onDidReceiveMessage(
@@ -35,13 +49,22 @@ export class ModernQtDesigner {
                     case 'openExternal':
                         this.openExternalDesigner();
                         break;
+                    case 'previewDesign':
+                        this.previewDesign(message.data);
+                        break;
+                    case 'exportDesign':
+                        this.exportDesign(message.data, message.format);
+                        break;
+                    case 'loadTemplate':
+                        this.loadTemplate(message.template);
+                        break;
                 }
             },
             undefined
         );
     }
 
-    private getWebviewContent(): string {
+    private getWebviewContent(initialContent: string = '', fileName: string = 'untitled.qml'): string {
         return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -162,39 +185,87 @@ export class ModernQtDesigner {
 
         .toolbar-section {
             display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 0 8px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            padding: 0 12px;
             border-right: 1px solid var(--border-light);
+            position: relative;
         }
 
         .toolbar-section:last-child {
             border-right: none;
         }
 
+        .section-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .toolbar-buttons {
+            display: flex;
+            gap: 4px;
+        }
+
         .toolbar-btn {
             background: var(--tertiary-bg);
             border: 1px solid var(--border-light);
             color: var(--text-primary);
-            padding: 8px 12px;
+            padding: 6px 10px;
             border-radius: var(--border-radius);
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 500;
             transition: var(--transition-fast);
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             min-width: auto;
+            white-space: nowrap;
         }
 
         .toolbar-btn:hover {
             background: var(--quaternary-bg);
             border-color: var(--border-medium);
             color: var(--text-primary);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-light);
         }
 
         .toolbar-btn.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: white;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .toolbar-btn.primary {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: white;
+        }
+
+        .toolbar-btn.success {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+            color: white;
+        }
+
+        .toolbar-btn.info {
+            background: #17a2b8;
+            border-color: #17a2b8;
+            color: white;
+        }
+
+        .toolbar-btn.danger {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+            color: white;
+        }
             background: var(--accent-blue);
             border-color: var(--accent-blue);
             color: white;
@@ -628,53 +699,66 @@ export class ModernQtDesigner {
             <div class="menu-left">
                 <div class="app-title">
                     <span>🎨</span>
-                    Professional Qt Designer Studio
+                    Modern Qt Designer Studio
                 </div>
                 <div class="menu-items">
-                    <button class="menu-item">File</button>
-                    <button class="menu-item">Edit</button>
-                    <button class="menu-item">View</button>
-                    <button class="menu-item">Form</button>
-                    <button class="menu-item">Tools</button>
-                    <button class="menu-item">Help</button>
+                    <button class="menu-item" onclick="showFileMenu()">File</button>
+                    <button class="menu-item" onclick="showEditMenu()">Edit</button>
+                    <button class="menu-item" onclick="showViewMenu()">View</button>
+                    <button class="menu-item" onclick="showFormMenu()">Form</button>
+                    <button class="menu-item" onclick="showToolsMenu()">Tools</button>
+                    <button class="menu-item" onclick="showTemplatesMenu()">Templates</button>
+                    <button class="menu-item" onclick="showHelpMenu()">Help</button>
                 </div>
             </div>
             <div class="menu-right">
-                <button class="menu-item" id="settingsBtn">⚙️ Settings</button>
+                <button class="menu-item" onclick="showSettings()">⚙️ Settings</button>
+                <button class="menu-item" onclick="toggleTheme()">🌙 Theme</button>
             </div>
         </div>
 
-        <!-- Toolbar -->
+        <!-- Enhanced Toolbar -->
         <div class="toolbar">
             <div class="toolbar-section">
-                <button class="toolbar-btn primary" id="newBtn">📄 New</button>
-                <button class="toolbar-btn" id="openBtn">📁 Open</button>
-                <button class="toolbar-btn" id="saveBtn">💾 Save</button>
-                <button class="toolbar-btn" id="saveAsBtn">💾 Save As</button>
+                <span class="section-label">File</span>
+                <button class="toolbar-btn primary" onclick="newDesign()" title="Create New Design">📄 New</button>
+                <button class="toolbar-btn" onclick="openDesign()" title="Open Existing Design">📁 Open</button>
+                <button class="toolbar-btn" onclick="saveDesign()" title="Save Current Design">💾 Save</button>
+                <button class="toolbar-btn" onclick="saveAsDesign()" title="Save As...">💾 Save As</button>
+                <button class="toolbar-btn" onclick="exportDesign()" title="Export Design">📤 Export</button>
             </div>
             
             <div class="toolbar-section">
-                <button class="toolbar-btn" id="undoBtn">↶ Undo</button>
-                <button class="toolbar-btn" id="redoBtn">↷ Redo</button>
+                <span class="section-label">Edit</span>
+                <button class="toolbar-btn" onclick="undoAction()" title="Undo (Ctrl+Z)">↶ Undo</button>
+                <button class="toolbar-btn" onclick="redoAction()" title="Redo (Ctrl+Y)">↷ Redo</button>
+                <button class="toolbar-btn" onclick="cutSelection()" title="Cut (Ctrl+X)">✂️ Cut</button>
+                <button class="toolbar-btn" onclick="copySelection()" title="Copy (Ctrl+C)">📋 Copy</button>
+                <button class="toolbar-btn" onclick="pasteSelection()" title="Paste (Ctrl+V)">📋 Paste</button>
+                <button class="toolbar-btn danger" onclick="deleteSelection()" title="Delete (Del)">🗑️ Delete</button>
             </div>
             
             <div class="toolbar-section">
-                <button class="toolbar-btn" id="cutBtn">✂️ Cut</button>
-                <button class="toolbar-btn" id="copyBtn">📋 Copy</button>
-                <button class="toolbar-btn" id="pasteBtn">📋 Paste</button>
-                <button class="toolbar-btn" id="deleteBtn">🗑️ Delete</button>
+                <span class="section-label">Tools</span>
+                <button class="toolbar-btn active" onclick="selectTool()" title="Selection Tool">🔍 Select</button>
+                <button class="toolbar-btn" onclick="signalSlotTool()" title="Signal/Slot Connections">� Signals</button>
+                <button class="toolbar-btn" onclick="layoutTool()" title="Layout Tools">� Layout</button>
+                <button class="toolbar-btn" onclick="alignTool()" title="Alignment Tools">� Align</button>
             </div>
             
             <div class="toolbar-section">
-                <button class="toolbar-btn" id="selectBtn" class="active">🔍 Select</button>
-                <button class="toolbar-btn" id="signalSlotBtn">🔗 Signals/Slots</button>
-                <button class="toolbar-btn" id="layoutBtn">📐 Layout</button>
+                <span class="section-label">Templates</span>
+                <button class="toolbar-btn" onclick="loadTemplate('window')" title="Load Window Template">🪟 Window</button>
+                <button class="toolbar-btn" onclick="loadTemplate('dialog')" title="Load Dialog Template">� Dialog</button>
+                <button class="toolbar-btn" onclick="loadTemplate('form')" title="Load Form Template">� Form</button>
             </div>
             
             <div class="toolbar-section">
-                <button class="toolbar-btn success" id="previewBtn">▶️ Preview</button>
-                <button class="toolbar-btn" id="codeBtn">💻 Generate Code</button>
-                <button class="toolbar-btn" id="externalBtn">🪟 External Qt Designer</button>
+                <span class="section-label">Preview & Code</span>
+                <button class="toolbar-btn success" onclick="previewDesign()" title="Live Preview (F5)">▶️ Preview</button>
+                <button class="toolbar-btn info" onclick="generateQMLCode()" title="Generate QML Code">� QML</button>
+                <button class="toolbar-btn info" onclick="generateCppCode()" title="Generate C++ Code">🟨 C++</button>
+                <button class="toolbar-btn" onclick="openExternalDesigner()" title="Open in External Qt Designer">🪟 External</button>
             </div>
         </div>
 
@@ -1438,34 +1522,27 @@ export class ModernQtDesigner {
 
         // Generate C++ code
         function generateCppCode(widgets) {
-            let cpp = \`#include <QtWidgets>
-
-class MainWindow : public QMainWindow
-{
-    Q_OBJECT
-
-public:
-    MainWindow(QWidget *parent = nullptr);
-
-private:
-\`;
+            let cpp = '#include <QtWidgets>\\n\\n' +
+                     'class MainWindow : public QMainWindow\\n' +
+                     '{\\n' +
+                     '    Q_OBJECT\\n\\n' +
+                     'public:\\n' +
+                     '    MainWindow(QWidget *parent = nullptr);\\n\\n' +
+                     'private:\\n';
 
             // Declare members
             widgets.forEach(widget => {
                 const type = widget.dataset.widget;
                 const id = widget.dataset.id;
-                cpp += \`    \${type} *\${id};\\n\`;
+                cpp += '    ' + type + ' *' + id + ';\\n';
             });
 
-            cpp += \`};
-
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-{
-    auto centralWidget = new QWidget(this);
-    setCentralWidget(centralWidget);
-
-\`;
+            cpp += '};\\n\\n' +
+                  'MainWindow::MainWindow(QWidget *parent)\\n' +
+                  '    : QMainWindow(parent)\\n' +
+                  '{\\n' +
+                  '    auto centralWidget = new QWidget(this);\\n' +
+                  '    setCentralWidget(centralWidget);\\n\\n';
 
             // Create widgets
             widgets.forEach(widget => {
@@ -1477,11 +1554,9 @@ MainWindow::MainWindow(QWidget *parent)
                 const height = parseInt(widget.style.height);
                 const text = widget.textContent;
 
-                cpp += \`    \${id} = new \${type}(centralWidget);
-    \${id}->setGeometry(\${x}, \${y}, \${width}, \${height});
-    \${id}->setText("\${text}");
-
-\`;
+                cpp += '    ' + id + ' = new ' + type + '(centralWidget);\\n' +
+                      '    ' + id + '->setGeometry(' + x + ', ' + y + ', ' + width + ', ' + height + ');\\n' +
+                      '    ' + id + '->setText("' + text + '");\\n\\n';
             });
 
             cpp += '}';
@@ -1591,21 +1666,191 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     private async saveDesign(designData: any) {
-        // Implementation for saving design
-        vscode.window.showInformationMessage('Design saved successfully!');
+        try {
+            const options: vscode.SaveDialogOptions = {
+                saveLabel: 'Save QML Design',
+                filters: {
+                    'QML Files': ['qml'],
+                    'All Files': ['*']
+                }
+            };
+
+            const uri = await vscode.window.showSaveDialog(options);
+            if (uri) {
+                await vscode.workspace.fs.writeFile(uri, Buffer.from(designData.qml, 'utf8'));
+                vscode.window.showInformationMessage(`Design saved successfully to ${uri.fsPath}`);
+            }
+        } catch (error) {
+            vscode.window.showErrorMessage(`Failed to save design: ${error}`);
+        }
     }
 
     private async generateCode(type: string, data: any) {
-        // Implementation for code generation
-        const document = await vscode.workspace.openTextDocument({
-            content: type === 'qml' ? data.qml : data.cpp,
-            language: type === 'qml' ? 'qml' : 'cpp'
-        });
-        await vscode.window.showTextDocument(document);
+        try {
+            const content = type === 'qml' ? data.qml : data.cpp;
+            const language = type === 'qml' ? 'qml' : 'cpp';
+            
+            const document = await vscode.workspace.openTextDocument({
+                content: content,
+                language: language
+            });
+            await vscode.window.showTextDocument(document, vscode.ViewColumn.Beside);
+            vscode.window.showInformationMessage(`${type.toUpperCase()} code generated successfully!`);
+        } catch (error) {
+            vscode.window.showErrorMessage(`Failed to generate code: ${error}`);
+        }
     }
 
     private async openExternalDesigner() {
-        // Implementation for opening external Qt Designer
-        vscode.commands.executeCommand('qtFullDesigner.openExternalDesigner');
+        vscode.window.showInformationMessage('External Qt Designer functionality will be available in future updates');
+    }
+
+    private async previewDesign(designData: any) {
+        try {
+            // Create a temporary QML file and trigger live preview
+            const tempContent = designData.qml || 'import QtQuick 2.15\nItem {\n    width: 640\n    height: 480\n}';
+            const document = await vscode.workspace.openTextDocument({
+                content: tempContent,
+                language: 'qml'
+            });
+            
+            // Trigger the live preview command
+            vscode.commands.executeCommand('qtLivePreview.startPreview', document.uri);
+            vscode.window.showInformationMessage('Design preview started!');
+        } catch (error) {
+            vscode.window.showErrorMessage(`Failed to preview design: ${error}`);
+        }
+    }
+
+    private async exportDesign(designData: any, format: string) {
+        try {
+            const options: vscode.SaveDialogOptions = {
+                saveLabel: `Export as ${format.toUpperCase()}`,
+                filters: {}
+            };
+
+            switch (format) {
+                case 'qml':
+                    options.filters = { 'QML Files': ['qml'] };
+                    break;
+                case 'cpp':
+                    options.filters = { 'C++ Files': ['cpp', 'h'] };
+                    break;
+                case 'ui':
+                    options.filters = { 'UI Files': ['ui'] };
+                    break;
+                default:
+                    options.filters = { 'All Files': ['*'] };
+            }
+
+            const uri = await vscode.window.showSaveDialog(options);
+            if (uri) {
+                const content = designData[format] || designData.qml || '';
+                await vscode.workspace.fs.writeFile(uri, Buffer.from(content, 'utf8'));
+                vscode.window.showInformationMessage(`Design exported successfully as ${format.toUpperCase()}`);
+            }
+        } catch (error) {
+            vscode.window.showErrorMessage(`Failed to export design: ${error}`);
+        }
+    }
+
+    private async loadTemplate(template: string) {
+        try {
+            // Define common Qt templates
+            const templates: { [key: string]: string } = {
+                'window': `import QtQuick 2.15
+import QtQuick.Window 2.15
+
+Window {
+    width: 640
+    height: 480
+    visible: true
+    title: qsTr("Hello World")
+
+    Rectangle {
+        anchors.fill: parent
+        color: "#f0f0f0"
+        
+        Text {
+            anchors.centerIn: parent
+            text: qsTr("Hello World")
+            font.pointSize: 24
+        }
+    }
+}`,
+                'dialog': `import QtQuick 2.15
+import QtQuick.Controls 2.15
+
+Dialog {
+    width: 400
+    height: 300
+    modal: true
+    title: qsTr("Dialog")
+
+    Column {
+        anchors.fill: parent
+        anchors.margins: 20
+        spacing: 10
+
+        Text {
+            text: qsTr("This is a dialog")
+        }
+
+        Button {
+            text: qsTr("OK")
+            onClicked: accept()
+        }
+    }
+}`,
+                'form': `import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
+
+ApplicationWindow {
+    width: 500
+    height: 400
+    visible: true
+    title: qsTr("Form Example")
+
+    ColumnLayout {
+        anchors.fill: parent
+        anchors.margins: 20
+
+        GroupBox {
+            title: qsTr("User Information")
+            Layout.fillWidth: true
+
+            GridLayout {
+                columns: 2
+                anchors.fill: parent
+
+                Text { text: qsTr("Name:") }
+                TextField { placeholderText: qsTr("Enter name") }
+
+                Text { text: qsTr("Email:") }
+                TextField { placeholderText: qsTr("Enter email") }
+            }
+        }
+
+        RowLayout {
+            Button { text: qsTr("Submit") }
+            Button { text: qsTr("Cancel") }
+        }
+    }
+}`
+            };
+
+            const templateContent = templates[template] || templates['window'];
+            
+            // Send the template back to the webview
+            if (this._designerPanel) {
+                this._designerPanel.webview.postMessage({
+                    command: 'templateLoaded',
+                    content: templateContent
+                });
+            }
+        } catch (error) {
+            vscode.window.showErrorMessage(`Failed to load template: ${error}`);
+        }
     }
 }

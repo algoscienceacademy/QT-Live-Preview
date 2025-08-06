@@ -91,22 +91,22 @@
         "category": "QT Live Preview"
       },
       {
-        "command": "qtFullDesigner.openDesigner",
-        "title": "🎨 Open Full Qt Designer",
-        "category": "QT Live Preview",
-        "icon": "$(split-horizontal)"
-      },
-      {
         "command": "qtModernDesigner.openDesigner", 
-        "title": "✨ Open Modern Qt Designer Studio",
+        "title": "🎨 Open Modern Qt Designer Studio",
         "category": "QT Live Preview",
         "icon": "$(sparkle)"
       },
       {
-        "command": "qtFullDesigner.openExternalDesigner",
-        "title": "🪟 Open External Qt Designer",
+        "command": "qtModernDesigner.newDesign",
+        "title": "✨ New Modern Qt Design",
         "category": "QT Live Preview",
-        "icon": "$(window)"
+        "icon": "$(add)"
+      },
+      {
+        "command": "qtModernDesigner.openInDesigner",
+        "title": "🎯 Open in Modern Designer",
+        "category": "QT Live Preview",
+        "icon": "$(edit)"
       },
       {
         "command": "qtUIDesigner.startRealtimeSync",
@@ -166,6 +166,11 @@
           "command": "qtUIDesigner.openInDesigner",
           "when": "resourceExtname == .qml || resourceExtname == .ui",
           "group": "qtpreview"
+        },
+        {
+          "command": "qtModernDesigner.openInDesigner",
+          "when": "resourceExtname == .qml || resourceExtname == .ui",
+          "group": "qtpreview"
         }
       ],
       "editor/context": [
@@ -186,6 +191,11 @@
         },
         {
           "command": "qtUIDesigner.openInDesigner",
+          "when": "resourceExtname == .qml || resourceExtname == .ui",
+          "group": "qtpreview"
+        },
+        {
+          "command": "qtModernDesigner.openInDesigner",
           "when": "resourceExtname == .qml || resourceExtname == .ui",
           "group": "qtpreview"
         }

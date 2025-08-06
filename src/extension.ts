@@ -8,7 +8,6 @@ import { QMLErrorDetector } from './qmlErrorDetector';
 import { QMLCodeActionProvider } from './qmlCodeActionProvider';
 import { QtUIDesigner } from './qtUIDesigner';
 import { CombinedDesignerPreview } from './combinedDesignerPreview';
-import { FullQtDesigner } from './fullQtDesigner';
 import { ModernQtDesigner } from './modernQtDesigner';
 import { QMLSyncEngine } from './qmlSyncEngine';
 
@@ -21,7 +20,6 @@ let qmlErrorDetector: QMLErrorDetector;
 let qmlCodeActionProvider: QMLCodeActionProvider;
 let qtUIDesigner: QtUIDesigner;
 let combinedDesigner: CombinedDesignerPreview;
-let fullQtDesigner: FullQtDesigner;
 let modernQtDesigner: ModernQtDesigner;
 
 export function activate(context: vscode.ExtensionContext) {
@@ -41,8 +39,7 @@ export function activate(context: vscode.ExtensionContext) {
     previewProvider.setBuildManager(buildManager);
     hotReloadManager.setBuildManager(buildManager);
 
-    // Initialize full Qt Designer
-    fullQtDesigner = new FullQtDesigner(context.extensionUri);
+    // Initialize modern Qt Designer
     modernQtDesigner = new ModernQtDesigner(context.extensionUri);
 
     // Register commands
@@ -125,17 +122,20 @@ export function activate(context: vscode.ExtensionContext) {
         combinedDesigner.openDesigner();
     });
 
-    // Full Qt Designer commands (Professional Designer + Live Preview + Properties)
-    const openFullDesignerCmd = vscode.commands.registerCommand('qtFullDesigner.openDesigner', () => {
-        modernQtDesigner.openDesigner();
-    });
-
+    // Modern Qt Designer commands
     const openModernDesignerCmd = vscode.commands.registerCommand('qtModernDesigner.openDesigner', () => {
         modernQtDesigner.openDesigner();
     });
 
-    const openExternalDesignerCmd = vscode.commands.registerCommand('qtFullDesigner.openExternalDesigner', () => {
-        fullQtDesigner.openFullDesigner(true);
+    const newModernDesignCmd = vscode.commands.registerCommand('qtModernDesigner.newDesign', () => {
+        modernQtDesigner.openDesigner();
+    });
+
+    const openInModernDesignerCmd = vscode.commands.registerCommand('qtModernDesigner.openInDesigner', (uri?: vscode.Uri) => {
+        const targetUri = uri || vscode.window.activeTextEditor?.document.uri;
+        if (targetUri) {
+            modernQtDesigner.openDesigner(targetUri);
+        }
     });
 
     const newCombinedDesignCmd = vscode.commands.registerCommand('qtCombinedDesigner.newDesign', () => {
@@ -207,9 +207,9 @@ export function activate(context: vscode.ExtensionContext) {
         openCombinedDesignerCmd,
         newCombinedDesignCmd,
         openInCombinedDesignerCmd,
-        openFullDesignerCmd,
         openModernDesignerCmd,
-        openExternalDesignerCmd
+        newModernDesignCmd,
+        openInModernDesignerCmd
     );
 
     // Register QML language features
