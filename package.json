@@ -3,7 +3,7 @@
   "displayName": "QT Live Preview",
   "publisher": "algoscienceacademy",
   "description": "Live preview for Qt6 Widgets and QML applications with hot reload - Full Qt6 module support",
-  "version": "3.0.2",
+  "version": "4.0.0",
   "engines": {
     "vscode": "^1.74.0"
   },

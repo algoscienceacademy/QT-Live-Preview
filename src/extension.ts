@@ -9,6 +9,7 @@ import { QMLCodeActionProvider } from './qmlCodeActionProvider';
 import { QtUIDesigner } from './qtUIDesigner';
 import { CombinedDesignerPreview } from './combinedDesignerPreview';
 import { FullQtDesigner } from './fullQtDesigner';
+import { QMLSyncEngine } from './qmlSyncEngine';
 
 let projectManager: QTProjectManager;
 let previewProvider: LivePreviewProvider;

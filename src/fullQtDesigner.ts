@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
+import { QMLSyncEngine } from './qmlSyncEngine';
 
 export class FullQtDesigner {
     private _designerPanel?: vscode.WebviewPanel;
@@ -10,9 +11,12 @@ export class FullQtDesigner {
     private _currentQmlContent: string = '';
     private _selectedWidget?: any;
     private _isExternalMode: boolean = false;
+    private _syncEngine: QMLSyncEngine;
+    private _widgets: any[] = [];
 
     constructor(extensionUri: vscode.Uri) {
         this._extensionUri = extensionUri;
+        this._syncEngine = new QMLSyncEngine();
     }
 
     public async openFullDesigner(external: boolean = false) {
@@ -59,11 +63,16 @@ export class FullQtDesigner {
         this._previewPanel.webview.html = this.getPreviewHtml();
         this._propertyPanel.webview.html = this.getPropertyPanelHtml();
 
+        // Register panels with sync engine
+        this._syncEngine.registerDesignerPanel(this._designerPanel);
+        this._syncEngine.registerPreviewPanel(this._previewPanel);
+        this._syncEngine.registerPropertyPanel(this._propertyPanel);
+
         // Set up message handlers
         this.setupMessageHandlers();
 
-        // Initialize with empty QML application
-        this.initializeDefaultApplication();
+        // Initialize with current active document or empty application
+        this.initializeWithActiveDocument();
     }
 
     private getDesignerHtml(): string {
@@ -72,61 +81,190 @@ export class FullQtDesigner {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Qt Designer</title>
+            <title>Qt Professional Design Studio</title>
             <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
+                :root {
+                    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                    --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+                    --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+                    --dark-gradient: linear-gradient(135deg, #434343 0%, #000000 100%);
+                    
+                    --primary-color: #667eea;
+                    --secondary-color: #764ba2;
+                    --accent-color: #f093fb;
+                    --success-color: #4facfe;
+                    --warning-color: #43e97b;
+                    --danger-color: #f5576c;
+                    
+                    --bg-dark: #1e1e1e;
+                    --bg-medium: #2d2d30;
+                    --bg-light: #3e3e42;
+                    --bg-lighter: #4e4e52;
+                    --text-primary: #ffffff;
+                    --text-secondary: #cccccc;
+                    --text-muted: #999999;
+                    
+                    --border-radius: 8px;
+                    --shadow-light: 0 2px 8px rgba(0,0,0,0.1);
+                    --shadow-medium: 0 4px 16px rgba(0,0,0,0.15);
+                    --shadow-heavy: 0 8px 32px rgba(0,0,0,0.2);
+                }
+
+                * { 
+                    margin: 0; 
+                    padding: 0; 
+                    box-sizing: border-box; 
+                }
+
                 body { 
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                    background: #f5f5f5;
+                    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, sans-serif;
+                    background: var(--bg-dark);
+                    color: var(--text-primary);
                     height: 100vh;
                     display: flex;
                     flex-direction: column;
+                    overflow: hidden;
+                    font-size: 13px;
+                    line-height: 1.4;
                 }
                 
                 .toolbar {
-                    background: #2d2d30;
+                    background: var(--primary-gradient);
                     color: white;
-                    padding: 8px;
+                    padding: 12px 16px;
                     display: flex;
-                    gap: 8px;
-                    border-bottom: 1px solid #3e3e42;
+                    align-items: center;
+                    justify-content: space-between;
+                    box-shadow: var(--shadow-medium);
+                    position: relative;
+                    z-index: 1000;
+                }
+                
+                .toolbar::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: var(--primary-gradient);
+                    opacity: 0.9;
+                    z-index: -1;
+                }
+                
+                .toolbar-left {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                }
+                
+                .toolbar-title {
+                    font-size: 16px;
+                    font-weight: 600;
+                    letter-spacing: 0.5px;
+                    margin-right: 24px;
+                    display: flex;
+                    align-items: center;
+                }
+                
+                .toolbar-title::before {
+                    content: '🎨';
+                    margin-right: 8px;
+                    font-size: 18px;
+                    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+                }
+                
+                .toolbar-group {
+                    display: flex;
+                    gap: 4px;
+                    padding: 0 8px;
+                    border-left: 1px solid rgba(255,255,255,0.2);
+                    border-right: 1px solid rgba(255,255,255,0.2);
+                }
+                
+                .toolbar-group:first-child {
+                    border-left: none;
+                }
+                
+                .toolbar-group:last-child {
+                    border-right: none;
                 }
                 
                 .toolbar button {
-                    background: #3c3c3c;
+                    background: rgba(255,255,255,0.15);
                     color: white;
-                    border: 1px solid #555;
-                    padding: 6px 12px;
-                    border-radius: 3px;
+                    border: 1px solid rgba(255,255,255,0.2);
+                    padding: 8px 12px;
+                    border-radius: var(--border-radius);
                     cursor: pointer;
                     font-size: 12px;
+                    font-weight: 500;
+                    transition: all 0.3s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
                 }
                 
-                .toolbar button:hover { background: #505050; }
-                .toolbar button.active { background: #007acc; }
+                .toolbar button:hover { 
+                    background: rgba(255,255,255,0.25);
+                    border-color: rgba(255,255,255,0.4);
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                }
+                
+                .toolbar button.active { 
+                    background: var(--success-gradient);
+                    border-color: rgba(255,255,255,0.5);
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                }
                 
                 .main-container {
                     display: flex;
                     flex: 1;
-                    height: calc(100vh - 50px);
+                    height: calc(100vh - 60px);
+                    background: var(--bg-dark);
                 }
                 
                 .widget-palette {
-                    width: 200px;
-                    background: #f8f8f8;
-                    border-right: 1px solid #ddd;
+                    width: 280px;
+                    background: var(--bg-medium);
+                    border-right: 1px solid var(--bg-lighter);
                     overflow-y: auto;
-                    padding: 8px;
+                    padding: 16px;
+                    box-shadow: var(--shadow-light);
+                }
+                
+                .palette-header {
+                    margin-bottom: 20px;
+                    padding-bottom: 12px;
+                    border-bottom: 2px solid var(--primary-color);
+                }
+                
+                .palette-title {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: var(--text-primary);
+                    margin-bottom: 8px;
+                    display: flex;
+                    align-items: center;
+                }
+                
+                .palette-subtitle {
+                    font-size: 11px;
+                    color: var(--text-muted);
+                    font-weight: 400;
                 }
                 
                 .design-area {
                     flex: 1;
-                    background: white;
+                    background: var(--bg-light);
                     position: relative;
                     overflow: auto;
-                    margin: 8px;
-                    border: 1px solid #ddd;
-                    border-radius: 4px;
+                    margin: 16px;
+                    border-radius: var(--border-radius);
+                    box-shadow: var(--shadow-medium);
+                    border: 1px solid var(--bg-lighter);
                 }
                 
                 .canvas {
@@ -134,39 +272,430 @@ export class FullQtDesigner {
                     min-height: 600px;
                     position: relative;
                     background: 
-                        linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px),
-                        linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px);
+                        radial-gradient(circle at 1px 1px, rgba(255,255,255,0.1) 1px, transparent 0);
                     background-size: 20px 20px;
+                    background-color: var(--bg-light);
                 }
                 
                 .widget-group {
-                    margin-bottom: 16px;
+                    margin-bottom: 24px;
                 }
                 
                 .widget-group h3 {
-                    font-size: 12px;
-                    font-weight: bold;
-                    color: #333;
-                    margin-bottom: 8px;
-                    padding: 4px 0;
-                    border-bottom: 1px solid #ddd;
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: var(--text-primary);
+                    margin-bottom: 12px;
+                    padding: 8px 12px;
+                    background: var(--primary-gradient);
+                    border-radius: var(--border-radius);
+                    display: flex;
+                    align-items: center;
+                    box-shadow: var(--shadow-light);
+                    position: relative;
+                    overflow: hidden;
+                }
+                
+                .widget-group h3::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+                    animation: shimmer 3s infinite;
+                }
+                
+                @keyframes shimmer {
+                    0% { transform: translateX(-100%); }
+                    100% { transform: translateX(100%); }
                 }
                 
                 .widget-item {
                     display: flex;
                     align-items: center;
-                    padding: 6px 8px;
-                    margin: 2px 0;
-                    background: white;
-                    border: 1px solid #ddd;
-                    border-radius: 3px;
+                    padding: 10px 12px;
+                    margin: 4px 0;
+                    background: var(--bg-light);
+                    border: 1px solid var(--bg-lighter);
+                    border-radius: var(--border-radius);
                     cursor: grab;
-                    transition: all 0.2s;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                     font-size: 12px;
+                    font-weight: 500;
+                    color: var(--text-secondary);
+                    position: relative;
+                    overflow: hidden;
+                }
+                
+                .widget-item::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: -100%;
+                    width: 100%;
+                    height: 100%;
+                    background: var(--success-gradient);
+                    transition: left 0.3s ease;
+                    opacity: 0.1;
                 }
                 
                 .widget-item:hover {
-                    background: #e3f2fd;
+                    background: var(--bg-lighter);
+                    border-color: var(--primary-color);
+                    transform: translateX(4px) translateY(-2px);
+                    box-shadow: var(--shadow-medium);
+                    color: var(--text-primary);
+                }
+                
+                .widget-item:hover::before {
+                    left: 0;
+                }
+                
+                .widget-item:active { 
+                    cursor: grabbing;
+                    transform: translateX(2px) translateY(-1px);
+                }
+                
+                .widget-icon {
+                    width: 18px;
+                    height: 18px;
+                    margin-right: 10px;
+                    background-size: contain;
+                    background-repeat: no-repeat;
+                    background-position: center;
+                    filter: brightness(1.2);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 14px;
+                }
+                
+                .dropped-widget {
+                    position: absolute;
+                    border: 2px solid var(--primary-color);
+                    background: linear-gradient(45deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+                    cursor: move;
+                    min-width: 100px;
+                    min-height: 40px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 12px;
+                    font-weight: 500;
+                    border-radius: var(--border-radius);
+                    color: var(--text-primary);
+                    box-shadow: var(--shadow-light);
+                    backdrop-filter: blur(10px);
+                }
+                
+                .dropped-widget.selected {
+                    border-color: var(--accent-color);
+                    background: linear-gradient(45deg, rgba(240, 147, 251, 0.2), rgba(245, 87, 108, 0.2));
+                    box-shadow: var(--shadow-medium);
+                }
+                
+                .dropped-widget:hover {
+                    border-color: var(--success-color);
+                    transform: scale(1.02);
+                }
+                
+                .resize-handle {
+                    position: absolute;
+                    width: 10px;
+                    height: 10px;
+                    background: var(--primary-gradient);
+                    border: 2px solid white;
+                    border-radius: 50%;
+                    box-shadow: var(--shadow-light);
+                    transition: all 0.2s ease;
+                }
+                
+                .resize-handle:hover {
+                    transform: scale(1.2);
+                    box-shadow: var(--shadow-medium);
+                }
+                
+                .resize-handle.nw { top: -5px; left: -5px; cursor: nw-resize; }
+                .resize-handle.ne { top: -5px; right: -5px; cursor: ne-resize; }
+                .resize-handle.sw { bottom: -5px; left: -5px; cursor: sw-resize; }
+                .resize-handle.se { bottom: -5px; right: -5px; cursor: se-resize; }
+                .resize-handle.n { top: -5px; left: calc(50% - 5px); cursor: n-resize; }
+                .resize-handle.s { bottom: -5px; left: calc(50% - 5px); cursor: s-resize; }
+                .resize-handle.w { top: calc(50% - 5px); left: -5px; cursor: w-resize; }
+                .resize-handle.e { top: calc(50% - 5px); right: -5px; cursor: e-resize; }
+                
+                .status-bar {
+                    background: var(--bg-medium);
+                    color: var(--text-secondary);
+                    padding: 8px 16px;
+                    border-top: 1px solid var(--bg-lighter);
+                    font-size: 11px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                
+                .status-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                }
+                
+                .status-indicator {
+                    width: 8px;
+                    height: 8px;
+                    border-radius: 50%;
+                    background: var(--success-color);
+                    animation: pulse 2s infinite;
+                }
+                
+                @keyframes pulse {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.5; }
+                }
+                
+                .form-container {
+                    margin: 20px;
+                    min-height: 400px;
+                    background: var(--bg-light);
+                    border: 2px dashed var(--bg-lighter);
+                    border-radius: var(--border-radius);
+                    position: relative;
+                    transition: all 0.3s ease;
+                }
+                
+                .form-container:hover {
+                    border-color: var(--primary-color);
+                    background: var(--bg-lighter);
+                }
+                
+                .form-container.has-content {
+                    border: 1px solid var(--bg-lighter);
+                    border-style: solid;
+                }
+                
+                .drop-zone-text {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    color: var(--text-muted);
+                    font-size: 14px;
+                    pointer-events: none;
+                    text-align: center;
+                    font-weight: 500;
+                }
+                
+                .sync-indicator {
+                    position: fixed;
+                    top: 70px;
+                    right: 20px;
+                    background: var(--success-gradient);
+                    color: white;
+                    padding: 8px 12px;
+                    border-radius: var(--border-radius);
+                    font-size: 11px;
+                    font-weight: 500;
+                    box-shadow: var(--shadow-medium);
+                    z-index: 1000;
+                    transition: all 0.3s ease;
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+                
+                .sync-indicator.show {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            </style>
+        </head>
+        <body>
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <div class="toolbar-title">Professional Design Studio</div>
+                    
+                    <div class="toolbar-group">
+                        <button id="newBtn">📄 New</button>
+                        <button id="openBtn">📁 Open</button>
+                        <button id="saveBtn">💾 Save</button>
+                    </div>
+                    
+                    <div class="toolbar-group">
+                        <button id="undoBtn">↶ Undo</button>
+                        <button id="redoBtn">↷ Redo</button>
+                    </div>
+                    
+                    <div class="toolbar-group">
+                        <button id="previewBtn">▶️ Preview</button>
+                        <button id="codeBtn">📝 Code</button>
+                        <button id="syncBtn" class="active">🔄 Sync</button>
+                    </div>
+                </div>
+                
+                <div class="toolbar-group">
+                    <button id="externalBtn">🪟 External</button>
+                    <button id="settingsBtn">⚙️ Settings</button>
+                </div>
+            </div>
+            
+            <div class="main-container">
+                <div class="widget-palette">
+                    <div class="palette-header">
+                        <div class="palette-title">🎨 Widget Palette</div>
+                        <div class="palette-subtitle">Drag widgets to design area</div>
+                    </div>
+                    
+                    <div class="widget-group">
+                        <h3>📱 Display Widgets</h3>
+                        <div class="widget-item" draggable="true" data-widget="Label">
+                            <div class="widget-icon">🏷️</div>
+                            Label
+                        </div>
+                        <div class="widget-item" draggable="true" data-widget="Text">
+                            <div class="widget-icon">📝</div>
+                            Text
+                        </div>
+                        <div class="widget-item" draggable="true" data-widget="Image">
+                            <div class="widget-icon">🖼️</div>
+                            Image
+                        </div>
+                        <div class="widget-item" draggable="true" data-widget="Rectangle">
+                            <div class="widget-icon">⬜</div>
+                            Rectangle
+                        </div>
+                    </div>
+                    
+                    <div class="widget-group">
+                        <h3>🖱️ Input Widgets</h3>
+                        <div class="widget-item" draggable="true" data-widget="Button">
+                            <div class="widget-icon">🔘</div>
+                            Button
+                        </div>
+                        <div class="widget-item" draggable="true" data-widget="TextField">
+                            <div class="widget-icon">📄</div>
+                            TextField
+                        </div>
+                        <div class="widget-item" draggable="true" data-widget="TextArea">
+                            <div class="widget-icon">📋</div>
+                            TextArea
+                        </div>
+                        <div class="widget-item" draggable="true" data-widget="CheckBox">
+                            <div class="widget-icon">☑️</div>
+                            CheckBox
+                        </div>
+                        <div class="widget-item" draggable="true" data-widget="RadioButton">
+                            <div class="widget-icon">🔘</div>
+                            RadioButton
+                        </div>
+                        <div class="widget-item" draggable="true" data-widget="ComboBox">
+                            <div class="widget-icon">📋</div>
+                            ComboBox
+                        </div>
+                        <div class="widget-item" draggable="true" data-widget="Slider">
+                            <div class="widget-icon">🎚️</div>
+                            Slider
+                        </div>
+                        <div class="widget-item" draggable="true" data-widget="SpinBox">
+                            <div class="widget-icon">🔢</div>
+                            SpinBox
+                        </div>
+                    </div>
+                    
+                    <div class="widget-group">
+                        <h3>📋 Container Widgets</h3>
+                        <div class="widget-item" draggable="true" data-widget="Item">
+                            <div class="widget-icon">📦</div>
+                            Item
+                        </div>
+                        <div class="widget-item" draggable="true" data-widget="Column">
+                            <div class="widget-icon">📋</div>
+                            Column
+                        </div>
+                        <div class="widget-item" draggable="true" data-widget="Row">
+                            <div class="widget-icon">➡️</div>
+                            Row
+                        </div>
+                        <div class="widget-item" draggable="true" data-widget="Grid">
+                            <div class="widget-icon">⬛</div>
+                            Grid
+                        </div>
+                        <div class="widget-item" draggable="true" data-widget="StackLayout">
+                            <div class="widget-icon">📚</div>
+                            StackLayout
+                        </div>
+                        <div class="widget-item" draggable="true" data-widget="ScrollView">
+                            <div class="widget-icon">📜</div>
+                            ScrollView
+                        </div>
+                        <div class="widget-item" draggable="true" data-widget="GroupBox">
+                            <div class="widget-icon">📦</div>
+                            GroupBox
+                        </div>
+                        <div class="widget-item" draggable="true" data-widget="Frame">
+                            <div class="widget-icon">🖼️</div>
+                            Frame
+                        </div>
+                    </div>
+                    
+                    <div class="widget-group">
+                        <h3>📊 Advanced Widgets</h3>
+                        <div class="widget-item" draggable="true" data-widget="ListView">
+                            <div class="widget-icon">📋</div>
+                            ListView
+                        </div>
+                        <div class="widget-item" draggable="true" data-widget="TreeView">
+                            <div class="widget-icon">🌳</div>
+                            TreeView
+                        </div>
+                        <div class="widget-item" draggable="true" data-widget="TableView">
+                            <div class="widget-icon">📊</div>
+                            TableView
+                        </div>
+                        <div class="widget-item" draggable="true" data-widget="TabView">
+                            <div class="widget-icon">📑</div>
+                            TabView
+                        </div>
+                        <div class="widget-item" draggable="true" data-widget="ProgressBar">
+                            <div class="widget-icon">📊</div>
+                            ProgressBar
+                        </div>
+                        <div class="widget-item" draggable="true" data-widget="WebView">
+                            <div class="widget-icon">🌐</div>
+                            WebView
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="design-area">
+                    <div class="canvas" id="canvas">
+                        <div class="form-container" id="formContainer">
+                            <div class="drop-zone-text">
+                                🎨 Drag widgets here to start designing<br>
+                                <small style="opacity: 0.7;">Professional Qt Design Studio</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="status-bar">
+                <div class="status-item">
+                    <div class="status-indicator"></div>
+                    <span>Real-time Sync Active</span>
+                </div>
+                <div class="status-item">
+                    <span>Ready • Widgets: <span id="widgetCount">0</span> • Designer Connected</span>
+                </div>
+                <div class="status-item">
+                    <span>Position: <span id="mousePos">0, 0</span></span>
+                </div>
+            </div>
+            
+            <div class="sync-indicator" id="syncIndicator">
+                🔄 Synced with VS Code
+            </div>
                     border-color: #2196f3;
                     transform: translateX(2px);
                 }
@@ -384,44 +913,624 @@ export class FullQtDesigner {
                 let isDragging = false;
                 let isResizing = false;
                 let dragOffset = { x: 0, y: 0 };
+                let isRealTimeSync = true;
+                let syncDebounceTimer = null;
                 
-                // Widget templates with default properties
+                // Enhanced widget templates with professional styling
                 const widgetTemplates = {
-                    Label: { width: 100, height: 30, text: 'Label', color: '#333' },
-                    Text: { width: 200, height: 100, text: 'Lorem ipsum...', wrapMode: 'WordWrap' },
-                    Image: { width: 100, height: 100, source: '', fillMode: 'PreserveAspectFit' },
-                    TextField: { width: 150, height: 30, text: '', placeholderText: 'Enter text...' },
-                    Button: { width: 100, height: 35, text: 'Button', enabled: true },
-                    CheckBox: { width: 120, height: 25, text: 'CheckBox', checked: false },
-                    RadioButton: { width: 120, height: 25, text: 'RadioButton', checked: false },
-                    Slider: { width: 150, height: 25, value: 50, from: 0, to: 100 },
-                    SpinBox: { width: 80, height: 30, value: 0, from: 0, to: 100 },
-                    Rectangle: { width: 200, height: 150, color: '#f0f0f0', border: { width: 1, color: '#ccc' } },
-                    Row: { width: 300, height: 50, spacing: 10 },
-                    Column: { width: 200, height: 300, spacing: 10 },
-                    Grid: { width: 300, height: 200, rows: 2, columns: 2 },
-                    ScrollView: { width: 200, height: 300, contentHeight: 500 },
-                    ListView: { width: 200, height: 300, model: [] },
-                    TableView: { width: 400, height: 300, columnCount: 3 },
-                    WebView: { width: 400, height: 300, url: 'about:blank' }
+                    Label: { 
+                        width: 120, height: 32, text: 'Label', 
+                        color: '#ffffff', backgroundColor: 'transparent',
+                        fontSize: 14, fontWeight: 'normal'
+                    },
+                    Text: { 
+                        width: 200, height: 100, text: 'Professional Text Area...', 
+                        wrapMode: 'WordWrap', color: '#ffffff', backgroundColor: '#3e3e42',
+                        fontSize: 13, padding: 8
+                    },
+                    Image: { 
+                        width: 150, height: 100, source: '', 
+                        fillMode: 'PreserveAspectFit', backgroundColor: '#2d2d30',
+                        border: '1px solid #4e4e52'
+                    },
+                    Rectangle: { 
+                        width: 120, height: 80, color: '#667eea', 
+                        border: '1px solid #764ba2', radius: 8,
+                        gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                    },
+                    Button: { 
+                        width: 100, height: 36, text: 'Button', 
+                        color: '#ffffff', backgroundColor: '#667eea',
+                        hoverColor: '#764ba2', fontSize: 13, fontWeight: '500'
+                    },
+                    TextField: { 
+                        width: 200, height: 32, placeholderText: 'Enter text...', 
+                        color: '#ffffff', backgroundColor: '#3e3e42',
+                        border: '1px solid #4e4e52', padding: 8
+                    },
+                    TextArea: { 
+                        width: 200, height: 120, placeholderText: 'Enter multi-line text...', 
+                        wrapMode: 'WordWrap', color: '#ffffff', backgroundColor: '#3e3e42',
+                        border: '1px solid #4e4e52', padding: 8
+                    },
+                    CheckBox: { 
+                        width: 120, height: 24, text: 'CheckBox', 
+                        checked: false, color: '#ffffff', accentColor: '#667eea'
+                    },
+                    RadioButton: { 
+                        width: 120, height: 24, text: 'RadioButton', 
+                        checked: false, color: '#ffffff', accentColor: '#667eea'
+                    },
+                    ComboBox: { 
+                        width: 150, height: 32, model: ['Option 1', 'Option 2', 'Option 3'], 
+                        color: '#ffffff', backgroundColor: '#3e3e42',
+                        border: '1px solid #4e4e52'
+                    },
+                    Slider: { 
+                        width: 200, height: 24, from: 0, to: 100, value: 50, 
+                        accentColor: '#667eea', backgroundColor: '#4e4e52'
+                    },
+                    SpinBox: { 
+                        width: 80, height: 32, from: 0, to: 100, value: 0, 
+                        color: '#ffffff', backgroundColor: '#3e3e42',
+                        border: '1px solid #4e4e52'
+                    },
+                    Item: { 
+                        width: 200, height: 150, backgroundColor: 'transparent',
+                        border: '2px dashed #4e4e52'
+                    },
+                    Column: { 
+                        width: 200, height: 200, spacing: 8, 
+                        backgroundColor: 'transparent', border: '1px dashed #667eea'
+                    },
+                    Row: { 
+                        width: 200, height: 100, spacing: 8, 
+                        backgroundColor: 'transparent', border: '1px dashed #667eea'
+                    },
+                    Grid: { 
+                        width: 200, height: 200, columns: 2, rows: 2, 
+                        backgroundColor: 'transparent', border: '1px dashed #667eea'
+                    },
+                    StackLayout: { 
+                        width: 200, height: 150, currentIndex: 0, 
+                        backgroundColor: '#3e3e42', border: '1px solid #4e4e52'
+                    },
+                    ScrollView: { 
+                        width: 200, height: 150, contentWidth: 300, contentHeight: 200, 
+                        backgroundColor: '#2d2d30', border: '1px solid #4e4e52'
+                    },
+                    GroupBox: { 
+                        width: 200, height: 150, title: 'Group Box', 
+                        color: '#ffffff', backgroundColor: '#3e3e42',
+                        border: '1px solid #4e4e52'
+                    },
+                    Frame: { 
+                        width: 200, height: 150, backgroundColor: '#3e3e42',
+                        border: '2px solid #667eea', radius: 8
+                    },
+                    ListView: { 
+                        width: 200, height: 150, model: ['Item 1', 'Item 2', 'Item 3'], 
+                        color: '#ffffff', backgroundColor: '#2d2d30',
+                        border: '1px solid #4e4e52'
+                    },
+                    TreeView: { 
+                        width: 200, height: 150, backgroundColor: '#2d2d30',
+                        color: '#ffffff', border: '1px solid #4e4e52'
+                    },
+                    TableView: { 
+                        width: 250, height: 150, columnCount: 3, rowCount: 5, 
+                        backgroundColor: '#2d2d30', color: '#ffffff',
+                        border: '1px solid #4e4e52'
+                    },
+                    TabView: { 
+                        width: 250, height: 150, tabPosition: 'Top', 
+                        backgroundColor: '#3e3e42', color: '#ffffff',
+                        border: '1px solid #4e4e52'
+                    },
+                    ProgressBar: { 
+                        width: 200, height: 24, from: 0, to: 100, value: 50, 
+                        color: '#667eea', backgroundColor: '#4e4e52'
+                    },
+                    WebView: { 
+                        width: 300, height: 200, url: 'about:blank', 
+                        backgroundColor: '#2d2d30', border: '1px solid #4e4e52'
+                    }
                 };
                 
-                // Initialize drag and drop
-                function initializeDragDrop() {
-                    const canvas = document.getElementById('designCanvas');
+                // Sync functionality
+                function showSyncIndicator(message = 'Synced with VS Code') {
+                    const indicator = document.getElementById('syncIndicator');
+                    indicator.textContent = '🔄 ' + message;
+                    indicator.classList.add('show');
+                    setTimeout(() => {
+                        indicator.classList.remove('show');
+                    }, 2000);
+                }
+                
+                function debouncedSync(callback, delay = 150) {
+                    clearTimeout(syncDebounceTimer);
+                    syncDebounceTimer = setTimeout(callback, delay);
+                }
+                
+                function syncToEditor() {
+                    if (!isRealTimeSync) return;
+                    
+                    debouncedSync(() => {
+                        const widgets = Array.from(document.querySelectorAll('.dropped-widget')).map(el => ({
+                            id: el.dataset.id,
+                            type: el.dataset.widget,
+                            x: parseInt(el.style.left) || 0,
+                            y: parseInt(el.style.top) || 0,
+                            width: parseInt(el.style.width) || 100,
+                            height: parseInt(el.style.height) || 30,
+                            properties: JSON.parse(el.dataset.properties || '{}')
+                        }));
+                        
+                        vscode.postMessage({
+                            command: 'syncToEditor',
+                            widgets: widgets
+                        });
+                        
+                        showSyncIndicator('Synced to VS Code Editor');
+                        updateWidgetCount();
+                    });
+                }
+                
+                function updateWidgetCount() {
+                    const count = document.querySelectorAll('.dropped-widget').length;
+                    document.getElementById('widgetCount').textContent = count;
+                }
+                
+                // Enhanced drag and drop functionality
+                function initializeDragAndDrop() {
+                    const canvas = document.getElementById('canvas');
                     const formContainer = document.getElementById('formContainer');
+                    
+                    // Track mouse position for status bar
+                    canvas.addEventListener('mousemove', (e) => {
+                        const rect = canvas.getBoundingClientRect();
+                        const x = Math.round(e.clientX - rect.left);
+                        const y = Math.round(e.clientY - rect.top);
+                        document.getElementById('mousePos').textContent = x + ', ' + y;
+                    });
                     
                     // Widget palette drag start
                     document.querySelectorAll('.widget-item').forEach(item => {
                         item.addEventListener('dragstart', (e) => {
-                            draggedWidget = e.target.dataset.widget;
-                            e.dataTransfer.effectAllowed = 'copy';
-                            updateStatus('Dragging ' + draggedWidget);
+                            e.dataTransfer.setData('text/plain', item.dataset.widget);
+                            draggedWidget = item.dataset.widget;
+                            item.style.opacity = '0.5';
+                        });
+                        
+                        item.addEventListener('dragend', () => {
+                            item.style.opacity = '1';
                         });
                     });
                     
                     // Canvas drop handling
-                    formContainer.addEventListener('dragover', (e) => {
+                    canvas.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        formContainer.style.borderColor = 'var(--primary-color)';
+                        formContainer.style.backgroundColor = 'var(--bg-lighter)';
+                    });
+                    
+                    canvas.addEventListener('dragleave', () => {
+                        formContainer.style.borderColor = 'var(--bg-lighter)';
+                        formContainer.style.backgroundColor = 'var(--bg-light)';
+                    });
+                    
+                    canvas.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        formContainer.style.borderColor = 'var(--bg-lighter)';
+                        formContainer.style.backgroundColor = 'var(--bg-light)';
+                        
+                        const widgetType = e.dataTransfer.getData('text/plain');
+                        if (widgetType && widgetTemplates[widgetType]) {
+                            createWidget(widgetType, e.offsetX, e.offsetY);
+                        }
+                    });
+                }
+                
+                // Enhanced widget creation with professional styling
+                function createWidget(type, x, y) {
+                    const template = widgetTemplates[type];
+                    const widget = document.createElement('div');
+                    const widgetId = 'widget_' + (++widgetCounter);
+                    
+                    widget.className = 'dropped-widget';
+                    widget.dataset.widget = type;
+                    widget.dataset.id = widgetId;
+                    widget.dataset.properties = JSON.stringify(template);
+                    widget.textContent = template.text || type;
+                    
+                    // Apply professional styling
+                    widget.style.left = (x - template.width / 2) + 'px';
+                    widget.style.top = (y - template.height / 2) + 'px';
+                    widget.style.width = template.width + 'px';
+                    widget.style.height = template.height + 'px';
+                    
+                    // Apply template-specific styles
+                    if (template.backgroundColor) {
+                        widget.style.backgroundColor = template.backgroundColor;
+                    }
+                    if (template.color) {
+                        widget.style.color = template.color;
+                    }
+                    if (template.border) {
+                        widget.style.border = template.border;
+                    }
+                    if (template.radius) {
+                        widget.style.borderRadius = template.radius + 'px';
+                    }
+                    if (template.fontSize) {
+                        widget.style.fontSize = template.fontSize + 'px';
+                    }
+                    if (template.fontWeight) {
+                        widget.style.fontWeight = template.fontWeight;
+                    }
+                    if (template.gradient) {
+                        widget.style.background = template.gradient;
+                    }
+                    
+                    // Add resize handles
+                    ['nw', 'ne', 'sw', 'se', 'n', 's', 'w', 'e'].forEach(direction => {
+                        const handle = document.createElement('div');
+                        handle.className = 'resize-handle ' + direction;
+                        handle.addEventListener('mousedown', (e) => startResize(e, widget, direction));
+                        widget.appendChild(handle);
+                    });
+                    
+                    // Widget selection and dragging
+                    widget.addEventListener('mousedown', (e) => {
+                        if (e.target === widget) {
+                            selectWidget(widget);
+                            startDrag(e, widget);
+                        }
+                    });
+                    
+                    // Double-click to edit properties
+                    widget.addEventListener('dblclick', () => {
+                        editWidgetProperties(widget);
+                    });
+                    
+                    document.getElementById('formContainer').appendChild(widget);
+                    
+                    // Hide drop zone text
+                    const dropZoneText = document.querySelector('.drop-zone-text');
+                    if (dropZoneText) {
+                        dropZoneText.style.display = 'none';
+                    }
+                    document.getElementById('formContainer').classList.add('has-content');
+                    
+                    selectWidget(widget);
+                    syncToEditor();
+                }
+                
+                // Enhanced widget selection with visual feedback
+                function selectWidget(widget) {
+                    // Clear previous selection
+                    document.querySelectorAll('.dropped-widget').forEach(w => {
+                        w.classList.remove('selected');
+                        w.querySelectorAll('.resize-handle').forEach(h => h.style.display = 'none');
+                    });
+                    
+                    // Select new widget
+                    selectedWidget = widget;
+                    widget.classList.add('selected');
+                    widget.querySelectorAll('.resize-handle').forEach(h => h.style.display = 'block');
+                    
+                    // Update property panel
+                    vscode.postMessage({
+                        command: 'selectWidget',
+                        widget: {
+                            id: widget.dataset.id,
+                            type: widget.dataset.widget,
+                            properties: JSON.parse(widget.dataset.properties || '{}'),
+                            x: parseInt(widget.style.left) || 0,
+                            y: parseInt(widget.style.top) || 0,
+                            width: parseInt(widget.style.width) || 100,
+                            height: parseInt(widget.style.height) || 30
+                        }
+                    });
+                }
+                
+                // Enhanced drag functionality with smooth animations
+                function startDrag(e, widget) {
+                    if (isResizing) return;
+                    
+                    isDragging = true;
+                    const rect = widget.getBoundingClientRect();
+                    const canvasRect = document.getElementById('canvas').getBoundingClientRect();
+                    
+                    dragOffset.x = e.clientX - rect.left;
+                    dragOffset.y = e.clientY - rect.top;
+                    
+                    widget.style.zIndex = '1000';
+                    widget.style.transform = 'scale(1.02)';
+                    
+                    const handleMouseMove = (e) => {
+                        if (!isDragging) return;
+                        
+                        const x = e.clientX - canvasRect.left - dragOffset.x;
+                        const y = e.clientY - canvasRect.top - dragOffset.y;
+                        
+                        widget.style.left = Math.max(0, x) + 'px';
+                        widget.style.top = Math.max(0, y) + 'px';
+                        
+                        syncToEditor();
+                    };
+                    
+                    const handleMouseUp = () => {
+                        isDragging = false;
+                        widget.style.zIndex = '';
+                        widget.style.transform = '';
+                        
+                        document.removeEventListener('mousemove', handleMouseMove);
+                        document.removeEventListener('mouseup', handleMouseUp);
+                        
+                        showSyncIndicator('Widget position updated');
+                    };
+                    
+                    document.addEventListener('mousemove', handleMouseMove);
+                    document.addEventListener('mouseup', handleMouseUp);
+                }
+                
+                // Enhanced resize functionality
+                function startResize(e, widget, direction) {
+                    e.stopPropagation();
+                    isResizing = true;
+                    
+                    const startX = e.clientX;
+                    const startY = e.clientY;
+                    const startWidth = parseInt(widget.style.width) || 100;
+                    const startHeight = parseInt(widget.style.height) || 30;
+                    const startLeft = parseInt(widget.style.left) || 0;
+                    const startTop = parseInt(widget.style.top) || 0;
+                    
+                    widget.style.transition = 'none';
+                    
+                    const handleMouseMove = (e) => {
+                        if (!isResizing) return;
+                        
+                        const deltaX = e.clientX - startX;
+                        const deltaY = e.clientY - startY;
+                        
+                        let newWidth = startWidth;
+                        let newHeight = startHeight;
+                        let newLeft = startLeft;
+                        let newTop = startTop;
+                        
+                        // Handle different resize directions
+                        if (direction.includes('e')) newWidth = Math.max(50, startWidth + deltaX);
+                        if (direction.includes('w')) {
+                            newWidth = Math.max(50, startWidth - deltaX);
+                            newLeft = startLeft + deltaX;
+                        }
+                        if (direction.includes('s')) newHeight = Math.max(20, startHeight + deltaY);
+                        if (direction.includes('n')) {
+                            newHeight = Math.max(20, startHeight - deltaY);
+                            newTop = startTop + deltaY;
+                        }
+                        
+                        widget.style.width = newWidth + 'px';
+                        widget.style.height = newHeight + 'px';
+                        widget.style.left = newLeft + 'px';
+                        widget.style.top = newTop + 'px';
+                        
+                        syncToEditor();
+                    };
+                    
+                    const handleMouseUp = () => {
+                        isResizing = false;
+                        widget.style.transition = '';
+                        
+                        document.removeEventListener('mousemove', handleMouseMove);
+                        document.removeEventListener('mouseup', handleMouseUp);
+                        
+                        showSyncIndicator('Widget resized');
+                    };
+                    
+                    document.addEventListener('mousemove', handleMouseMove);
+                    document.addEventListener('mouseup', handleMouseUp);
+                }
+                
+                // Enhanced property editing
+                function editWidgetProperties(widget) {
+                    const properties = JSON.parse(widget.dataset.properties || '{}');
+                    const type = widget.dataset.widget;
+                    
+                    vscode.postMessage({
+                        command: 'editProperties',
+                        widget: {
+                            id: widget.dataset.id,
+                            type: type,
+                            properties: properties
+                        }
+                    });
+                }
+                
+                // Toolbar button handlers with enhanced functionality
+                function setupToolbarHandlers() {
+                    document.getElementById('newBtn').addEventListener('click', () => {
+                        if (confirm('Create new design? This will clear the current design.')) {
+                            clearDesign();
+                            showSyncIndicator('New design created');
+                        }
+                    });
+                    
+                    document.getElementById('saveBtn').addEventListener('click', () => {
+                        vscode.postMessage({ command: 'saveDesign' });
+                        showSyncIndicator('Design saved');
+                    });
+                    
+                    document.getElementById('openBtn').addEventListener('click', () => {
+                        vscode.postMessage({ command: 'openDesign' });
+                    });
+                    
+                    document.getElementById('previewBtn').addEventListener('click', () => {
+                        vscode.postMessage({ command: 'showPreview' });
+                        showSyncIndicator('Preview updated');
+                    });
+                    
+                    document.getElementById('codeBtn').addEventListener('click', () => {
+                        vscode.postMessage({ command: 'showCode' });
+                    });
+                    
+                    document.getElementById('syncBtn').addEventListener('click', (e) => {
+                        isRealTimeSync = !isRealTimeSync;
+                        e.target.classList.toggle('active', isRealTimeSync);
+                        e.target.textContent = isRealTimeSync ? '🔄 Sync' : '⏸️ Paused';
+                        showSyncIndicator(isRealTimeSync ? 'Real-time sync enabled' : 'Real-time sync paused');
+                    });
+                    
+                    document.getElementById('externalBtn').addEventListener('click', () => {
+                        vscode.postMessage({ command: 'openExternal' });
+                    });
+                    
+                    document.getElementById('undoBtn').addEventListener('click', () => {
+                        vscode.postMessage({ command: 'undo' });
+                    });
+                    
+                    document.getElementById('redoBtn').addEventListener('click', () => {
+                        vscode.postMessage({ command: 'redo' });
+                    });
+                }
+                
+                function clearDesign() {
+                    document.querySelectorAll('.dropped-widget').forEach(widget => widget.remove());
+                    document.querySelector('.drop-zone-text').style.display = 'block';
+                    document.getElementById('formContainer').classList.remove('has-content');
+                    selectedWidget = null;
+                    widgetCounter = 0;
+                    updateWidgetCount();
+                }
+                
+                // Message handling from VS Code
+                window.addEventListener('message', (event) => {
+                    const message = event.data;
+                    
+                    switch (message.command) {
+                        case 'syncFromEditor':
+                            syncFromEditor(message.qmlContent);
+                            break;
+                        case 'updateProperty':
+                            updateWidgetProperty(message.widgetId, message.property, message.value);
+                            break;
+                        case 'loadDesign':
+                            loadDesign(message.widgets);
+                            break;
+                    }
+                });
+                
+                function syncFromEditor(qmlContent) {
+                    if (!isRealTimeSync) return;
+                    
+                    // Parse QML and update visual designer
+                    showSyncIndicator('Synced from VS Code Editor');
+                }
+                
+                function updateWidgetProperty(widgetId, property, value) {
+                    const widget = document.querySelector('[data-id="' + widgetId + '"]');
+                    if (widget) {
+                        const properties = JSON.parse(widget.dataset.properties || '{}');
+                        properties[property] = value;
+                        widget.dataset.properties = JSON.stringify(properties);
+                        
+                        // Apply visual updates
+                        if (property === 'text') widget.textContent = value;
+                        if (property === 'color') widget.style.color = value;
+                        if (property === 'backgroundColor') widget.style.backgroundColor = value;
+                        
+                        syncToEditor();
+                        showSyncIndicator('Property updated');
+                    }
+                }
+                
+                function loadDesign(widgets) {
+                    clearDesign();
+                    widgets.forEach(widgetData => {
+                        const widget = createWidgetFromData(widgetData);
+                        document.getElementById('formContainer').appendChild(widget);
+                    });
+                    
+                    if (widgets.length > 0) {
+                        document.querySelector('.drop-zone-text').style.display = 'none';
+                        document.getElementById('formContainer').classList.add('has-content');
+                    }
+                    
+                    updateWidgetCount();
+                    showSyncIndicator('Design loaded');
+                }
+                
+                function createWidgetFromData(data) {
+                    const widget = document.createElement('div');
+                    widget.className = 'dropped-widget';
+                    widget.dataset.widget = data.type;
+                    widget.dataset.id = data.id;
+                    widget.dataset.properties = JSON.stringify(data.properties);
+                    widget.textContent = data.properties.text || data.type;
+                    
+                    widget.style.left = data.x + 'px';
+                    widget.style.top = data.y + 'px';
+                    widget.style.width = data.width + 'px';
+                    widget.style.height = data.height + 'px';
+                    
+                    // Apply styling from properties
+                    Object.entries(data.properties).forEach(([key, value]) => {
+                        if (key === 'color') widget.style.color = value;
+                        if (key === 'backgroundColor') widget.style.backgroundColor = value;
+                        if (key === 'border') widget.style.border = value;
+                    });
+                    
+                    // Add resize handles and event listeners
+                    ['nw', 'ne', 'sw', 'se', 'n', 's', 'w', 'e'].forEach(direction => {
+                        const handle = document.createElement('div');
+                        handle.className = 'resize-handle ' + direction;
+                        handle.addEventListener('mousedown', (e) => startResize(e, widget, direction));
+                        widget.appendChild(handle);
+                    });
+                    
+                    widget.addEventListener('mousedown', (e) => {
+                        if (e.target === widget) {
+                            selectWidget(widget);
+                            startDrag(e, widget);
+                        }
+                    });
+                    
+                    widget.addEventListener('dblclick', () => editWidgetProperties(widget));
+                    
+                    return widget;
+                }
+                
+                // Initialize everything
+                document.addEventListener('DOMContentLoaded', () => {
+                    initializeDragAndDrop();
+                    setupToolbarHandlers();
+                    updateWidgetCount();
+                    
+                    // Clear selection when clicking on canvas
+                    document.getElementById('canvas').addEventListener('click', (e) => {
+                        if (e.target.id === 'canvas' || e.target.id === 'formContainer') {
+                            selectWidget(null);
+                            document.querySelectorAll('.dropped-widget').forEach(w => {
+                                w.classList.remove('selected');
+                                w.querySelectorAll('.resize-handle').forEach(h => h.style.display = 'none');
+                            });
+                        }
+                    });
+                    
+                    // Keyboard shortcuts
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === 'Delete' && selectedWidget) {
+                            selectedWidget.remove();
+                            selectedWidget = null;
+                            syncToEditor();
+                            updateWidgetCount();
+                            showSyncIndicator('Widget deleted');
+                        }
+                    });
+                });
+            </script>
                         e.preventDefault();
                         e.dataTransfer.dropEffect = 'copy';
                     });
@@ -652,13 +1761,85 @@ export class FullQtDesigner {
                     const message = event.data;
                     switch (message.command) {
                         case 'loadDesign':
-                            // Load existing design
+                            loadDesignFromWidgets(message.widgets);
                             break;
                         case 'updateFromCode':
-                            // Update designer from code changes
+                            loadDesignFromWidgets(message.widgets);
+                            updateStatus('Updated from code');
+                            break;
+                        case 'updateProperty':
+                            updateWidgetProperty(message.widgetId, message.property, message.value);
                             break;
                     }
                 });
+
+                // Load design from widgets array
+                function loadDesignFromWidgets(widgets) {
+                    const formContainer = document.getElementById('formContainer');
+                    // Clear existing widgets except drop zone text
+                    const existingWidgets = formContainer.querySelectorAll('.dropped-widget');
+                    existingWidgets.forEach(w => w.remove());
+                    
+                    if (widgets && widgets.length > 0) {
+                        formContainer.classList.add('has-content');
+                        formContainer.querySelector('.drop-zone-text').style.display = 'none';
+                        
+                        widgets.forEach(widget => {
+                            createWidgetFromData(widget);
+                        });
+                    } else {
+                        formContainer.classList.remove('has-content');
+                        formContainer.querySelector('.drop-zone-text').style.display = 'block';
+                    }
+                }
+
+                // Create widget from data object
+                function createWidgetFromData(widgetData) {
+                    const widget = document.createElement('div');
+                    widget.className = 'dropped-widget';
+                    widget.id = widgetData.id;
+                    widget.dataset.type = widgetData.type;
+                    widget.dataset.properties = JSON.stringify(widgetData.properties);
+                    
+                    widget.style.left = widgetData.position.x + 'px';
+                    widget.style.top = widgetData.position.y + 'px';
+                    widget.style.width = widgetData.position.width + 'px';
+                    widget.style.height = widgetData.position.height + 'px';
+                    
+                    // Set widget content
+                    if (widgetData.properties.text) {
+                        widget.textContent = widgetData.properties.text;
+                    } else {
+                        widget.textContent = widgetData.type;
+                    }
+                    
+                    // Add resize handles
+                    addResizeHandles(widget);
+                    
+                    // Add to canvas
+                    document.getElementById('formContainer').appendChild(widget);
+                    
+                    // Setup widget interaction
+                    setupWidgetInteraction(widget);
+                }
+
+                // Update widget property
+                function updateWidgetProperty(widgetId, property, value) {
+                    const widget = document.getElementById(widgetId);
+                    if (widget) {
+                        const properties = JSON.parse(widget.dataset.properties || '{}');
+                        properties[property] = value;
+                        widget.dataset.properties = JSON.stringify(properties);
+                        
+                        // Update visual representation
+                        if (property === 'text') {
+                            widget.textContent = value;
+                        }
+                        
+                        // Trigger QML generation
+                        generateQMLCode();
+                    }
+                }
             </script>
         </body>
         </html>`;
@@ -883,9 +2064,47 @@ export class FullQtDesigner {
                     switch (message.command) {
                         case 'updatePreview':
                             renderQMLPreview(message.widgets);
+                            updateLiveIndicator(true);
+                            break;
+                        case 'updateFromCode':
+                            renderQMLPreview(message.widgets);
+                            updateLiveIndicator(true);
                             break;
                     }
                 });
+
+                function updateLiveIndicator(isActive) {
+                    const dot = document.querySelector('.live-dot');
+                    if (dot) {
+                        dot.style.backgroundColor = isActive ? '#4caf50' : '#ff9800';
+                        dot.style.animation = isActive ? 'pulse 2s infinite' : 'none';
+                    }
+                }
+
+                function renderQMLPreview(widgets) {
+                    const content = document.getElementById('previewContent');
+                    content.innerHTML = '';
+                    
+                    if (!widgets || widgets.length === 0) {
+                        content.innerHTML = '<div style="text-align: center; color: #999; font-size: 16px; margin-top: 50px;">👁️ Live Preview<br><br><small>Your QML interface will appear here in real-time</small></div>';
+                        updateLiveIndicator(false);
+                        return;
+                    }
+                    
+                    // Create a container for the widgets
+                    const container = document.createElement('div');
+                    container.style.position = 'relative';
+                    container.style.width = '100%';
+                    container.style.height = '100%';
+                    
+                    widgets.forEach(widget => {
+                        const element = createPreviewElement(widget);
+                        container.appendChild(element);
+                    });
+                    
+                    content.appendChild(container);
+                    updateLiveIndicator(true);
+                }
             </script>
         </body>
         </html>`;
@@ -897,54 +2116,175 @@ export class FullQtDesigner {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Properties</title>
+            <title>Professional Properties Panel</title>
             <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
+                :root {
+                    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                    --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+                    --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+                    
+                    --primary-color: #667eea;
+                    --secondary-color: #764ba2;
+                    --accent-color: #f093fb;
+                    --success-color: #4facfe;
+                    --warning-color: #43e97b;
+                    --danger-color: #f5576c;
+                    
+                    --bg-dark: #1e1e1e;
+                    --bg-medium: #2d2d30;
+                    --bg-light: #3e3e42;
+                    --bg-lighter: #4e4e52;
+                    --text-primary: #ffffff;
+                    --text-secondary: #cccccc;
+                    --text-muted: #999999;
+                    
+                    --border-radius: 8px;
+                    --shadow-light: 0 2px 8px rgba(0,0,0,0.1);
+                    --shadow-medium: 0 4px 16px rgba(0,0,0,0.15);
+                }
+
+                * { 
+                    margin: 0; 
+                    padding: 0; 
+                    box-sizing: border-box; 
+                }
+
                 body { 
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                    background: #f5f5f5;
+                    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, sans-serif;
+                    background: var(--bg-dark);
+                    color: var(--text-primary);
                     height: 100vh;
                     display: flex;
                     flex-direction: column;
+                    font-size: 13px;
+                    line-height: 1.4;
                 }
                 
                 .property-header {
-                    background: #2d2d30;
+                    background: var(--primary-gradient);
                     color: white;
-                    padding: 8px;
-                    border-bottom: 1px solid #3e3e42;
-                    font-size: 12px;
-                    font-weight: bold;
+                    padding: 12px 16px;
+                    border-bottom: 1px solid var(--bg-lighter);
+                    font-size: 14px;
+                    font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    box-shadow: var(--shadow-light);
+                }
+                
+                .property-header::before {
+                    content: '⚙️';
+                    margin-right: 8px;
+                    font-size: 16px;
+                    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+                }
+                
+                .property-sync-indicator {
+                    width: 8px;
+                    height: 8px;
+                    border-radius: 50%;
+                    background: var(--success-color);
+                    animation: pulse 2s infinite;
+                }
+                
+                @keyframes pulse {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.5; }
                 }
                 
                 .property-content {
                     flex: 1;
                     overflow-y: auto;
-                    padding: 8px;
+                    padding: 16px;
+                    background: var(--bg-dark);
+                }
+                
+                .no-selection {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100%;
+                    text-align: center;
+                    color: var(--text-muted);
+                }
+                
+                .no-selection-icon {
+                    font-size: 48px;
+                    margin-bottom: 16px;
+                    opacity: 0.5;
                 }
                 
                 .property-group {
-                    background: white;
-                    border: 1px solid #ddd;
-                    border-radius: 4px;
-                    margin-bottom: 8px;
+                    background: var(--bg-medium);
+                    border: 1px solid var(--bg-lighter);
+                    border-radius: var(--border-radius);
+                    margin-bottom: 16px;
+                    overflow: hidden;
+                    box-shadow: var(--shadow-light);
                 }
                 
                 .property-group-header {
-                    background: #f8f9fa;
-                    padding: 8px 12px;
-                    border-bottom: 1px solid #e9ecef;
-                    font-weight: bold;
+                    background: var(--bg-light);
+                    padding: 10px 16px;
+                    border-bottom: 1px solid var(--bg-lighter);
+                    font-weight: 600;
                     font-size: 12px;
-                    color: #495057;
+                    color: var(--text-primary);
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    cursor: pointer;
+                    transition: background-color 0.2s ease;
+                }
+                
+                .property-group-header:hover {
+                    background: var(--bg-lighter);
+                }
+                
+                .property-group-header.collapsed {
+                    border-bottom: none;
+                }
+                
+                .property-group-icon {
+                    margin-right: 8px;
+                    font-size: 14px;
+                }
+                
+                .property-group-toggle {
+                    font-size: 10px;
+                    color: var(--text-muted);
+                    transition: transform 0.2s ease;
+                }
+                
+                .property-group-header.collapsed .property-group-toggle {
+                    transform: rotate(-90deg);
+                }
+                
+                .property-group-content {
+                    padding: 12px 0;
+                    transition: max-height 0.3s ease;
+                    overflow: hidden;
+                }
+                
+                .property-group-content.collapsed {
+                    max-height: 0;
+                    padding: 0;
                 }
                 
                 .property-item {
                     display: flex;
                     align-items: center;
-                    padding: 6px 12px;
-                    border-bottom: 1px solid #f1f3f4;
+                    padding: 8px 16px;
+                    border-bottom: 1px solid rgba(255,255,255,0.05);
                     font-size: 12px;
+                    transition: background-color 0.2s ease;
+                }
+                
+                .property-item:hover {
+                    background-color: rgba(255,255,255,0.02);
                 }
                 
                 .property-item:last-child {
@@ -953,32 +2293,558 @@ export class FullQtDesigner {
                 
                 .property-label {
                     flex: 1;
-                    color: #333;
+                    color: var(--text-secondary);
                     font-weight: 500;
+                    min-width: 80px;
                 }
                 
                 .property-input {
                     flex: 1.5;
-                    margin-left: 8px;
+                    margin-left: 12px;
                 }
                 
                 .property-input input,
                 .property-input select,
                 .property-input textarea {
                     width: 100%;
-                    padding: 4px 6px;
-                    border: 1px solid #ccc;
-                    border-radius: 3px;
+                    padding: 6px 10px;
+                    background: var(--bg-light);
+                    border: 1px solid var(--bg-lighter);
+                    border-radius: var(--border-radius);
+                    color: var(--text-primary);
                     font-size: 11px;
+                    font-family: inherit;
+                    transition: all 0.2s ease;
+                }
+                
+                .property-input input:focus,
+                .property-input select:focus,
+                .property-input textarea:focus {
+                    outline: none;
+                    border-color: var(--primary-color);
+                    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
                 }
                 
                 .property-input input[type="checkbox"] {
                     width: auto;
+                    margin-right: 8px;
+                    accent-color: var(--primary-color);
                 }
                 
                 .property-input input[type="color"] {
-                    width: 40px;
-                    height: 24px;
+                    width: 50px;
+                    height: 32px;
+                    padding: 2px;
+                    border-radius: var(--border-radius);
+                    cursor: pointer;
+                }
+                
+                .property-input input[type="range"] {
+                    accent-color: var(--primary-color);
+                }
+                
+                .property-input .input-group {
+                    display: flex;
+                    gap: 4px;
+                }
+                
+                .property-input .input-group input {
+                    flex: 1;
+                }
+                
+                .property-input .unit-label {
+                    display: flex;
+                    align-items: center;
+                    padding: 0 8px;
+                    background: var(--bg-lighter);
+                    border: 1px solid var(--bg-lighter);
+                    border-left: none;
+                    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+                    color: var(--text-muted);
+                    font-size: 10px;
+                    white-space: nowrap;
+                }
+                
+                .property-button {
+                    background: var(--primary-gradient);
+                    color: white;
+                    border: none;
+                    padding: 6px 12px;
+                    border-radius: var(--border-radius);
+                    font-size: 11px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    margin-top: 4px;
+                }
+                
+                .property-button:hover {
+                    transform: translateY(-1px);
+                    box-shadow: var(--shadow-light);
+                }
+                
+                .property-button.secondary {
+                    background: var(--bg-lighter);
+                    color: var(--text-secondary);
+                }
+                
+                .property-button.danger {
+                    background: var(--secondary-gradient);
+                }
+                
+                .widget-info {
+                    background: var(--bg-medium);
+                    padding: 12px 16px;
+                    margin-bottom: 16px;
+                    border-radius: var(--border-radius);
+                    border: 1px solid var(--bg-lighter);
+                }
+                
+                .widget-type {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: var(--primary-color);
+                    margin-bottom: 4px;
+                }
+                
+                .widget-id {
+                    font-size: 11px;
+                    color: var(--text-muted);
+                    font-family: 'Courier New', monospace;
+                }
+                
+                .property-tabs {
+                    display: flex;
+                    background: var(--bg-medium);
+                    border-radius: var(--border-radius) var(--border-radius) 0 0;
+                    overflow: hidden;
+                    margin-bottom: 16px;
+                }
+                
+                .property-tab {
+                    flex: 1;
+                    padding: 10px 12px;
+                    background: var(--bg-light);
+                    color: var(--text-muted);
+                    border: none;
+                    cursor: pointer;
+                    font-size: 11px;
+                    font-weight: 500;
+                    transition: all 0.2s ease;
+                    border-right: 1px solid var(--bg-lighter);
+                }
+                
+                .property-tab:last-child {
+                    border-right: none;
+                }
+                
+                .property-tab.active {
+                    background: var(--primary-gradient);
+                    color: white;
+                }
+                
+                .property-tab:hover:not(.active) {
+                    background: var(--bg-lighter);
+                    color: var(--text-secondary);
+                }
+                
+                .color-picker-group {
+                    display: flex;
+                    gap: 8px;
+                    align-items: center;
+                }
+                
+                .color-preset {
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    border: 2px solid var(--bg-lighter);
+                    transition: all 0.2s ease;
+                }
+                
+                .color-preset:hover {
+                    transform: scale(1.1);
+                    border-color: var(--text-secondary);
+                }
+                
+                .range-group {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+                
+                .range-value {
+                    min-width: 40px;
+                    text-align: center;
+                    background: var(--bg-lighter);
+                    border: 1px solid var(--bg-lighter);
+                    border-radius: var(--border-radius);
+                    padding: 4px 6px;
+                    font-size: 10px;
+                    color: var(--text-primary);
+                }
+            </style>
+        </head>
+        <body>
+            <div class="property-header">
+                Professional Properties
+                <div class="property-sync-indicator" title="Real-time sync active"></div>
+            </div>
+            
+            <div class="property-content" id="propertyContent">
+                <div class="no-selection" id="noSelection">
+                    <div class="no-selection-icon">🎯</div>
+                    <div>
+                        <h3>No Widget Selected</h3>
+                        <p>Select a widget in the designer<br>to edit its properties</p>
+                    </div>
+                </div>
+                
+                <div id="widgetProperties" style="display: none;">
+                    <div class="widget-info">
+                        <div class="widget-type" id="widgetType">Button</div>
+                        <div class="widget-id" id="widgetId">widget_1</div>
+                    </div>
+                    
+                    <div class="property-tabs">
+                        <button class="property-tab active" data-tab="general">General</button>
+                        <button class="property-tab" data-tab="layout">Layout</button>
+                        <button class="property-tab" data-tab="style">Style</button>
+                    </div>
+                    
+                    <div class="tab-content" id="generalTab">
+                        <div class="property-group">
+                            <div class="property-group-header">
+                                <span><span class="property-group-icon">📝</span>Content</span>
+                                <span class="property-group-toggle">▼</span>
+                            </div>
+                            <div class="property-group-content">
+                                <div class="property-item">
+                                    <div class="property-label">Text</div>
+                                    <div class="property-input">
+                                        <input type="text" id="prop-text" placeholder="Enter text...">
+                                    </div>
+                                </div>
+                                <div class="property-item">
+                                    <div class="property-label">Placeholder</div>
+                                    <div class="property-input">
+                                        <input type="text" id="prop-placeholder" placeholder="Placeholder text...">
+                                    </div>
+                                </div>
+                                <div class="property-item">
+                                    <div class="property-label">Enabled</div>
+                                    <div class="property-input">
+                                        <input type="checkbox" id="prop-enabled" checked>
+                                        <label for="prop-enabled">Widget is enabled</label>
+                                    </div>
+                                </div>
+                                <div class="property-item">
+                                    <div class="property-label">Visible</div>
+                                    <div class="property-input">
+                                        <input type="checkbox" id="prop-visible" checked>
+                                        <label for="prop-visible">Widget is visible</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="layoutTab" style="display: none;">
+                        <div class="property-group">
+                            <div class="property-group-header">
+                                <span><span class="property-group-icon">📐</span>Position & Size</span>
+                                <span class="property-group-toggle">▼</span>
+                            </div>
+                            <div class="property-group-content">
+                                <div class="property-item">
+                                    <div class="property-label">X Position</div>
+                                    <div class="property-input">
+                                        <div class="input-group">
+                                            <input type="number" id="prop-x" min="0" value="0">
+                                            <div class="unit-label">px</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="property-item">
+                                    <div class="property-label">Y Position</div>
+                                    <div class="property-input">
+                                        <div class="input-group">
+                                            <input type="number" id="prop-y" min="0" value="0">
+                                            <div class="unit-label">px</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="property-item">
+                                    <div class="property-label">Width</div>
+                                    <div class="property-input">
+                                        <div class="input-group">
+                                            <input type="number" id="prop-width" min="1" value="100">
+                                            <div class="unit-label">px</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="property-item">
+                                    <div class="property-label">Height</div>
+                                    <div class="property-input">
+                                        <div class="input-group">
+                                            <input type="number" id="prop-height" min="1" value="30">
+                                            <div class="unit-label">px</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="styleTab" style="display: none;">
+                        <div class="property-group">
+                            <div class="property-group-header">
+                                <span><span class="property-group-icon">🎨</span>Colors</span>
+                                <span class="property-group-toggle">▼</span>
+                            </div>
+                            <div class="property-group-content">
+                                <div class="property-item">
+                                    <div class="property-label">Text Color</div>
+                                    <div class="property-input">
+                                        <div class="color-picker-group">
+                                            <input type="color" id="prop-color" value="#ffffff">
+                                            <div class="color-preset" style="background: #ffffff;" data-color="#ffffff"></div>
+                                            <div class="color-preset" style="background: #000000;" data-color="#000000"></div>
+                                            <div class="color-preset" style="background: #667eea;" data-color="#667eea"></div>
+                                            <div class="color-preset" style="background: #f093fb;" data-color="#f093fb"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="property-item">
+                                    <div class="property-label">Background</div>
+                                    <div class="property-input">
+                                        <div class="color-picker-group">
+                                            <input type="color" id="prop-backgroundColor" value="#3e3e42">
+                                            <div class="color-preset" style="background: transparent; border: 2px dashed #666;" data-color="transparent"></div>
+                                            <div class="color-preset" style="background: #3e3e42;" data-color="#3e3e42"></div>
+                                            <div class="color-preset" style="background: #667eea;" data-color="#667eea"></div>
+                                            <div class="color-preset" style="background: #f093fb;" data-color="#f093fb"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="property-item">
+                                    <div class="property-label">Opacity</div>
+                                    <div class="property-input">
+                                        <div class="range-group">
+                                            <input type="range" id="prop-opacity" min="0" max="1" step="0.1" value="1">
+                                            <input type="number" class="range-value" id="prop-opacity-value" min="0" max="1" step="0.1" value="1">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="property-group">
+                            <div class="property-group-header">
+                                <span><span class="property-group-icon">🖼️</span>Appearance</span>
+                                <span class="property-group-toggle">▼</span>
+                            </div>
+                            <div class="property-group-content">
+                                <div class="property-item">
+                                    <div class="property-label">Border Radius</div>
+                                    <div class="property-input">
+                                        <div class="input-group">
+                                            <input type="number" id="prop-borderRadius" min="0" value="8">
+                                            <div class="unit-label">px</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="property-item">
+                                    <div class="property-label">Font Size</div>
+                                    <div class="property-input">
+                                        <div class="input-group">
+                                            <input type="number" id="prop-fontSize" min="8" max="72" value="13">
+                                            <div class="unit-label">px</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="property-item">
+                                    <div class="property-label">Font Weight</div>
+                                    <div class="property-input">
+                                        <select id="prop-fontWeight">
+                                            <option value="normal">Normal</option>
+                                            <option value="bold">Bold</option>
+                                            <option value="lighter">Lighter</option>
+                                            <option value="500">Medium</option>
+                                            <option value="600">Semi Bold</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--bg-lighter);">
+                        <button class="property-button" onclick="applyChanges()">Apply Changes</button>
+                        <button class="property-button secondary" onclick="resetProperties()">Reset</button>
+                        <button class="property-button danger" onclick="deleteWidget()">Delete Widget</button>
+                    </div>
+                </div>
+            </div>
+            
+            <script>
+                const vscode = acquireVsCodeApi();
+                let currentWidget = null;
+                
+                // Tab switching
+                document.querySelectorAll('.property-tab').forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        // Remove active class from all tabs
+                        document.querySelectorAll('.property-tab').forEach(t => t.classList.remove('active'));
+                        document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+                        
+                        // Add active class to clicked tab
+                        tab.classList.add('active');
+                        const tabId = tab.dataset.tab + 'Tab';
+                        document.getElementById(tabId).style.display = 'block';
+                    });
+                });
+                
+                // Property group collapsing
+                document.querySelectorAll('.property-group-header').forEach(header => {
+                    header.addEventListener('click', () => {
+                        header.classList.toggle('collapsed');
+                        const content = header.nextElementSibling;
+                        content.classList.toggle('collapsed');
+                    });
+                });
+                
+                // Color preset selection
+                document.querySelectorAll('.color-preset').forEach(preset => {
+                    preset.addEventListener('click', () => {
+                        const color = preset.dataset.color;
+                        const colorInput = preset.parentElement.querySelector('input[type="color"]');
+                        if (colorInput) {
+                            colorInput.value = color === 'transparent' ? '#000000' : color;
+                            colorInput.dispatchEvent(new Event('change'));
+                        }
+                    });
+                });
+                
+                // Range slider sync
+                document.getElementById('prop-opacity').addEventListener('input', (e) => {
+                    document.getElementById('prop-opacity-value').value = e.target.value;
+                });
+                
+                document.getElementById('prop-opacity-value').addEventListener('input', (e) => {
+                    document.getElementById('prop-opacity').value = e.target.value;
+                });
+                
+                // Property change handlers
+                function setupPropertyChangeHandlers() {
+                    const inputs = document.querySelectorAll('#widgetProperties input, #widgetProperties select, #widgetProperties textarea');
+                    inputs.forEach(input => {
+                        input.addEventListener('change', () => {
+                            if (currentWidget) {
+                                updateProperty(input.id.replace('prop-', ''), input.value, input.type);
+                            }
+                        });
+                    });
+                }
+                
+                function updateProperty(property, value, type) {
+                    if (type === 'checkbox') {
+                        value = document.getElementById('prop-' + property).checked;
+                    }
+                    
+                    vscode.postMessage({
+                        command: 'updateProperty',
+                        widgetId: currentWidget.id,
+                        property: property,
+                        value: value
+                    });
+                }
+                
+                function applyChanges() {
+                    vscode.postMessage({
+                        command: 'applyProperties',
+                        widgetId: currentWidget.id
+                    });
+                }
+                
+                function resetProperties() {
+                    if (currentWidget) {
+                        loadWidgetProperties(currentWidget);
+                    }
+                }
+                
+                function deleteWidget() {
+                    if (currentWidget && confirm('Delete this widget?')) {
+                        vscode.postMessage({
+                            command: 'deleteWidget',
+                            widgetId: currentWidget.id
+                        });
+                    }
+                }
+                
+                function showNoSelection() {
+                    document.getElementById('noSelection').style.display = 'flex';
+                    document.getElementById('widgetProperties').style.display = 'none';
+                    currentWidget = null;
+                }
+                
+                function showWidgetProperties(widget) {
+                    document.getElementById('noSelection').style.display = 'none';
+                    document.getElementById('widgetProperties').style.display = 'block';
+                    currentWidget = widget;
+                    loadWidgetProperties(widget);
+                }
+                
+                function loadWidgetProperties(widget) {
+                    document.getElementById('widgetType').textContent = widget.type;
+                    document.getElementById('widgetId').textContent = widget.id;
+                    
+                    // Load property values
+                    const props = widget.properties;
+                    Object.entries(props).forEach(([key, value]) => {
+                        const input = document.getElementById('prop-' + key);
+                        if (input) {
+                            if (input.type === 'checkbox') {
+                                input.checked = value;
+                            } else {
+                                input.value = value;
+                            }
+                        }
+                    });
+                    
+                    // Load position and size
+                    document.getElementById('prop-x').value = widget.x || 0;
+                    document.getElementById('prop-y').value = widget.y || 0;
+                    document.getElementById('prop-width').value = widget.width || 100;
+                    document.getElementById('prop-height').value = widget.height || 30;
+                }
+                
+                // Message handling from designer
+                window.addEventListener('message', (event) => {
+                    const message = event.data;
+                    
+                    switch (message.command) {
+                        case 'selectWidget':
+                            showWidgetProperties(message.widget);
+                            break;
+                        case 'clearSelection':
+                            showNoSelection();
+                            break;
+                        case 'updateWidget':
+                            if (currentWidget && currentWidget.id === message.widget.id) {
+                                loadWidgetProperties(message.widget);
+                            }
+                            break;
+                    }
+                });
+                
+                // Initialize
+                document.addEventListener('DOMContentLoaded', () => {
+                    setupPropertyChangeHandlers();
+                    showNoSelection();
+                });
+            </script>
                     padding: 0;
                     border: none;
                 }
@@ -1235,8 +3101,45 @@ export class FullQtDesigner {
                         case 'updateProperties':
                             updateProperties(message.widget);
                             break;
+                        case 'updateFromCode':
+                            updateObjectTreeFromWidgets(message.widgets);
+                            break;
+                        case 'updateFromDesigner':
+                            updateObjectTreeFromWidgets(message.widgets);
+                            break;
                     }
                 });
+
+                function updateObjectTreeFromWidgets(widgets) {
+                    const tree = document.getElementById('objectTree');
+                    tree.innerHTML = '';
+                    
+                    if (!widgets || widgets.length === 0) {
+                        tree.innerHTML = '<div style="text-align: center; color: #999; padding: 20px; font-size: 12px;">No objects in form</div>';
+                        return;
+                    }
+                    
+                    widgets.forEach(widget => {
+                        const item = document.createElement('div');
+                        item.className = 'object-item';
+                        item.textContent = '🎯 ' + widget.type + ' (' + widget.id + ')';
+                        item.addEventListener('click', () => {
+                            // Select this widget
+                            document.querySelectorAll('.object-item').forEach(i => i.classList.remove('selected'));
+                            item.classList.add('selected');
+                            
+                            // Update property editor
+                            updateProperties(widget);
+                            
+                            // Notify designer to select this widget
+                            vscode.postMessage({
+                                command: 'selectWidget',
+                                widgetId: widget.id
+                            });
+                        });
+                        tree.appendChild(item);
+                    });
+                }
             </script>
         </body>
         </html>`;
@@ -1247,20 +3150,23 @@ export class FullQtDesigner {
         this._designerPanel?.webview.onDidReceiveMessage(async (message) => {
             switch (message.command) {
                 case 'generateQML':
-                    const qmlCode = this.generateQMLFromWidgets(message.widgets);
+                    this._widgets = message.widgets;
+                    const qmlCode = this._syncEngine.generateQMLFromWidgets(message.widgets);
                     this._currentQmlContent = qmlCode;
                     
-                    // Update preview
-                    this._previewPanel?.webview.postMessage({
-                        command: 'updatePreview',
-                        widgets: message.widgets
-                    });
-                    
-                    // Show in code editor if needed
-                    await this.updateCodeEditor(qmlCode);
+                    // Sync to VS Code editor and preview
+                    await this._syncEngine.syncFromDesigner(message.widgets, qmlCode);
                     break;
                     
                 case 'updateProperties':
+                    this._propertyPanel?.webview.postMessage({
+                        command: 'updateProperties',
+                        widget: message.widget
+                    });
+                    break;
+                    
+                case 'widgetSelected':
+                    this._selectedWidget = message.widget;
                     this._propertyPanel?.webview.postMessage({
                         command: 'updateProperties',
                         widget: message.widget
@@ -1286,69 +3192,39 @@ export class FullQtDesigner {
         });
 
         // Property panel messages
-        this._propertyPanel?.webview.onDidReceiveMessage((message) => {
+        this._propertyPanel?.webview.onDidReceiveMessage(async (message) => {
             switch (message.command) {
                 case 'updateWidgetProperty':
+                    // Update the widget in the designer
                     this._designerPanel?.webview.postMessage({
                         command: 'updateProperty',
                         widgetId: message.widgetId,
                         property: message.property,
                         value: message.value
                     });
+                    
+                    // Sync the property change across all panels and editor
+                    await this._syncEngine.syncFromProperties(
+                        message.widgetId, 
+                        message.property, 
+                        message.value
+                    );
                     break;
             }
         });
-    }
 
-    private generateQMLFromWidgets(widgets: any[]): string {
-        let qml = `import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
-
-ApplicationWindow {
-    visible: true
-    width: 800
-    height: 600
-    title: "Qt Live Preview"
-
-`;
-
-        widgets.forEach(widget => {
-            qml += this.generateWidgetQML(widget, '    ');
-        });
-
-        qml += '}\n';
-        return qml;
-    }
-
-    private generateWidgetQML(widget: any, indent: string): string {
-        const pos = widget.position;
-        const props = widget.properties;
-        
-        let qml = `${indent}${widget.type} {
-${indent}    id: ${widget.id}
-${indent}    x: ${pos.x}
-${indent}    y: ${pos.y}
-${indent}    width: ${pos.width}
-${indent}    height: ${pos.height}
-`;
-
-        // Add widget-specific properties
-        Object.keys(props).forEach(key => {
-            if (props[key] !== undefined && props[key] !== null) {
-                if (typeof props[key] === 'string') {
-                    qml += `${indent}    ${key}: "${props[key]}"
-`;
-                } else {
-                    qml += `${indent}    ${key}: ${props[key]}
-`;
-                }
+        // Preview panel messages  
+        this._previewPanel?.webview.onDidReceiveMessage((message) => {
+            switch (message.command) {
+                case 'refreshPreview':
+                    // Refresh preview from current widgets
+                    this._previewPanel?.webview.postMessage({
+                        command: 'updatePreview',
+                        widgets: this._widgets
+                    });
+                    break;
             }
         });
-
-        qml += `${indent}}
-`;
-        return qml;
     }
 
     private async updateCodeEditor(qmlContent: string) {
@@ -1383,6 +3259,25 @@ ${indent}    height: ${pos.height}
         vscode.window.showInformationMessage('🪟 Qt Designer opened in external mode! You can now position windows on multiple monitors.');
     }
 
+    public dispose() {
+        this._designerPanel?.dispose();
+        this._previewPanel?.dispose(); 
+        this._propertyPanel?.dispose();
+        this._syncEngine.dispose();
+    }
+
+    private initializeWithActiveDocument() {
+        // Check if there's an active QML document
+        const activeEditor = vscode.window.activeTextEditor;
+        if (activeEditor && activeEditor.document.languageId === 'qml') {
+            // Parse existing QML and load into designer
+            this._syncEngine.setActiveDocument(activeEditor.document);
+        } else {
+            // Initialize with a simple default layout
+            this.initializeDefaultApplication();
+        }
+    }
+
     private initializeDefaultApplication() {
         // Initialize with a simple default layout
         const defaultWidgets = [
@@ -1394,8 +3289,17 @@ ${indent}    height: ${pos.height}
             }
         ];
         
+        this._widgets = defaultWidgets;
+        const qmlCode = this._syncEngine.generateQMLFromWidgets(defaultWidgets);
+        this._currentQmlContent = qmlCode;
+        
         this._previewPanel?.webview.postMessage({
             command: 'updatePreview',
+            widgets: defaultWidgets
+        });
+        
+        this._designerPanel?.webview.postMessage({
+            command: 'loadDesign',
             widgets: defaultWidgets
         });
     }
