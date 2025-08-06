@@ -84,31 +84,38 @@ export class FullQtDesigner {
             <title>Qt Professional Design Studio</title>
             <style>
                 :root {
-                    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-                    --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-                    --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-                    --dark-gradient: linear-gradient(135deg, #434343 0%, #000000 100%);
+                    /* Black and White Professional Theme */
+                    --primary-color: #ffffff;
+                    --secondary-color: #e0e0e0;
+                    --accent-color: #333333;
+                    --success-color: #666666;
+                    --warning-color: #888888;
+                    --danger-color: #000000;
                     
-                    --primary-color: #667eea;
-                    --secondary-color: #764ba2;
-                    --accent-color: #f093fb;
-                    --success-color: #4facfe;
-                    --warning-color: #43e97b;
-                    --danger-color: #f5576c;
+                    --bg-primary: #000000;
+                    --bg-secondary: #1a1a1a;
+                    --bg-tertiary: #2a2a2a;
+                    --bg-quaternary: #3a3a3a;
+                    --bg-surface: #ffffff;
                     
-                    --bg-dark: #1e1e1e;
-                    --bg-medium: #2d2d30;
-                    --bg-light: #3e3e42;
-                    --bg-lighter: #4e4e52;
                     --text-primary: #ffffff;
-                    --text-secondary: #cccccc;
+                    --text-secondary: #e0e0e0;
+                    --text-tertiary: #cccccc;
                     --text-muted: #999999;
+                    --text-inverse: #000000;
                     
-                    --border-radius: 8px;
-                    --shadow-light: 0 2px 8px rgba(0,0,0,0.1);
-                    --shadow-medium: 0 4px 16px rgba(0,0,0,0.15);
-                    --shadow-heavy: 0 8px 32px rgba(0,0,0,0.2);
+                    --border-primary: #333333;
+                    --border-secondary: #555555;
+                    --border-light: #777777;
+                    
+                    --shadow-light: 0 2px 8px rgba(0,0,0,0.3);
+                    --shadow-medium: 0 4px 16px rgba(0,0,0,0.4);
+                    --shadow-heavy: 0 8px 32px rgba(0,0,0,0.5);
+                    
+                    --border-radius: 6px;
+                    --transition-fast: 0.15s ease;
+                    --transition-normal: 0.25s ease;
+                    --transition-slow: 0.4s ease;
                 }
 
                 * { 
@@ -119,7 +126,7 @@ export class FullQtDesigner {
 
                 body { 
                     font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, sans-serif;
-                    background: var(--bg-dark);
+                    background: var(--bg-primary);
                     color: var(--text-primary);
                     height: 100vh;
                     display: flex;
@@ -130,27 +137,14 @@ export class FullQtDesigner {
                 }
                 
                 .toolbar {
-                    background: var(--primary-gradient);
-                    color: white;
+                    background: var(--bg-secondary);
+                    color: var(--text-primary);
                     padding: 12px 16px;
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
-                    box-shadow: var(--shadow-medium);
-                    position: relative;
-                    z-index: 1000;
-                }
-                
-                .toolbar::before {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background: var(--primary-gradient);
-                    opacity: 0.9;
-                    z-index: -1;
+                    border-bottom: 2px solid var(--border-primary);
+                    box-shadow: var(--shadow-light);
                 }
                 
                 .toolbar-left {
@@ -161,26 +155,27 @@ export class FullQtDesigner {
                 
                 .toolbar-title {
                     font-size: 16px;
-                    font-weight: 600;
+                    font-weight: 700;
                     letter-spacing: 0.5px;
                     margin-right: 24px;
                     display: flex;
                     align-items: center;
+                    color: var(--text-primary);
                 }
                 
                 .toolbar-title::before {
-                    content: '🎨';
+                    content: '⚫';
                     margin-right: 8px;
                     font-size: 18px;
-                    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+                    color: var(--text-primary);
                 }
                 
                 .toolbar-group {
                     display: flex;
                     gap: 4px;
-                    padding: 0 8px;
-                    border-left: 1px solid rgba(255,255,255,0.2);
-                    border-right: 1px solid rgba(255,255,255,0.2);
+                    padding: 0 12px;
+                    border-left: 1px solid var(--border-primary);
+                    border-right: 1px solid var(--border-primary);
                 }
                 
                 .toolbar-group:first-child {
@@ -192,44 +187,45 @@ export class FullQtDesigner {
                 }
                 
                 .toolbar button {
-                    background: rgba(255,255,255,0.15);
-                    color: white;
-                    border: 1px solid rgba(255,255,255,0.2);
+                    background: var(--bg-tertiary);
+                    color: var(--text-primary);
+                    border: 1px solid var(--border-primary);
                     padding: 8px 12px;
                     border-radius: var(--border-radius);
                     cursor: pointer;
                     font-size: 12px;
                     font-weight: 500;
-                    transition: all 0.3s ease;
+                    transition: all var(--transition-fast);
                     display: flex;
                     align-items: center;
                     gap: 6px;
                 }
                 
                 .toolbar button:hover { 
-                    background: rgba(255,255,255,0.25);
-                    border-color: rgba(255,255,255,0.4);
+                    background: var(--bg-quaternary);
+                    border-color: var(--border-secondary);
                     transform: translateY(-1px);
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                    box-shadow: var(--shadow-light);
                 }
                 
                 .toolbar button.active { 
-                    background: var(--success-gradient);
-                    border-color: rgba(255,255,255,0.5);
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                    background: var(--bg-surface);
+                    color: var(--text-inverse);
+                    border-color: var(--border-light);
+                    box-shadow: var(--shadow-medium);
                 }
                 
                 .main-container {
                     display: flex;
                     flex: 1;
                     height: calc(100vh - 60px);
-                    background: var(--bg-dark);
+                    background: var(--bg-primary);
                 }
                 
                 .widget-palette {
                     width: 280px;
-                    background: var(--bg-medium);
-                    border-right: 1px solid var(--bg-lighter);
+                    background: var(--bg-secondary);
+                    border-right: 1px solid var(--border-primary);
                     overflow-y: auto;
                     padding: 16px;
                     box-shadow: var(--shadow-light);
@@ -238,7 +234,7 @@ export class FullQtDesigner {
                 .palette-header {
                     margin-bottom: 20px;
                     padding-bottom: 12px;
-                    border-bottom: 2px solid var(--primary-color);
+                    border-bottom: 2px solid var(--border-primary);
                 }
                 
                 .palette-title {
@@ -250,6 +246,12 @@ export class FullQtDesigner {
                     align-items: center;
                 }
                 
+                .palette-title::before {
+                    content: '⚫';
+                    margin-right: 8px;
+                    font-size: 16px;
+                }
+                
                 .palette-subtitle {
                     font-size: 11px;
                     color: var(--text-muted);
@@ -258,13 +260,13 @@ export class FullQtDesigner {
                 
                 .design-area {
                     flex: 1;
-                    background: var(--bg-light);
+                    background: var(--bg-tertiary);
                     position: relative;
                     overflow: auto;
                     margin: 16px;
                     border-radius: var(--border-radius);
                     box-shadow: var(--shadow-medium);
-                    border: 1px solid var(--bg-lighter);
+                    border: 1px solid var(--border-primary);
                 }
                 
                 .canvas {
@@ -274,11 +276,11 @@ export class FullQtDesigner {
                     background: 
                         radial-gradient(circle at 1px 1px, rgba(255,255,255,0.1) 1px, transparent 0);
                     background-size: 20px 20px;
-                    background-color: var(--bg-light);
+                    background-color: var(--bg-tertiary);
                 }
                 
                 .widget-group {
-                    margin-bottom: 24px;
+                    margin-bottom: 20px;
                 }
                 
                 .widget-group h3 {
@@ -287,29 +289,12 @@ export class FullQtDesigner {
                     color: var(--text-primary);
                     margin-bottom: 12px;
                     padding: 8px 12px;
-                    background: var(--primary-gradient);
+                    background: var(--bg-tertiary);
+                    border: 1px solid var(--border-primary);
                     border-radius: var(--border-radius);
                     display: flex;
                     align-items: center;
                     box-shadow: var(--shadow-light);
-                    position: relative;
-                    overflow: hidden;
-                }
-                
-                .widget-group h3::before {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
-                    animation: shimmer 3s infinite;
-                }
-                
-                @keyframes shimmer {
-                    0% { transform: translateX(-100%); }
-                    100% { transform: translateX(100%); }
                 }
                 
                 .widget-item {
@@ -317,40 +302,22 @@ export class FullQtDesigner {
                     align-items: center;
                     padding: 10px 12px;
                     margin: 4px 0;
-                    background: var(--bg-light);
-                    border: 1px solid var(--bg-lighter);
+                    background: var(--bg-tertiary);
+                    border: 1px solid var(--border-primary);
                     border-radius: var(--border-radius);
                     cursor: grab;
-                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    transition: all var(--transition-fast);
                     font-size: 12px;
                     font-weight: 500;
                     color: var(--text-secondary);
-                    position: relative;
-                    overflow: hidden;
-                }
-                
-                .widget-item::before {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    left: -100%;
-                    width: 100%;
-                    height: 100%;
-                    background: var(--success-gradient);
-                    transition: left 0.3s ease;
-                    opacity: 0.1;
                 }
                 
                 .widget-item:hover {
-                    background: var(--bg-lighter);
-                    border-color: var(--primary-color);
+                    background: var(--bg-quaternary);
+                    border-color: var(--border-secondary);
                     transform: translateX(4px) translateY(-2px);
-                    box-shadow: var(--shadow-medium);
+                    box-shadow: var(--shadow-light);
                     color: var(--text-primary);
-                }
-                
-                .widget-item:hover::before {
-                    left: 0;
                 }
                 
                 .widget-item:active { 
@@ -362,20 +329,18 @@ export class FullQtDesigner {
                     width: 18px;
                     height: 18px;
                     margin-right: 10px;
-                    background-size: contain;
-                    background-repeat: no-repeat;
-                    background-position: center;
-                    filter: brightness(1.2);
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     font-size: 14px;
+                    color: var(--text-primary);
                 }
                 
                 .dropped-widget {
                     position: absolute;
-                    border: 2px solid var(--primary-color);
-                    background: linear-gradient(45deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+                    border: 2px solid var(--border-light);
+                    background: var(--bg-surface);
+                    color: var(--text-inverse);
                     cursor: move;
                     min-width: 100px;
                     min-height: 40px;
@@ -385,36 +350,38 @@ export class FullQtDesigner {
                     font-size: 12px;
                     font-weight: 500;
                     border-radius: var(--border-radius);
-                    color: var(--text-primary);
                     box-shadow: var(--shadow-light);
-                    backdrop-filter: blur(10px);
+                    transition: all var(--transition-fast);
                 }
                 
                 .dropped-widget.selected {
-                    border-color: var(--accent-color);
-                    background: linear-gradient(45deg, rgba(240, 147, 251, 0.2), rgba(245, 87, 108, 0.2));
+                    border-color: var(--text-primary);
                     box-shadow: var(--shadow-medium);
+                    background: var(--bg-quaternary);
+                    color: var(--text-primary);
                 }
                 
                 .dropped-widget:hover {
-                    border-color: var(--success-color);
+                    border-color: var(--border-light);
                     transform: scale(1.02);
+                    box-shadow: var(--shadow-medium);
                 }
                 
                 .resize-handle {
                     position: absolute;
                     width: 10px;
                     height: 10px;
-                    background: var(--primary-gradient);
-                    border: 2px solid white;
+                    background: var(--text-primary);
+                    border: 2px solid var(--bg-primary);
                     border-radius: 50%;
                     box-shadow: var(--shadow-light);
-                    transition: all 0.2s ease;
+                    transition: all var(--transition-fast);
                 }
                 
                 .resize-handle:hover {
                     transform: scale(1.2);
                     box-shadow: var(--shadow-medium);
+                    background: var(--border-light);
                 }
                 
                 .resize-handle.nw { top: -5px; left: -5px; cursor: nw-resize; }
@@ -427,10 +394,10 @@ export class FullQtDesigner {
                 .resize-handle.e { top: calc(50% - 5px); right: -5px; cursor: e-resize; }
                 
                 .status-bar {
-                    background: var(--bg-medium);
+                    background: var(--bg-secondary);
                     color: var(--text-secondary);
                     padding: 8px 16px;
-                    border-top: 1px solid var(--bg-lighter);
+                    border-top: 1px solid var(--border-primary);
                     font-size: 11px;
                     display: flex;
                     justify-content: space-between;
@@ -447,32 +414,32 @@ export class FullQtDesigner {
                     width: 8px;
                     height: 8px;
                     border-radius: 50%;
-                    background: var(--success-color);
+                    background: var(--text-primary);
                     animation: pulse 2s infinite;
                 }
                 
                 @keyframes pulse {
                     0%, 100% { opacity: 1; }
-                    50% { opacity: 0.5; }
+                    50% { opacity: 0.3; }
                 }
                 
                 .form-container {
                     margin: 20px;
                     min-height: 400px;
-                    background: var(--bg-light);
-                    border: 2px dashed var(--bg-lighter);
+                    background: var(--bg-tertiary);
+                    border: 2px dashed var(--border-primary);
                     border-radius: var(--border-radius);
                     position: relative;
-                    transition: all 0.3s ease;
+                    transition: all var(--transition-normal);
                 }
                 
                 .form-container:hover {
-                    border-color: var(--primary-color);
-                    background: var(--bg-lighter);
+                    border-color: var(--border-secondary);
+                    background: var(--bg-quaternary);
                 }
                 
                 .form-container.has-content {
-                    border: 1px solid var(--bg-lighter);
+                    border: 1px solid var(--border-primary);
                     border-style: solid;
                 }
                 
@@ -492,15 +459,16 @@ export class FullQtDesigner {
                     position: fixed;
                     top: 70px;
                     right: 20px;
-                    background: var(--success-gradient);
-                    color: white;
+                    background: var(--bg-surface);
+                    color: var(--text-inverse);
                     padding: 8px 12px;
                     border-radius: var(--border-radius);
                     font-size: 11px;
                     font-weight: 500;
                     box-shadow: var(--shadow-medium);
+                    border: 1px solid var(--border-primary);
                     z-index: 1000;
-                    transition: all 0.3s ease;
+                    transition: all var(--transition-normal);
                     opacity: 0;
                     transform: translateY(-10px);
                 }
@@ -1066,8 +1034,9 @@ export class FullQtDesigner {
                             properties: JSON.parse(el.dataset.properties || '{}')
                         }));
                         
+                        // Send to VS Code for QML generation and editor update
                         vscode.postMessage({
-                            command: 'syncToEditor',
+                            command: 'generateQML',
                             widgets: widgets
                         });
                         
@@ -1214,23 +1183,30 @@ export class FullQtDesigner {
                         w.querySelectorAll('.resize-handle').forEach(h => h.style.display = 'none');
                     });
                     
+                    if (!widget) {
+                        selectedWidget = null;
+                        return;
+                    }
+                    
                     // Select new widget
                     selectedWidget = widget;
                     widget.classList.add('selected');
                     widget.querySelectorAll('.resize-handle').forEach(h => h.style.display = 'block');
                     
-                    // Update property panel
+                    // Send widget selection to property panel and VS Code
+                    const widgetData = {
+                        id: widget.dataset.id,
+                        type: widget.dataset.widget,
+                        properties: JSON.parse(widget.dataset.properties || '{}'),
+                        x: parseInt(widget.style.left) || 0,
+                        y: parseInt(widget.style.top) || 0,
+                        width: parseInt(widget.style.width) || 100,
+                        height: parseInt(widget.style.height) || 30
+                    };
+                    
                     vscode.postMessage({
-                        command: 'selectWidget',
-                        widget: {
-                            id: widget.dataset.id,
-                            type: widget.dataset.widget,
-                            properties: JSON.parse(widget.dataset.properties || '{}'),
-                            x: parseInt(widget.style.left) || 0,
-                            y: parseInt(widget.style.top) || 0,
-                            width: parseInt(widget.style.width) || 100,
-                            height: parseInt(widget.style.height) || 30
-                        }
+                        command: 'widgetSelected',
+                        widget: widgetData
                     });
                 }
                 
@@ -1853,62 +1829,117 @@ export class FullQtDesigner {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Live Preview</title>
             <style>
+                :root {
+                    /* Black and White Theme */
+                    --bg-primary: #000000;
+                    --bg-secondary: #1a1a1a;
+                    --bg-tertiary: #2a2a2a;
+                    --bg-surface: #ffffff;
+                    --text-primary: #ffffff;
+                    --text-secondary: #e0e0e0;
+                    --text-inverse: #000000;
+                    --border-primary: #333333;
+                    --border-secondary: #555555;
+                    --shadow-light: 0 2px 8px rgba(0,0,0,0.3);
+                    --border-radius: 6px;
+                    --transition-fast: 0.15s ease;
+                }
+
                 * { margin: 0; padding: 0; box-sizing: border-box; }
+                
                 body { 
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                    background: #f5f5f5;
+                    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+                    background: var(--bg-primary);
+                    color: var(--text-primary);
                     height: 100vh;
                     display: flex;
                     flex-direction: column;
+                    font-size: 13px;
                 }
                 
                 .preview-toolbar {
-                    background: #2d2d30;
-                    color: white;
-                    padding: 8px;
+                    background: var(--bg-secondary);
+                    color: var(--text-primary);
+                    padding: 12px 16px;
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
-                    border-bottom: 1px solid #3e3e42;
+                    border-bottom: 2px solid var(--border-primary);
+                    box-shadow: var(--shadow-light);
                 }
                 
-                .preview-container {
-                    flex: 1;
-                    padding: 20px;
-                    overflow: auto;
-                    background: white;
-                    margin: 8px;
-                    border-radius: 4px;
-                    border: 1px solid #ddd;
+                .preview-title {
+                    font-size: 14px;
+                    font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                }
+                
+                .preview-title::before {
+                    content: '▶';
+                    margin-right: 8px;
+                    font-size: 16px;
                 }
                 
                 .live-indicator {
                     display: flex;
                     align-items: center;
                     gap: 8px;
-                    font-size: 12px;
+                    font-size: 11px;
+                    color: var(--text-secondary);
                 }
                 
                 .live-dot {
                     width: 8px;
                     height: 8px;
-                    background: #4caf50;
+                    background: var(--text-primary);
                     border-radius: 50%;
                     animation: pulse 2s infinite;
                 }
                 
                 @keyframes pulse {
-                    0% { opacity: 1; }
-                    50% { opacity: 0.5; }
-                    100% { opacity: 1; }
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.3; }
+                }
+                
+                .preview-controls {
+                    display: flex;
+                    gap: 8px;
+                }
+                
+                .preview-btn {
+                    background: var(--bg-tertiary);
+                    color: var(--text-primary);
+                    border: 1px solid var(--border-primary);
+                    padding: 6px 12px;
+                    border-radius: var(--border-radius);
+                    cursor: pointer;
+                    font-size: 11px;
+                    transition: all var(--transition-fast);
+                }
+                
+                .preview-btn:hover {
+                    background: var(--bg-surface);
+                    color: var(--text-inverse);
+                }
+                
+                .preview-container {
+                    flex: 1;
+                    padding: 20px;
+                    overflow: auto;
+                    background: var(--bg-tertiary);
+                    margin: 16px;
+                    border-radius: var(--border-radius);
+                    border: 1px solid var(--border-primary);
+                    box-shadow: var(--shadow-light);
                 }
                 
                 .preview-frame {
                     width: 100%;
-                    height: 500px;
-                    border: 1px solid #ddd;
-                    border-radius: 4px;
-                    background: white;
+                    min-height: 500px;
+                    border: 1px solid var(--border-primary);
+                    border-radius: var(--border-radius);
+                    background: var(--bg-surface);
                     position: relative;
                     overflow: hidden;
                 }
@@ -1917,47 +1948,104 @@ export class FullQtDesigner {
                     padding: 20px;
                     height: 100%;
                     position: relative;
+                    background: var(--bg-surface);
+                    color: var(--text-inverse);
                 }
                 
-                /* QML Component Styles */
-                .qml-label { color: #333; font-size: 14px; }
+                .no-preview {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100%;
+                    color: var(--text-inverse);
+                    opacity: 0.6;
+                }
+                
+                .no-preview-icon {
+                    font-size: 48px;
+                    margin-bottom: 16px;
+                }
+                
+                /* QML Widget Styles for Preview */
+                .qml-widget {
+                    position: absolute;
+                    border: 1px solid var(--border-primary);
+                    background: var(--bg-surface);
+                    color: var(--text-inverse);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-family: inherit;
+                    border-radius: 4px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                }
+                
+                .qml-label { 
+                    background: transparent;
+                    border: none;
+                    font-weight: 500;
+                }
+                
                 .qml-button { 
-                    background: #0078d4; color: white; border: none; 
-                    padding: 8px 16px; border-radius: 4px; cursor: pointer;
+                    background: var(--bg-secondary);
+                    color: var(--text-primary);
+                    border: 1px solid var(--border-secondary);
+                    cursor: pointer;
+                    transition: all var(--transition-fast);
+                    font-weight: 500;
                 }
-                .qml-button:hover { background: #106ebe; }
-                .qml-textfield { 
-                    border: 1px solid #ccc; padding: 8px; border-radius: 4px;
-                    font-size: 14px;
+                
+                .qml-button:hover {
+                    background: var(--bg-tertiary);
                 }
-                .qml-checkbox { margin-right: 8px; }
-                .qml-rectangle { 
-                    border-radius: 4px; 
-                    border: 1px solid #ddd;
+                
+                .qml-textfield {
+                    background: var(--bg-surface);
+                    color: var(--text-inverse);
+                    border: 1px solid var(--border-primary);
+                    padding: 4px 8px;
+                    font-size: 12px;
                 }
-                .qml-row { display: flex; gap: 10px; align-items: center; }
-                .qml-column { display: flex; flex-direction: column; gap: 10px; }
+                
+                .qml-checkbox, .qml-radiobutton {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    font-size: 12px;
+                }
+                
+                .qml-rectangle {
+                    background: var(--bg-secondary);
+                    border: 1px solid var(--border-primary);
+                }
+                
+                .qml-container {
+                    background: transparent;
+                    border: 1px dashed var(--border-primary);
+                }
             </style>
         </head>
         <body>
             <div class="preview-toolbar">
+                <div class="preview-title">Live Preview</div>
                 <div class="live-indicator">
                     <div class="live-dot"></div>
-                    Live Preview
+                    <span>Live Sync Active</span>
                 </div>
-                <div style="display: flex; gap: 8px;">
-                    <button onclick="refreshPreview()" style="background: #3c3c3c; color: white; border: 1px solid #555; padding: 4px 8px; border-radius: 3px; cursor: pointer;">🔄 Refresh</button>
-                    <button onclick="toggleFullscreen()" style="background: #3c3c3c; color: white; border: 1px solid #555; padding: 4px 8px; border-radius: 3px; cursor: pointer;">⛶ Fullscreen</button>
+                <div class="preview-controls">
+                    <button class="preview-btn" onclick="refreshPreview()">🔄 Refresh</button>
+                    <button class="preview-btn" onclick="fullscreen()">⛶ Fullscreen</button>
                 </div>
             </div>
             
             <div class="preview-container">
                 <div class="preview-frame" id="previewFrame">
                     <div class="preview-content" id="previewContent">
-                        <div style="text-align: center; color: #999; font-size: 16px; margin-top: 50px;">
-                            👁️ Live Preview
-                            <br><br>
-                            <small>Your QML interface will appear here in real-time</small>
+                        <div class="no-preview">
+                            <div class="no-preview-icon">▶</div>
+                            <div>Start designing to see live preview</div>
+                            <small style="opacity: 0.7; margin-top: 8px;">Widgets will appear here in real-time</small>
                         </div>
                     </div>
                 </div>
@@ -1965,146 +2053,112 @@ export class FullQtDesigner {
             
             <script>
                 const vscode = acquireVsCodeApi();
+                let currentWidgets = [];
                 
-                function refreshPreview() {
-                    vscode.postMessage({ command: 'refreshPreview' });
-                }
-                
-                function toggleFullscreen() {
-                    vscode.postMessage({ command: 'toggleFullscreen' });
-                }
-                
-                function renderQMLPreview(widgets) {
-                    const content = document.getElementById('previewContent');
-                    content.innerHTML = '';
+                // Listen for widget updates from designer
+                window.addEventListener('message', (event) => {
+                    const message = event.data;
                     
+                    switch (message.command) {
+                        case 'updatePreview':
+                            updatePreview(message.widgets);
+                            break;
+                        case 'clearPreview':
+                            clearPreview();
+                            break;
+                    }
+                });
+                
+                function updatePreview(widgets) {
                     if (!widgets || widgets.length === 0) {
-                        content.innerHTML = '<div style="text-align: center; color: #999; font-size: 16px; margin-top: 50px;">👁️ Live Preview<br><br><small>Your QML interface will appear here in real-time</small></div>';
+                        showNoPreview();
                         return;
                     }
                     
+                    currentWidgets = widgets;
+                    const previewContent = document.getElementById('previewContent');
+                    previewContent.innerHTML = '';
+                    
                     widgets.forEach(widget => {
-                        const element = createPreviewElement(widget);
-                        content.appendChild(element);
+                        const element = createPreviewWidget(widget);
+                        previewContent.appendChild(element);
                     });
                 }
                 
-                function createPreviewElement(widget) {
+                function createPreviewWidget(widget) {
                     const element = document.createElement('div');
-                    element.style.position = 'absolute';
-                    element.style.left = widget.position.x + 'px';
-                    element.style.top = widget.position.y + 'px';
-                    element.style.width = widget.position.width + 'px';
-                    element.style.height = widget.position.height + 'px';
+                    element.className = 'qml-widget qml-' + widget.type.toLowerCase();
+                    element.style.left = widget.x + 'px';
+                    element.style.top = widget.y + 'px';
+                    element.style.width = widget.width + 'px';
+                    element.style.height = widget.height + 'px';
                     
-                    switch (widget.type) {
-                        case 'Label':
-                            element.className = 'qml-label';
-                            element.textContent = widget.properties.text || 'Label';
-                            break;
-                            
-                        case 'Button':
-                            element.className = 'qml-button';
-                            element.textContent = widget.properties.text || 'Button';
-                            element.style.display = 'flex';
-                            element.style.alignItems = 'center';
-                            element.style.justifyContent = 'center';
-                            break;
-                            
-                        case 'TextField':
-                            const input = document.createElement('input');
-                            input.className = 'qml-textfield';
-                            input.type = 'text';
-                            input.placeholder = widget.properties.placeholderText || '';
-                            input.value = widget.properties.text || '';
-                            input.style.width = '100%';
-                            input.style.height = '100%';
-                            element.appendChild(input);
-                            break;
-                            
-                        case 'Rectangle':
-                            element.className = 'qml-rectangle';
-                            element.style.backgroundColor = widget.properties.color || '#f0f0f0';
-                            if (widget.properties.border) {
-                                element.style.borderWidth = widget.properties.border.width + 'px';
-                                element.style.borderColor = widget.properties.border.color;
-                            }
-                            break;
-                            
-                        case 'CheckBox':
-                            const checkbox = document.createElement('input');
-                            checkbox.type = 'checkbox';
-                            checkbox.className = 'qml-checkbox';
-                            checkbox.checked = widget.properties.checked || false;
-                            
-                            const label = document.createElement('label');
-                            label.appendChild(checkbox);
-                            label.appendChild(document.createTextNode(widget.properties.text || 'CheckBox'));
-                            label.style.display = 'flex';
-                            label.style.alignItems = 'center';
-                            
-                            element.appendChild(label);
-                            break;
-                            
-                        default:
-                            element.textContent = widget.type;
-                            element.style.border = '1px solid #ccc';
-                            element.style.display = 'flex';
-                            element.style.alignItems = 'center';
-                            element.style.justifyContent = 'center';
-                            element.style.backgroundColor = '#f9f9f9';
+                    // Apply properties
+                    const props = widget.properties || {};
+                    
+                    if (props.text) {
+                        element.textContent = props.text;
+                    } else if (props.placeholderText) {
+                        element.textContent = props.placeholderText;
+                        element.style.opacity = '0.6';
+                    } else {
+                        element.textContent = widget.type;
+                    }
+                    
+                    if (props.color) {
+                        element.style.color = props.color;
+                    }
+                    
+                    if (props.backgroundColor) {
+                        element.style.backgroundColor = props.backgroundColor;
+                    }
+                    
+                    if (props.border) {
+                        element.style.border = props.border;
+                    }
+                    
+                    if (props.fontSize) {
+                        element.style.fontSize = props.fontSize + 'px';
+                    }
+                    
+                    if (props.fontWeight) {
+                        element.style.fontWeight = props.fontWeight;
                     }
                     
                     return element;
                 }
                 
-                // Listen for messages from VS Code
-                window.addEventListener('message', event => {
-                    const message = event.data;
-                    switch (message.command) {
-                        case 'updatePreview':
-                            renderQMLPreview(message.widgets);
-                            updateLiveIndicator(true);
-                            break;
-                        case 'updateFromCode':
-                            renderQMLPreview(message.widgets);
-                            updateLiveIndicator(true);
-                            break;
-                    }
-                });
-
-                function updateLiveIndicator(isActive) {
-                    const dot = document.querySelector('.live-dot');
-                    if (dot) {
-                        dot.style.backgroundColor = isActive ? '#4caf50' : '#ff9800';
-                        dot.style.animation = isActive ? 'pulse 2s infinite' : 'none';
-                    }
+                function showNoPreview() {
+                    const previewContent = document.getElementById('previewContent');
+                    previewContent.innerHTML = \`
+                        <div class="no-preview">
+                            <div class="no-preview-icon">▶</div>
+                            <div>Start designing to see live preview</div>
+                            <small style="opacity: 0.7; margin-top: 8px;">Widgets will appear here in real-time</small>
+                        </div>
+                    \`;
                 }
-
-                function renderQMLPreview(widgets) {
-                    const content = document.getElementById('previewContent');
-                    content.innerHTML = '';
-                    
-                    if (!widgets || widgets.length === 0) {
-                        content.innerHTML = '<div style="text-align: center; color: #999; font-size: 16px; margin-top: 50px;">👁️ Live Preview<br><br><small>Your QML interface will appear here in real-time</small></div>';
-                        updateLiveIndicator(false);
-                        return;
-                    }
-                    
-                    // Create a container for the widgets
-                    const container = document.createElement('div');
-                    container.style.position = 'relative';
-                    container.style.width = '100%';
-                    container.style.height = '100%';
-                    
-                    widgets.forEach(widget => {
-                        const element = createPreviewElement(widget);
-                        container.appendChild(element);
+                
+                function clearPreview() {
+                    currentWidgets = [];
+                    showNoPreview();
+                }
+                
+                function refreshPreview() {
+                    vscode.postMessage({
+                        command: 'refreshPreview'
                     });
-                    
-                    content.appendChild(container);
-                    updateLiveIndicator(true);
                 }
+                
+                function fullscreen() {
+                    const frame = document.getElementById('previewFrame');
+                    if (frame.requestFullscreen) {
+                        frame.requestFullscreen();
+                    }
+                }
+                
+                // Initialize
+                showNoPreview();
             </script>
         </body>
         </html>`;
@@ -2116,32 +2170,22 @@ export class FullQtDesigner {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Professional Properties Panel</title>
+            <title>Property Panel</title>
             <style>
                 :root {
-                    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-                    --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-                    --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-                    
-                    --primary-color: #667eea;
-                    --secondary-color: #764ba2;
-                    --accent-color: #f093fb;
-                    --success-color: #4facfe;
-                    --warning-color: #43e97b;
-                    --danger-color: #f5576c;
-                    
-                    --bg-dark: #1e1e1e;
-                    --bg-medium: #2d2d30;
-                    --bg-light: #3e3e42;
-                    --bg-lighter: #4e4e52;
+                    /* Black and White Theme */
+                    --bg-primary: #000000;
+                    --bg-secondary: #1a1a1a;
+                    --bg-tertiary: #2a2a2a;
+                    --bg-surface: #ffffff;
                     --text-primary: #ffffff;
-                    --text-secondary: #cccccc;
-                    --text-muted: #999999;
-                    
-                    --border-radius: 8px;
-                    --shadow-light: 0 2px 8px rgba(0,0,0,0.1);
-                    --shadow-medium: 0 4px 16px rgba(0,0,0,0.15);
+                    --text-secondary: #e0e0e0;
+                    --text-inverse: #000000;
+                    --border-primary: #333333;
+                    --border-secondary: #555555;
+                    --shadow-light: 0 2px 8px rgba(0,0,0,0.3);
+                    --border-radius: 6px;
+                    --transition-fast: 0.15s ease;
                 }
 
                 * { 
@@ -2151,8 +2195,8 @@ export class FullQtDesigner {
                 }
 
                 body { 
-                    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, sans-serif;
-                    background: var(--bg-dark);
+                    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+                    background: var(--bg-primary);
                     color: var(--text-primary);
                     height: 100vh;
                     display: flex;
@@ -2162,10 +2206,10 @@ export class FullQtDesigner {
                 }
                 
                 .property-header {
-                    background: var(--primary-gradient);
-                    color: white;
+                    background: var(--bg-secondary);
+                    color: var(--text-primary);
                     padding: 12px 16px;
-                    border-bottom: 1px solid var(--bg-lighter);
+                    border-bottom: 2px solid var(--border-primary);
                     font-size: 14px;
                     font-weight: 600;
                     display: flex;
@@ -2174,31 +2218,43 @@ export class FullQtDesigner {
                     box-shadow: var(--shadow-light);
                 }
                 
-                .property-header::before {
-                    content: '⚙️';
+                .property-title {
+                    display: flex;
+                    align-items: center;
+                }
+                
+                .property-title::before {
+                    content: '⚙';
                     margin-right: 8px;
                     font-size: 16px;
-                    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
                 }
                 
                 .property-sync-indicator {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-size: 11px;
+                    color: var(--text-secondary);
+                }
+                
+                .sync-dot {
                     width: 8px;
                     height: 8px;
+                    background: var(--text-primary);
                     border-radius: 50%;
-                    background: var(--success-color);
                     animation: pulse 2s infinite;
                 }
                 
                 @keyframes pulse {
                     0%, 100% { opacity: 1; }
-                    50% { opacity: 0.5; }
+                    50% { opacity: 0.3; }
                 }
                 
                 .property-content {
                     flex: 1;
                     overflow-y: auto;
                     padding: 16px;
-                    background: var(--bg-dark);
+                    background: var(--bg-primary);
                 }
                 
                 .no-selection {
@@ -2208,18 +2264,52 @@ export class FullQtDesigner {
                     justify-content: center;
                     height: 100%;
                     text-align: center;
-                    color: var(--text-muted);
+                    color: var(--text-secondary);
+                    opacity: 0.6;
                 }
                 
                 .no-selection-icon {
                     font-size: 48px;
                     margin-bottom: 16px;
-                    opacity: 0.5;
+                }
+                
+                .widget-info {
+                    background: var(--bg-secondary);
+                    border: 1px solid var(--border-primary);
+                    border-radius: var(--border-radius);
+                    padding: 16px;
+                    margin-bottom: 16px;
+                    box-shadow: var(--shadow-light);
+                }
+                
+                .widget-type {
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: var(--text-primary);
+                    margin-bottom: 8px;
+                    display: flex;
+                    align-items: center;
+                }
+                
+                .widget-type::before {
+                    content: '▣';
+                    margin-right: 8px;
+                    font-size: 18px;
+                }
+                
+                .widget-id {
+                    font-size: 11px;
+                    color: var(--text-secondary);
+                    font-family: 'Monaco', 'Consolas', monospace;
+                    background: var(--bg-tertiary);
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    border: 1px solid var(--border-primary);
                 }
                 
                 .property-group {
-                    background: var(--bg-medium);
-                    border: 1px solid var(--bg-lighter);
+                    background: var(--bg-secondary);
+                    border: 1px solid var(--border-primary);
                     border-radius: var(--border-radius);
                     margin-bottom: 16px;
                     overflow: hidden;
@@ -2227,9 +2317,9 @@ export class FullQtDesigner {
                 }
                 
                 .property-group-header {
-                    background: var(--bg-light);
+                    background: var(--bg-tertiary);
                     padding: 10px 16px;
-                    border-bottom: 1px solid var(--bg-lighter);
+                    border-bottom: 1px solid var(--border-primary);
                     font-weight: 600;
                     font-size: 12px;
                     color: var(--text-primary);
@@ -2237,11 +2327,12 @@ export class FullQtDesigner {
                     align-items: center;
                     justify-content: space-between;
                     cursor: pointer;
-                    transition: background-color 0.2s ease;
+                    transition: background-color var(--transition-fast);
                 }
                 
                 .property-group-header:hover {
-                    background: var(--bg-lighter);
+                    background: var(--bg-surface);
+                    color: var(--text-inverse);
                 }
                 
                 .property-group-header.collapsed {
@@ -2255,7 +2346,7 @@ export class FullQtDesigner {
                 
                 .property-group-toggle {
                     font-size: 10px;
-                    color: var(--text-muted);
+                    color: var(--text-secondary);
                     transition: transform 0.2s ease;
                 }
                 
@@ -2278,13 +2369,13 @@ export class FullQtDesigner {
                     display: flex;
                     align-items: center;
                     padding: 8px 16px;
-                    border-bottom: 1px solid rgba(255,255,255,0.05);
+                    border-bottom: 1px solid var(--border-primary);
                     font-size: 12px;
-                    transition: background-color 0.2s ease;
+                    transition: background-color var(--transition-fast);
                 }
                 
                 .property-item:hover {
-                    background-color: rgba(255,255,255,0.02);
+                    background-color: var(--bg-tertiary);
                 }
                 
                 .property-item:last-child {
@@ -2308,519 +2399,122 @@ export class FullQtDesigner {
                 .property-input textarea {
                     width: 100%;
                     padding: 6px 10px;
-                    background: var(--bg-light);
-                    border: 1px solid var(--bg-lighter);
+                    background: var(--bg-surface);
+                    border: 1px solid var(--border-primary);
                     border-radius: var(--border-radius);
-                    color: var(--text-primary);
+                    color: var(--text-inverse);
                     font-size: 11px;
                     font-family: inherit;
-                    transition: all 0.2s ease;
+                    transition: all var(--transition-fast);
                 }
                 
                 .property-input input:focus,
                 .property-input select:focus,
                 .property-input textarea:focus {
                     outline: none;
-                    border-color: var(--primary-color);
-                    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+                    border-color: var(--text-primary);
+                    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
                 }
                 
                 .property-input input[type="checkbox"] {
                     width: auto;
                     margin-right: 8px;
-                    accent-color: var(--primary-color);
                 }
                 
                 .property-input input[type="color"] {
-                    width: 50px;
-                    height: 32px;
-                    padding: 2px;
-                    border-radius: var(--border-radius);
+                    width: 40px;
+                    height: 30px;
+                    padding: 0;
+                    border: 1px solid var(--border-primary);
                     cursor: pointer;
                 }
                 
-                .property-input input[type="range"] {
-                    accent-color: var(--primary-color);
+                .property-input textarea {
+                    resize: vertical;
+                    min-height: 60px;
                 }
                 
-                .property-input .input-group {
+                .property-actions {
+                    padding: 16px;
+                    background: var(--bg-secondary);
+                    border-top: 1px solid var(--border-primary);
                     display: flex;
-                    gap: 4px;
-                }
-                
-                .property-input .input-group input {
-                    flex: 1;
-                }
-                
-                .property-input .unit-label {
-                    display: flex;
-                    align-items: center;
-                    padding: 0 8px;
-                    background: var(--bg-lighter);
-                    border: 1px solid var(--bg-lighter);
-                    border-left: none;
-                    border-radius: 0 var(--border-radius) var(--border-radius) 0;
-                    color: var(--text-muted);
-                    font-size: 10px;
-                    white-space: nowrap;
-                }
-                
-                .property-button {
-                    background: var(--primary-gradient);
-                    color: white;
-                    border: none;
-                    padding: 6px 12px;
-                    border-radius: var(--border-radius);
-                    font-size: 11px;
-                    font-weight: 500;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                    margin-top: 4px;
-                }
-                
-                .property-button:hover {
-                    transform: translateY(-1px);
-                    box-shadow: var(--shadow-light);
-                }
-                
-                .property-button.secondary {
-                    background: var(--bg-lighter);
-                    color: var(--text-secondary);
-                }
-                
-                .property-button.danger {
-                    background: var(--secondary-gradient);
-                }
-                
-                .widget-info {
-                    background: var(--bg-medium);
-                    padding: 12px 16px;
-                    margin-bottom: 16px;
-                    border-radius: var(--border-radius);
-                    border: 1px solid var(--bg-lighter);
-                }
-                
-                .widget-type {
-                    font-size: 14px;
-                    font-weight: 600;
-                    color: var(--primary-color);
-                    margin-bottom: 4px;
-                }
-                
-                .widget-id {
-                    font-size: 11px;
-                    color: var(--text-muted);
-                    font-family: 'Courier New', monospace;
-                }
-                
-                .property-tabs {
-                    display: flex;
-                    background: var(--bg-medium);
-                    border-radius: var(--border-radius) var(--border-radius) 0 0;
-                    overflow: hidden;
-                    margin-bottom: 16px;
-                }
-                
-                .property-tab {
-                    flex: 1;
-                    padding: 10px 12px;
-                    background: var(--bg-light);
-                    color: var(--text-muted);
-                    border: none;
-                    cursor: pointer;
-                    font-size: 11px;
-                    font-weight: 500;
-                    transition: all 0.2s ease;
-                    border-right: 1px solid var(--bg-lighter);
-                }
-                
-                .property-tab:last-child {
-                    border-right: none;
-                }
-                
-                .property-tab.active {
-                    background: var(--primary-gradient);
-                    color: white;
-                }
-                
-                .property-tab:hover:not(.active) {
-                    background: var(--bg-lighter);
-                    color: var(--text-secondary);
-                }
-                
-                .color-picker-group {
-                    display: flex;
-                    gap: 8px;
-                    align-items: center;
-                }
-                
-                .color-preset {
-                    width: 20px;
-                    height: 20px;
-                    border-radius: 50%;
-                    cursor: pointer;
-                    border: 2px solid var(--bg-lighter);
-                    transition: all 0.2s ease;
-                }
-                
-                .color-preset:hover {
-                    transform: scale(1.1);
-                    border-color: var(--text-secondary);
-                }
-                
-                .range-group {
-                    display: flex;
-                    align-items: center;
                     gap: 8px;
                 }
                 
-                .range-value {
-                    min-width: 40px;
-                    text-align: center;
-                    background: var(--bg-lighter);
-                    border: 1px solid var(--bg-lighter);
-                    border-radius: var(--border-radius);
-                    padding: 4px 6px;
-                    font-size: 10px;
+                .property-btn {
+                    background: var(--bg-tertiary);
                     color: var(--text-primary);
+                    border: 1px solid var(--border-primary);
+                    padding: 8px 16px;
+                    border-radius: var(--border-radius);
+                    cursor: pointer;
+                    font-size: 11px;
+                    font-weight: 500;
+                    transition: all var(--transition-fast);
+                    flex: 1;
+                }
+                
+                .property-btn:hover {
+                    background: var(--bg-surface);
+                    color: var(--text-inverse);
+                }
+                
+                .property-btn.primary {
+                    background: var(--text-primary);
+                    color: var(--text-inverse);
+                }
+                
+                .property-btn.primary:hover {
+                    background: var(--text-secondary);
+                }
+                
+                /* Custom scrollbar */
+                .property-content::-webkit-scrollbar {
+                    width: 8px;
+                }
+                
+                .property-content::-webkit-scrollbar-track {
+                    background: var(--bg-primary);
+                }
+                
+                .property-content::-webkit-scrollbar-thumb {
+                    background: var(--border-primary);
+                    border-radius: 4px;
+                }
+                
+                .property-content::-webkit-scrollbar-thumb:hover {
+                    background: var(--border-secondary);
                 }
             </style>
         </head>
         <body>
             <div class="property-header">
-                Professional Properties
-                <div class="property-sync-indicator" title="Real-time sync active"></div>
+                <div class="property-title">Properties</div>
+                <div class="property-sync-indicator">
+                    <div class="sync-dot"></div>
+                    <span>Sync Active</span>
+                </div>
             </div>
             
             <div class="property-content" id="propertyContent">
-                <div class="no-selection" id="noSelection">
-                    <div class="no-selection-icon">🎯</div>
-                    <div>
-                        <h3>No Widget Selected</h3>
-                        <p>Select a widget in the designer<br>to edit its properties</p>
-                    </div>
+                <div class="no-selection">
+                    <div class="no-selection-icon">⚙</div>
+                    <div>No widget selected</div>
+                    <small style="margin-top: 8px; opacity: 0.7;">Select a widget to edit properties</small>
                 </div>
-                
-                <div id="widgetProperties" style="display: none;">
-                    <div class="widget-info">
-                        <div class="widget-type" id="widgetType">Button</div>
-                        <div class="widget-id" id="widgetId">widget_1</div>
-                    </div>
-                    
-                    <div class="property-tabs">
-                        <button class="property-tab active" data-tab="general">General</button>
-                        <button class="property-tab" data-tab="layout">Layout</button>
-                        <button class="property-tab" data-tab="style">Style</button>
-                    </div>
-                    
-                    <div class="tab-content" id="generalTab">
-                        <div class="property-group">
-                            <div class="property-group-header">
-                                <span><span class="property-group-icon">📝</span>Content</span>
-                                <span class="property-group-toggle">▼</span>
-                            </div>
-                            <div class="property-group-content">
-                                <div class="property-item">
-                                    <div class="property-label">Text</div>
-                                    <div class="property-input">
-                                        <input type="text" id="prop-text" placeholder="Enter text...">
-                                    </div>
-                                </div>
-                                <div class="property-item">
-                                    <div class="property-label">Placeholder</div>
-                                    <div class="property-input">
-                                        <input type="text" id="prop-placeholder" placeholder="Placeholder text...">
-                                    </div>
-                                </div>
-                                <div class="property-item">
-                                    <div class="property-label">Enabled</div>
-                                    <div class="property-input">
-                                        <input type="checkbox" id="prop-enabled" checked>
-                                        <label for="prop-enabled">Widget is enabled</label>
-                                    </div>
-                                </div>
-                                <div class="property-item">
-                                    <div class="property-label">Visible</div>
-                                    <div class="property-input">
-                                        <input type="checkbox" id="prop-visible" checked>
-                                        <label for="prop-visible">Widget is visible</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="tab-content" id="layoutTab" style="display: none;">
-                        <div class="property-group">
-                            <div class="property-group-header">
-                                <span><span class="property-group-icon">📐</span>Position & Size</span>
-                                <span class="property-group-toggle">▼</span>
-                            </div>
-                            <div class="property-group-content">
-                                <div class="property-item">
-                                    <div class="property-label">X Position</div>
-                                    <div class="property-input">
-                                        <div class="input-group">
-                                            <input type="number" id="prop-x" min="0" value="0">
-                                            <div class="unit-label">px</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="property-item">
-                                    <div class="property-label">Y Position</div>
-                                    <div class="property-input">
-                                        <div class="input-group">
-                                            <input type="number" id="prop-y" min="0" value="0">
-                                            <div class="unit-label">px</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="property-item">
-                                    <div class="property-label">Width</div>
-                                    <div class="property-input">
-                                        <div class="input-group">
-                                            <input type="number" id="prop-width" min="1" value="100">
-                                            <div class="unit-label">px</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="property-item">
-                                    <div class="property-label">Height</div>
-                                    <div class="property-input">
-                                        <div class="input-group">
-                                            <input type="number" id="prop-height" min="1" value="30">
-                                            <div class="unit-label">px</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="tab-content" id="styleTab" style="display: none;">
-                        <div class="property-group">
-                            <div class="property-group-header">
-                                <span><span class="property-group-icon">🎨</span>Colors</span>
-                                <span class="property-group-toggle">▼</span>
-                            </div>
-                            <div class="property-group-content">
-                                <div class="property-item">
-                                    <div class="property-label">Text Color</div>
-                                    <div class="property-input">
-                                        <div class="color-picker-group">
-                                            <input type="color" id="prop-color" value="#ffffff">
-                                            <div class="color-preset" style="background: #ffffff;" data-color="#ffffff"></div>
-                                            <div class="color-preset" style="background: #000000;" data-color="#000000"></div>
-                                            <div class="color-preset" style="background: #667eea;" data-color="#667eea"></div>
-                                            <div class="color-preset" style="background: #f093fb;" data-color="#f093fb"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="property-item">
-                                    <div class="property-label">Background</div>
-                                    <div class="property-input">
-                                        <div class="color-picker-group">
-                                            <input type="color" id="prop-backgroundColor" value="#3e3e42">
-                                            <div class="color-preset" style="background: transparent; border: 2px dashed #666;" data-color="transparent"></div>
-                                            <div class="color-preset" style="background: #3e3e42;" data-color="#3e3e42"></div>
-                                            <div class="color-preset" style="background: #667eea;" data-color="#667eea"></div>
-                                            <div class="color-preset" style="background: #f093fb;" data-color="#f093fb"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="property-item">
-                                    <div class="property-label">Opacity</div>
-                                    <div class="property-input">
-                                        <div class="range-group">
-                                            <input type="range" id="prop-opacity" min="0" max="1" step="0.1" value="1">
-                                            <input type="number" class="range-value" id="prop-opacity-value" min="0" max="1" step="0.1" value="1">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="property-group">
-                            <div class="property-group-header">
-                                <span><span class="property-group-icon">🖼️</span>Appearance</span>
-                                <span class="property-group-toggle">▼</span>
-                            </div>
-                            <div class="property-group-content">
-                                <div class="property-item">
-                                    <div class="property-label">Border Radius</div>
-                                    <div class="property-input">
-                                        <div class="input-group">
-                                            <input type="number" id="prop-borderRadius" min="0" value="8">
-                                            <div class="unit-label">px</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="property-item">
-                                    <div class="property-label">Font Size</div>
-                                    <div class="property-input">
-                                        <div class="input-group">
-                                            <input type="number" id="prop-fontSize" min="8" max="72" value="13">
-                                            <div class="unit-label">px</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="property-item">
-                                    <div class="property-label">Font Weight</div>
-                                    <div class="property-input">
-                                        <select id="prop-fontWeight">
-                                            <option value="normal">Normal</option>
-                                            <option value="bold">Bold</option>
-                                            <option value="lighter">Lighter</option>
-                                            <option value="500">Medium</option>
-                                            <option value="600">Semi Bold</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--bg-lighter);">
-                        <button class="property-button" onclick="applyChanges()">Apply Changes</button>
-                        <button class="property-button secondary" onclick="resetProperties()">Reset</button>
-                        <button class="property-button danger" onclick="deleteWidget()">Delete Widget</button>
-                    </div>
-                </div>
+            </div>
+            
+            <div class="property-actions" id="propertyActions" style="display: none;">
+                <button class="property-btn" onclick="resetProperties()">Reset</button>
+                <button class="property-btn primary" onclick="applyProperties()">Apply</button>
             </div>
             
             <script>
                 const vscode = acquireVsCodeApi();
                 let currentWidget = null;
                 
-                // Tab switching
-                document.querySelectorAll('.property-tab').forEach(tab => {
-                    tab.addEventListener('click', () => {
-                        // Remove active class from all tabs
-                        document.querySelectorAll('.property-tab').forEach(t => t.classList.remove('active'));
-                        document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
-                        
-                        // Add active class to clicked tab
-                        tab.classList.add('active');
-                        const tabId = tab.dataset.tab + 'Tab';
-                        document.getElementById(tabId).style.display = 'block';
-                    });
-                });
-                
-                // Property group collapsing
-                document.querySelectorAll('.property-group-header').forEach(header => {
-                    header.addEventListener('click', () => {
-                        header.classList.toggle('collapsed');
-                        const content = header.nextElementSibling;
-                        content.classList.toggle('collapsed');
-                    });
-                });
-                
-                // Color preset selection
-                document.querySelectorAll('.color-preset').forEach(preset => {
-                    preset.addEventListener('click', () => {
-                        const color = preset.dataset.color;
-                        const colorInput = preset.parentElement.querySelector('input[type="color"]');
-                        if (colorInput) {
-                            colorInput.value = color === 'transparent' ? '#000000' : color;
-                            colorInput.dispatchEvent(new Event('change'));
-                        }
-                    });
-                });
-                
-                // Range slider sync
-                document.getElementById('prop-opacity').addEventListener('input', (e) => {
-                    document.getElementById('prop-opacity-value').value = e.target.value;
-                });
-                
-                document.getElementById('prop-opacity-value').addEventListener('input', (e) => {
-                    document.getElementById('prop-opacity').value = e.target.value;
-                });
-                
-                // Property change handlers
-                function setupPropertyChangeHandlers() {
-                    const inputs = document.querySelectorAll('#widgetProperties input, #widgetProperties select, #widgetProperties textarea');
-                    inputs.forEach(input => {
-                        input.addEventListener('change', () => {
-                            if (currentWidget) {
-                                updateProperty(input.id.replace('prop-', ''), input.value, input.type);
-                            }
-                        });
-                    });
-                }
-                
-                function updateProperty(property, value, type) {
-                    if (type === 'checkbox') {
-                        value = document.getElementById('prop-' + property).checked;
-                    }
-                    
-                    vscode.postMessage({
-                        command: 'updateProperty',
-                        widgetId: currentWidget.id,
-                        property: property,
-                        value: value
-                    });
-                }
-                
-                function applyChanges() {
-                    vscode.postMessage({
-                        command: 'applyProperties',
-                        widgetId: currentWidget.id
-                    });
-                }
-                
-                function resetProperties() {
-                    if (currentWidget) {
-                        loadWidgetProperties(currentWidget);
-                    }
-                }
-                
-                function deleteWidget() {
-                    if (currentWidget && confirm('Delete this widget?')) {
-                        vscode.postMessage({
-                            command: 'deleteWidget',
-                            widgetId: currentWidget.id
-                        });
-                    }
-                }
-                
-                function showNoSelection() {
-                    document.getElementById('noSelection').style.display = 'flex';
-                    document.getElementById('widgetProperties').style.display = 'none';
-                    currentWidget = null;
-                }
-                
-                function showWidgetProperties(widget) {
-                    document.getElementById('noSelection').style.display = 'none';
-                    document.getElementById('widgetProperties').style.display = 'block';
-                    currentWidget = widget;
-                    loadWidgetProperties(widget);
-                }
-                
-                function loadWidgetProperties(widget) {
-                    document.getElementById('widgetType').textContent = widget.type;
-                    document.getElementById('widgetId').textContent = widget.id;
-                    
-                    // Load property values
-                    const props = widget.properties;
-                    Object.entries(props).forEach(([key, value]) => {
-                        const input = document.getElementById('prop-' + key);
-                        if (input) {
-                            if (input.type === 'checkbox') {
-                                input.checked = value;
-                            } else {
-                                input.value = value;
-                            }
-                        }
-                    });
-                    
-                    // Load position and size
-                    document.getElementById('prop-x').value = widget.x || 0;
-                    document.getElementById('prop-y').value = widget.y || 0;
-                    document.getElementById('prop-width').value = widget.width || 100;
-                    document.getElementById('prop-height').value = widget.height || 30;
-                }
-                
-                // Message handling from designer
+                // Listen for widget selection
                 window.addEventListener('message', (event) => {
                     const message = event.data;
                     
@@ -2829,317 +2523,181 @@ export class FullQtDesigner {
                             showWidgetProperties(message.widget);
                             break;
                         case 'clearSelection':
-                            showNoSelection();
-                            break;
-                        case 'updateWidget':
-                            if (currentWidget && currentWidget.id === message.widget.id) {
-                                loadWidgetProperties(message.widget);
-                            }
+                            clearProperties();
                             break;
                     }
                 });
+                
+                function showWidgetProperties(widget) {
+                    currentWidget = widget;
+                    const content = document.getElementById('propertyContent');
+                    const actions = document.getElementById('propertyActions');
+                    
+                    content.innerHTML = \`
+                        <div class="widget-info">
+                            <div class="widget-type">\${widget.type}</div>
+                            <div class="widget-id">ID: \${widget.id}</div>
+                        </div>
+                        
+                        <div class="property-group">
+                            <div class="property-group-header" onclick="toggleGroup(this)">
+                                <span><span class="property-group-icon">📐</span>Layout</span>
+                                <span class="property-group-toggle">▼</span>
+                            </div>
+                            <div class="property-group-content">
+                                <div class="property-item">
+                                    <div class="property-label">X</div>
+                                    <div class="property-input">
+                                        <input type="number" value="\${widget.x}" onchange="updateProperty('x', this.value)">
+                                    </div>
+                                </div>
+                                <div class="property-item">
+                                    <div class="property-label">Y</div>
+                                    <div class="property-input">
+                                        <input type="number" value="\${widget.y}" onchange="updateProperty('y', this.value)">
+                                    </div>
+                                </div>
+                                <div class="property-item">
+                                    <div class="property-label">Width</div>
+                                    <div class="property-input">
+                                        <input type="number" value="\${widget.width}" onchange="updateProperty('width', this.value)">
+                                    </div>
+                                </div>
+                                <div class="property-item">
+                                    <div class="property-label">Height</div>
+                                    <div class="property-input">
+                                        <input type="number" value="\${widget.height}" onchange="updateProperty('height', this.value)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        \${generatePropertyGroups(widget)}
+                    \`;
+                    
+                    actions.style.display = 'flex';
+                }
+                
+                function generatePropertyGroups(widget) {
+                    const props = widget.properties || {};
+                    let html = '';
+                    
+                    // Common properties
+                    if (props.text !== undefined || widget.type === 'Label' || widget.type === 'Button') {
+                        html += \`
+                            <div class="property-group">
+                                <div class="property-group-header" onclick="toggleGroup(this)">
+                                    <span><span class="property-group-icon">📝</span>Text</span>
+                                    <span class="property-group-toggle">▼</span>
+                                </div>
+                                <div class="property-group-content">
+                                    <div class="property-item">
+                                        <div class="property-label">Text</div>
+                                        <div class="property-input">
+                                            <input type="text" value="\${props.text || ''}" onchange="updateProperty('text', this.value)">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        \`;
+                    }
+                    
+                    // Appearance properties
+                    html += \`
+                        <div class="property-group">
+                            <div class="property-group-header" onclick="toggleGroup(this)">
+                                <span><span class="property-group-icon">🎨</span>Appearance</span>
+                                <span class="property-group-toggle">▼</span>
+                            </div>
+                            <div class="property-group-content">
+                                <div class="property-item">
+                                    <div class="property-label">Color</div>
+                                    <div class="property-input">
+                                        <input type="color" value="\${props.color || '#000000'}" onchange="updateProperty('color', this.value)">
+                                    </div>
+                                </div>
+                                <div class="property-item">
+                                    <div class="property-label">Background</div>
+                                    <div class="property-input">
+                                        <input type="color" value="\${props.backgroundColor || '#ffffff'}" onchange="updateProperty('backgroundColor', this.value)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    \`;
+                    
+                    return html;
+                }
+                
+                function toggleGroup(header) {
+                    const content = header.nextElementSibling;
+                    const isCollapsed = header.classList.contains('collapsed');
+                    
+                    if (isCollapsed) {
+                        header.classList.remove('collapsed');
+                        content.classList.remove('collapsed');
+                    } else {
+                        header.classList.add('collapsed');
+                        content.classList.add('collapsed');
+                    }
+                }
+                
+                function updateProperty(property, value) {
+                    if (!currentWidget) return;
+                    
+                    // Update current widget
+                    if (['x', 'y', 'width', 'height'].includes(property)) {
+                        currentWidget[property] = parseInt(value);
+                    } else {
+                        if (!currentWidget.properties) {
+                            currentWidget.properties = {};
+                        }
+                        currentWidget.properties[property] = value;
+                    }
+                    
+                    // Send update to designer
+                    vscode.postMessage({
+                        command: 'updateWidget',
+                        widget: currentWidget
+                    });
+                }
+                
+                function clearProperties() {
+                    currentWidget = null;
+                    const content = document.getElementById('propertyContent');
+                    const actions = document.getElementById('propertyActions');
+                    
+                    content.innerHTML = \`
+                        <div class="no-selection">
+                            <div class="no-selection-icon">⚙</div>
+                            <div>No widget selected</div>
+                            <small style="margin-top: 8px; opacity: 0.7;">Select a widget to edit properties</small>
+                        </div>
+                    \`;
+                    
+                    actions.style.display = 'none';
+                }
+                
+                function resetProperties() {
+                    if (!currentWidget) return;
+                    
+                    vscode.postMessage({
+                        command: 'resetWidget',
+                        widgetId: currentWidget.id
+                    });
+                }
+                
+                function applyProperties() {
+                    if (!currentWidget) return;
+                    
+                    vscode.postMessage({
+                        command: 'applyProperties',
+                        widget: currentWidget
+                    });
+                }
                 
                 // Initialize
-                document.addEventListener('DOMContentLoaded', () => {
-                    setupPropertyChangeHandlers();
-                    showNoSelection();
-                });
-            </script>
-                    padding: 0;
-                    border: none;
-                }
-                
-                .no-selection {
-                    text-align: center;
-                    color: #999;
-                    padding: 40px 20px;
-                    font-size: 14px;
-                }
-                
-                .object-inspector {
-                    background: white;
-                    border: 1px solid #ddd;
-                    border-radius: 4px;
-                    margin-bottom: 8px;
-                    max-height: 200px;
-                    overflow-y: auto;
-                }
-                
-                .object-tree {
-                    padding: 8px;
-                }
-                
-                .object-item {
-                    padding: 4px 8px;
-                    cursor: pointer;
-                    font-size: 12px;
-                    border-radius: 3px;
-                }
-                
-                .object-item:hover {
-                    background: #f0f0f0;
-                }
-                
-                .object-item.selected {
-                    background: #e3f2fd;
-                    color: #1976d2;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="property-header">
-                🔧 Properties Panel
-            </div>
-            
-            <div class="property-content">
-                <div class="object-inspector">
-                    <div class="property-group-header">📋 Object Inspector</div>
-                    <div class="object-tree" id="objectTree">
-                        <div style="text-align: center; color: #999; padding: 20px; font-size: 12px;">
-                            No objects in form
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="propertyEditor">
-                    <div class="no-selection">
-                        🎯 Select a widget to edit properties
-                    </div>
-                </div>
-            </div>
-            
-            <script>
-                const vscode = acquireVsCodeApi();
-                let currentWidget = null;
-                
-                function updateProperties(widget) {
-                    currentWidget = widget;
-                    updateObjectTree();
-                    renderPropertyEditor(widget);
-                }
-                
-                function updateObjectTree() {
-                    // This would show all widgets in the form
-                    const tree = document.getElementById('objectTree');
-                    tree.innerHTML = '<div class="object-item selected">🎨 ' + (currentWidget?.type || 'Form') + ' (' + (currentWidget?.id || 'root') + ')</div>';
-                }
-                
-                function renderPropertyEditor(widget) {
-                    const editor = document.getElementById('propertyEditor');
-                    
-                    if (!widget) {
-                        editor.innerHTML = '<div class="no-selection">🎯 Select a widget to edit properties</div>';
-                        return;
-                    }
-                    
-                    editor.innerHTML = '';
-                    
-                    // Object properties
-                    const objectGroup = createPropertyGroup('📋 Object', [
-                        { label: 'ID', key: 'id', type: 'text', value: widget.id },
-                        { label: 'Type', key: 'type', type: 'text', value: widget.type, readonly: true }
-                    ]);
-                    editor.appendChild(objectGroup);
-                    
-                    // Position properties
-                    const positionGroup = createPropertyGroup('📍 Position', [
-                        { label: 'X', key: 'x', type: 'number', value: widget.position?.x || 0 },
-                        { label: 'Y', key: 'y', type: 'number', value: widget.position?.y || 0 },
-                        { label: 'Width', key: 'width', type: 'number', value: widget.position?.width || 100 },
-                        { label: 'Height', key: 'height', type: 'number', value: widget.position?.height || 30 }
-                    ]);
-                    editor.appendChild(positionGroup);
-                    
-                    // Widget-specific properties
-                    const specificProps = getWidgetSpecificProperties(widget);
-                    if (specificProps.length > 0) {
-                        const specificGroup = createPropertyGroup('⚙️ ' + widget.type + ' Properties', specificProps);
-                        editor.appendChild(specificGroup);
-                    }
-                    
-                    // Style properties
-                    const styleGroup = createPropertyGroup('🎨 Style', [
-                        { label: 'Color', key: 'color', type: 'color', value: widget.properties?.color || '#333333' },
-                        { label: 'Background', key: 'backgroundColor', type: 'color', value: widget.properties?.backgroundColor || '#ffffff' },
-                        { label: 'Font Size', key: 'fontSize', type: 'number', value: widget.properties?.fontSize || 14 },
-                        { label: 'Font Weight', key: 'fontWeight', type: 'select', value: widget.properties?.fontWeight || 'normal', options: ['normal', 'bold', '100', '200', '300', '400', '500', '600', '700', '800', '900'] }
-                    ]);
-                    editor.appendChild(styleGroup);
-                }
-                
-                function getWidgetSpecificProperties(widget) {
-                    const props = [];
-                    
-                    switch (widget.type) {
-                        case 'Label':
-                        case 'Text':
-                        case 'Button':
-                            props.push({ label: 'Text', key: 'text', type: 'text', value: widget.properties?.text || '' });
-                            break;
-                            
-                        case 'TextField':
-                            props.push(
-                                { label: 'Text', key: 'text', type: 'text', value: widget.properties?.text || '' },
-                                { label: 'Placeholder', key: 'placeholderText', type: 'text', value: widget.properties?.placeholderText || '' },
-                                { label: 'Read Only', key: 'readOnly', type: 'checkbox', value: widget.properties?.readOnly || false }
-                            );
-                            break;
-                            
-                        case 'CheckBox':
-                        case 'RadioButton':
-                            props.push(
-                                { label: 'Text', key: 'text', type: 'text', value: widget.properties?.text || '' },
-                                { label: 'Checked', key: 'checked', type: 'checkbox', value: widget.properties?.checked || false }
-                            );
-                            break;
-                            
-                        case 'Slider':
-                            props.push(
-                                { label: 'Value', key: 'value', type: 'number', value: widget.properties?.value || 0 },
-                                { label: 'From', key: 'from', type: 'number', value: widget.properties?.from || 0 },
-                                { label: 'To', key: 'to', type: 'number', value: widget.properties?.to || 100 }
-                            );
-                            break;
-                            
-                        case 'Image':
-                            props.push(
-                                { label: 'Source', key: 'source', type: 'text', value: widget.properties?.source || '' },
-                                { label: 'Fill Mode', key: 'fillMode', type: 'select', value: widget.properties?.fillMode || 'PreserveAspectFit', options: ['Stretch', 'PreserveAspectFit', 'PreserveAspectCrop', 'Tile', 'TileVertically', 'TileHorizontally'] }
-                            );
-                            break;
-                    }
-                    
-                    return props;
-                }
-                
-                function createPropertyGroup(title, properties) {
-                    const group = document.createElement('div');
-                    group.className = 'property-group';
-                    
-                    const header = document.createElement('div');
-                    header.className = 'property-group-header';
-                    header.textContent = title;
-                    group.appendChild(header);
-                    
-                    properties.forEach(prop => {
-                        const item = document.createElement('div');
-                        item.className = 'property-item';
-                        
-                        const label = document.createElement('div');
-                        label.className = 'property-label';
-                        label.textContent = prop.label;
-                        
-                        const input = document.createElement('div');
-                        input.className = 'property-input';
-                        
-                        let inputElement;
-                        
-                        switch (prop.type) {
-                            case 'checkbox':
-                                inputElement = document.createElement('input');
-                                inputElement.type = 'checkbox';
-                                inputElement.checked = prop.value;
-                                break;
-                                
-                            case 'select':
-                                inputElement = document.createElement('select');
-                                prop.options?.forEach(option => {
-                                    const optElement = document.createElement('option');
-                                    optElement.value = option;
-                                    optElement.textContent = option;
-                                    optElement.selected = option === prop.value;
-                                    inputElement.appendChild(optElement);
-                                });
-                                break;
-                                
-                            case 'color':
-                                inputElement = document.createElement('input');
-                                inputElement.type = 'color';
-                                inputElement.value = prop.value;
-                                break;
-                                
-                            case 'number':
-                                inputElement = document.createElement('input');
-                                inputElement.type = 'number';
-                                inputElement.value = prop.value;
-                                break;
-                                
-                            default:
-                                inputElement = document.createElement('input');
-                                inputElement.type = 'text';
-                                inputElement.value = prop.value;
-                                inputElement.readOnly = prop.readonly || false;
-                        }
-                        
-                        // Add change listener
-                        inputElement.addEventListener('input', () => {
-                            updateWidgetProperty(prop.key, inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value);
-                        });
-                        
-                        input.appendChild(inputElement);
-                        item.appendChild(label);
-                        item.appendChild(input);
-                        group.appendChild(item);
-                    });
-                    
-                    return group;
-                }
-                
-                function updateWidgetProperty(key, value) {
-                    vscode.postMessage({
-                        command: 'updateWidgetProperty',
-                        widgetId: currentWidget?.id,
-                        property: key,
-                        value: value
-                    });
-                }
-                
-                // Listen for messages from VS Code
-                window.addEventListener('message', event => {
-                    const message = event.data;
-                    switch (message.command) {
-                        case 'updateProperties':
-                            updateProperties(message.widget);
-                            break;
-                        case 'updateFromCode':
-                            updateObjectTreeFromWidgets(message.widgets);
-                            break;
-                        case 'updateFromDesigner':
-                            updateObjectTreeFromWidgets(message.widgets);
-                            break;
-                    }
-                });
-
-                function updateObjectTreeFromWidgets(widgets) {
-                    const tree = document.getElementById('objectTree');
-                    tree.innerHTML = '';
-                    
-                    if (!widgets || widgets.length === 0) {
-                        tree.innerHTML = '<div style="text-align: center; color: #999; padding: 20px; font-size: 12px;">No objects in form</div>';
-                        return;
-                    }
-                    
-                    widgets.forEach(widget => {
-                        const item = document.createElement('div');
-                        item.className = 'object-item';
-                        item.textContent = '🎯 ' + widget.type + ' (' + widget.id + ')';
-                        item.addEventListener('click', () => {
-                            // Select this widget
-                            document.querySelectorAll('.object-item').forEach(i => i.classList.remove('selected'));
-                            item.classList.add('selected');
-                            
-                            // Update property editor
-                            updateProperties(widget);
-                            
-                            // Notify designer to select this widget
-                            vscode.postMessage({
-                                command: 'selectWidget',
-                                widgetId: widget.id
-                            });
-                        });
-                        tree.appendChild(item);
-                    });
-                }
+                clearProperties();
             </script>
         </body>
         </html>`;
@@ -3154,22 +2712,30 @@ export class FullQtDesigner {
                     const qmlCode = this._syncEngine.generateQMLFromWidgets(message.widgets);
                     this._currentQmlContent = qmlCode;
                     
-                    // Sync to VS Code editor and preview
-                    await this._syncEngine.syncFromDesigner(message.widgets, qmlCode);
-                    break;
+                    // Update code editor
+                    await this.updateCodeEditor(qmlCode);
                     
-                case 'updateProperties':
-                    this._propertyPanel?.webview.postMessage({
-                        command: 'updateProperties',
-                        widget: message.widget
+                    // Update preview panel
+                    this._previewPanel?.webview.postMessage({
+                        command: 'updatePreview',
+                        widgets: message.widgets
                     });
                     break;
                     
                 case 'widgetSelected':
                     this._selectedWidget = message.widget;
+                    // Send to property panel
                     this._propertyPanel?.webview.postMessage({
-                        command: 'updateProperties',
+                        command: 'selectWidget',
                         widget: message.widget
+                    });
+                    break;
+                    
+                case 'refreshPreview':
+                    // Refresh preview with current widgets
+                    this._previewPanel?.webview.postMessage({
+                        command: 'updatePreview',
+                        widgets: this._widgets
                     });
                     break;
                     
@@ -3194,30 +2760,71 @@ export class FullQtDesigner {
         // Property panel messages
         this._propertyPanel?.webview.onDidReceiveMessage(async (message) => {
             switch (message.command) {
-                case 'updateWidgetProperty':
-                    // Update the widget in the designer
-                    this._designerPanel?.webview.postMessage({
-                        command: 'updateProperty',
-                        widgetId: message.widgetId,
-                        property: message.property,
-                        value: message.value
-                    });
+                case 'updateWidget':
+                    const updatedWidget = message.widget;
+                    // Find and update widget in widgets array
+                    const widgetIndex = this._widgets.findIndex(w => w.id === updatedWidget.id);
+                    if (widgetIndex !== -1) {
+                        this._widgets[widgetIndex] = updatedWidget;
+                        
+                        // Update designer panel
+                        this._designerPanel?.webview.postMessage({
+                            command: 'updateWidget',
+                            widget: updatedWidget
+                        });
+                        
+                        // Update preview panel
+                        this._previewPanel?.webview.postMessage({
+                            command: 'updatePreview',
+                            widgets: this._widgets
+                        });
+                        
+                        // Generate and sync QML code
+                        const qmlCode = this._syncEngine.generateQMLFromWidgets(this._widgets);
+                        await this.updateCodeEditor(qmlCode);
+                    }
+                    break;
                     
-                    // Sync the property change across all panels and editor
-                    await this._syncEngine.syncFromProperties(
-                        message.widgetId, 
-                        message.property, 
-                        message.value
-                    );
+                case 'resetWidget':
+                    // Reset widget to default properties
+                    const widget = this._widgets.find(w => w.id === message.widgetId);
+                    if (widget) {
+                        // Reset to default properties based on widget type
+                        widget.properties = this.getDefaultProperties(widget.type);
+                        
+                        // Update all panels
+                        this._designerPanel?.webview.postMessage({
+                            command: 'updateWidget',
+                            widget: widget
+                        });
+                        
+                        this._propertyPanel?.webview.postMessage({
+                            command: 'selectWidget',
+                            widget: widget
+                        });
+                        
+                        this._previewPanel?.webview.postMessage({
+                            command: 'updatePreview',
+                            widgets: this._widgets
+                        });
+                    }
+                    break;
+                    
+                case 'applyProperties':
+                    // Apply all property changes and sync to editor
+                    const qmlCode = this._syncEngine.generateQMLFromWidgets(this._widgets);
+                    await this.updateCodeEditor(qmlCode);
+                    
+                    vscode.window.showInformationMessage('Properties applied and synced to editor');
                     break;
             }
         });
 
-        // Preview panel messages  
-        this._previewPanel?.webview.onDidReceiveMessage((message) => {
+        // Preview panel messages
+        this._previewPanel?.webview.onDidReceiveMessage(async (message) => {
             switch (message.command) {
                 case 'refreshPreview':
-                    // Refresh preview from current widgets
+                    // Refresh preview with current widgets
                     this._previewPanel?.webview.postMessage({
                         command: 'updatePreview',
                         widgets: this._widgets
@@ -3225,6 +2832,95 @@ export class FullQtDesigner {
                     break;
             }
         });
+
+        // Property panel messages
+        this._propertyPanel?.webview.onDidReceiveMessage(async (message) => {
+            switch (message.command) {
+                case 'updateWidget':
+                    const updatedWidget = message.widget;
+                    // Find and update widget in widgets array
+                    const widgetIndex = this._widgets.findIndex(w => w.id === updatedWidget.id);
+                    if (widgetIndex !== -1) {
+                        this._widgets[widgetIndex] = updatedWidget;
+                        
+                        // Update designer panel
+                        this._designerPanel?.webview.postMessage({
+                            command: 'updateWidget',
+                            widget: updatedWidget
+                        });
+                        
+                        // Update preview panel
+                        this._previewPanel?.webview.postMessage({
+                            command: 'updatePreview',
+                            widgets: this._widgets
+                        });
+                        
+                        // Generate and sync QML code
+                        const qmlCode = this._syncEngine.generateQMLFromWidgets(this._widgets);
+                        await this.updateCodeEditor(qmlCode);
+                    }
+                    break;
+                    
+                case 'resetWidget':
+                    // Reset widget to default properties
+                    const widget = this._widgets.find(w => w.id === message.widgetId);
+                    if (widget) {
+                        // Reset to default properties based on widget type
+                        widget.properties = this.getDefaultProperties(widget.type);
+                        
+                        // Update all panels
+                        this._designerPanel?.webview.postMessage({
+                            command: 'updateWidget',
+                            widget: widget
+                        });
+                        
+                        this._propertyPanel?.webview.postMessage({
+                            command: 'selectWidget',
+                            widget: widget
+                        });
+                        
+                        this._previewPanel?.webview.postMessage({
+                            command: 'updatePreview',
+                            widgets: this._widgets
+                        });
+                    }
+                    break;
+                    
+                case 'applyProperties':
+                    // Apply all property changes and sync to editor
+                    const qmlCode = this._syncEngine.generateQMLFromWidgets(this._widgets);
+                    await this.updateCodeEditor(qmlCode);
+                    
+                    vscode.window.showInformationMessage('Properties applied and synced to editor');
+                    break;
+            }
+        });
+
+        // Preview panel messages
+        this._previewPanel?.webview.onDidReceiveMessage(async (message) => {
+            switch (message.command) {
+                case 'refreshPreview':
+                    // Refresh preview with current widgets
+                    this._previewPanel?.webview.postMessage({
+                        command: 'updatePreview',
+                        widgets: this._widgets
+                    });
+                    break;
+            }
+        });
+    }
+
+    private getDefaultProperties(type: string): any {
+        const defaults: { [key: string]: any } = {
+            'Button': { text: 'Button', color: '#000000', backgroundColor: '#ffffff' },
+            'Label': { text: 'Label', color: '#000000', backgroundColor: 'transparent' },
+            'TextField': { text: '', placeholderText: 'Enter text...', color: '#000000', backgroundColor: '#ffffff' },
+            'CheckBox': { text: 'CheckBox', checked: false, color: '#000000' },
+            'RadioButton': { text: 'RadioButton', checked: false, color: '#000000' },
+            'Rectangle': { color: '#000000', backgroundColor: '#ffffff' },
+            'Image': { source: '', fillMode: 'PreserveAspectFit' }
+        };
+        return defaults[type] || {};
     }
 
     private async updateCodeEditor(qmlContent: string) {
