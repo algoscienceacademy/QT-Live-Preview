@@ -3,7 +3,7 @@
   "displayName": "QT Live Preview",
   "publisher": "algoscienceacademy",
   "description": "Live preview for Qt6 Widgets and QML applications with hot reload - Full Qt6 module support",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -107,6 +107,24 @@
         "title": "Toggle Real-time Sync",
         "category": "QT Live Preview",
         "icon": "$(sync-ignored)"
+      },
+      {
+        "command": "qtCombinedDesigner.openDesigner",
+        "title": "Open Combined Designer + Preview",
+        "category": "QT Live Preview",
+        "icon": "$(preview)"
+      },
+      {
+        "command": "qtCombinedDesigner.newDesign",
+        "title": "New Combined Design",
+        "category": "QT Live Preview",
+        "icon": "$(add)"
+      },
+      {
+        "command": "qtCombinedDesigner.openInDesigner",
+        "title": "Open in Combined Designer",
+        "category": "QT Live Preview",
+        "icon": "$(edit)"
       }
     ],
     "menus": {
@@ -182,6 +200,46 @@
         {
           "command": "qtUIDesigner.toggleRealtimeSync",
           "when": "resourceExtname == .qml"
+        },
+        {
+          "command": "qtCombinedDesigner.openDesigner",
+          "when": "true"
+        },
+        {
+          "command": "qtCombinedDesigner.newDesign",
+          "when": "true"
+        },
+        {
+          "command": "qtCombinedDesigner.openInDesigner",
+          "when": "resourceExtname == .qml"
+        }
+      ]
+    },
+    "views": {
+      "qtDevelopment": [
+        {
+          "id": "qtLivePreview.preview",
+          "name": "Live Preview",
+          "type": "webview"
+        },
+        {
+          "id": "qtUIDesigner.designer",
+          "name": "UI Designer",
+          "type": "webview"
+        },
+        {
+          "id": "qtCombinedDesigner.designer",
+          "name": "Designer + Preview",
+          "type": "webview"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "qtDevelopment",
+          "title": "Qt Development",
+          "icon": "$(preview)"
         }
       ]
     },
