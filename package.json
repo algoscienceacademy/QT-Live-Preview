@@ -3,7 +3,7 @@
   "displayName": "QT Live Preview",
   "publisher": "algoscienceacademy",
   "description": "Live preview for Qt6 Widgets and QML applications with hot reload - Full Qt6 module support",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -89,6 +89,18 @@
         "command": "qtUIDesigner.openInDesigner",
         "title": "Open in UI Designer",
         "category": "QT Live Preview"
+      },
+      {
+        "command": "qtFullDesigner.openDesigner",
+        "title": "🎨 Open Full Qt Designer",
+        "category": "QT Live Preview",
+        "icon": "$(split-horizontal)"
+      },
+      {
+        "command": "qtFullDesigner.openExternalDesigner",
+        "title": "🪟 Open External Qt Designer",
+        "category": "QT Live Preview",
+        "icon": "$(window)"
       },
       {
         "command": "qtUIDesigner.startRealtimeSync",

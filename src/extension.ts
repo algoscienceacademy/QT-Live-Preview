@@ -8,6 +8,7 @@ import { QMLErrorDetector } from './qmlErrorDetector';
 import { QMLCodeActionProvider } from './qmlCodeActionProvider';
 import { QtUIDesigner } from './qtUIDesigner';
 import { CombinedDesignerPreview } from './combinedDesignerPreview';
+import { FullQtDesigner } from './fullQtDesigner';
 
 let projectManager: QTProjectManager;
 let previewProvider: LivePreviewProvider;
@@ -18,6 +19,7 @@ let qmlErrorDetector: QMLErrorDetector;
 let qmlCodeActionProvider: QMLCodeActionProvider;
 let qtUIDesigner: QtUIDesigner;
 let combinedDesigner: CombinedDesignerPreview;
+let fullQtDesigner: FullQtDesigner;
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('QT Live Preview extension is now active!');
@@ -35,6 +37,9 @@ export function activate(context: vscode.ExtensionContext) {
     // Connect components
     previewProvider.setBuildManager(buildManager);
     hotReloadManager.setBuildManager(buildManager);
+
+    // Initialize full Qt Designer
+    fullQtDesigner = new FullQtDesigner(context.extensionUri);
 
     // Register commands
     const createProjectCmd = vscode.commands.registerCommand('qtLivePreview.createProject', () => {
@@ -116,6 +121,15 @@ export function activate(context: vscode.ExtensionContext) {
         combinedDesigner.openDesigner();
     });
 
+    // Full Qt Designer commands (Professional Designer + Live Preview + Properties)
+    const openFullDesignerCmd = vscode.commands.registerCommand('qtFullDesigner.openDesigner', () => {
+        fullQtDesigner.openFullDesigner(false);
+    });
+
+    const openExternalDesignerCmd = vscode.commands.registerCommand('qtFullDesigner.openExternalDesigner', () => {
+        fullQtDesigner.openFullDesigner(true);
+    });
+
     const newCombinedDesignCmd = vscode.commands.registerCommand('qtCombinedDesigner.newDesign', () => {
         combinedDesigner.openDesigner();
     });
@@ -184,7 +198,9 @@ export function activate(context: vscode.ExtensionContext) {
         toggleSyncCmd,
         openCombinedDesignerCmd,
         newCombinedDesignCmd,
-        openInCombinedDesignerCmd
+        openInCombinedDesignerCmd,
+        openFullDesignerCmd,
+        openExternalDesignerCmd
     );
 
     // Register QML language features
