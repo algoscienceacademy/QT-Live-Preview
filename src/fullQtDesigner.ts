@@ -280,44 +280,103 @@ export class FullQtDesigner {
                 }
                 
                 .widget-group {
-                    margin-bottom: 20px;
+                    background: var(--bg-tertiary);
+                    border-radius: var(--border-radius);
+                    border: 1px solid var(--border-primary);
+                    margin-bottom: 8px;
+                    overflow: hidden;
+                    box-shadow: var(--shadow-light);
                 }
                 
-                .widget-group h3 {
-                    font-size: 13px;
+                .widget-group h3,
+                .widget-group-header {
+                    background: var(--bg-surface);
+                    color: var(--text-inverse);
+                    padding: 10px 12px;
+                    margin: 0;
+                    font-size: 11px;
                     font-weight: 600;
-                    color: var(--text-primary);
-                    margin-bottom: 12px;
-                    padding: 8px 12px;
-                    background: var(--bg-tertiary);
-                    border: 1px solid var(--border-primary);
-                    border-radius: var(--border-radius);
+                    border-bottom: 1px solid var(--border-primary);
+                    cursor: pointer;
                     display: flex;
                     align-items: center;
-                    box-shadow: var(--shadow-light);
+                    justify-content: space-between;
+                    transition: all var(--transition-fast);
+                    user-select: none;
+                }
+                
+                .widget-group h3:hover,
+                .widget-group-header:hover {
+                    background: var(--text-secondary);
+                }
+                
+                .widget-group-header.collapsed {
+                    border-bottom: none;
+                }
+                
+                .group-toggle {
+                    font-size: 10px;
+                    transition: transform 0.2s ease;
+                }
+                
+                .widget-group-header.collapsed .group-toggle {
+                    transform: rotate(-90deg);
+                }
+                
+                .widget-group-content {
+                    padding: 8px;
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 4px;
+                    transition: max-height 0.3s ease;
+                    overflow: hidden;
+                }
+                
+                .widget-group-content.collapsed {
+                    max-height: 0;
+                    padding: 0;
+                }
+                
+                .toolbox-search {
+                    background: var(--bg-surface);
+                    border: 1px solid var(--border-primary);
+                    border-radius: var(--border-radius);
+                    padding: 8px 12px;
+                    color: var(--text-inverse);
+                    font-size: 12px;
+                    margin-bottom: 12px;
+                    width: 100%;
+                }
+                
+                .toolbox-search::placeholder {
+                    color: var(--text-secondary);
                 }
                 
                 .widget-item {
                     display: flex;
+                    flex-direction: column;
                     align-items: center;
-                    padding: 10px 12px;
-                    margin: 4px 0;
-                    background: var(--bg-tertiary);
+                    padding: 8px 6px;
+                    background: var(--bg-secondary);
                     border: 1px solid var(--border-primary);
                     border-radius: var(--border-radius);
                     cursor: grab;
                     transition: all var(--transition-fast);
-                    font-size: 12px;
+                    font-size: 10px;
                     font-weight: 500;
-                    color: var(--text-secondary);
+                    color: var(--text-primary);
+                    text-align: center;
+                    gap: 4px;
+                    min-height: 65px;
+                    justify-content: center;
                 }
                 
                 .widget-item:hover {
-                    background: var(--bg-quaternary);
-                    border-color: var(--border-secondary);
-                    transform: translateX(4px) translateY(-2px);
+                    background: var(--bg-surface);
+                    color: var(--text-inverse);
+                    transform: translateY(-2px);
                     box-shadow: var(--shadow-light);
-                    color: var(--text-primary);
+                }
                 }
                 
                 .widget-item:active { 
@@ -477,6 +536,467 @@ export class FullQtDesigner {
                     opacity: 1;
                     transform: translateY(0);
                 }
+                
+                /* Code Generation Dropdown Styles */
+                .dropdown {
+                    position: relative;
+                    display: inline-block;
+                }
+                
+                .dropdown-content {
+                    display: none;
+                    position: absolute;
+                    background-color: var(--bg-secondary);
+                    min-width: 160px;
+                    box-shadow: var(--shadow-medium);
+                    border: 1px solid var(--border-primary);
+                    border-radius: var(--border-radius);
+                    z-index: 1000;
+                    top: 100%;
+                    left: 0;
+                    margin-top: 4px;
+                }
+                
+                .dropdown-content button {
+                    color: var(--text-primary);
+                    padding: 10px 16px;
+                    text-decoration: none;
+                    display: block;
+                    background: none;
+                    border: none;
+                    width: 100%;
+                    text-align: left;
+                    cursor: pointer;
+                    font-size: 13px;
+                    transition: all var(--transition-fast);
+                }
+                
+                .dropdown-content button:hover {
+                    background-color: var(--bg-tertiary);
+                    color: var(--text-secondary);
+                }
+                
+                .dropdown-content button:first-child {
+                    border-radius: var(--border-radius) var(--border-radius) 0 0;
+                }
+                
+                .dropdown-content button:last-child {
+                    border-radius: 0 0 var(--border-radius) var(--border-radius);
+                }
+                
+                .dropdown.show .dropdown-content {
+                    display: block;
+                    animation: fadeIn 0.2s ease-in-out;
+                }
+                
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(-5px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                
+                /* Signal/Slot System Styles */
+                .mode-btn.active {
+                    background: var(--accent-primary);
+                    color: white;
+                    border-color: var(--accent-primary);
+                }
+                
+                .signal-slot-panel {
+                    position: fixed;
+                    right: 20px;
+                    top: 60px;
+                    width: 320px;
+                    height: 500px;
+                    background: var(--bg-secondary);
+                    border: 1px solid var(--border-primary);
+                    border-radius: var(--border-radius);
+                    box-shadow: var(--shadow-heavy);
+                    z-index: 1000;
+                    display: none;
+                    flex-direction: column;
+                }
+                
+                .signal-slot-panel.show {
+                    display: flex;
+                    animation: slideIn 0.3s ease-out;
+                }
+                
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                
+                .panel-header {
+                    background: var(--bg-tertiary);
+                    padding: 12px 16px;
+                    border-bottom: 1px solid var(--border-primary);
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    border-radius: var(--border-radius) var(--border-radius) 0 0;
+                }
+                
+                .panel-title {
+                    font-weight: 600;
+                    color: var(--text-primary);
+                    font-size: 14px;
+                }
+                
+                .panel-close {
+                    background: none;
+                    border: none;
+                    color: var(--text-secondary);
+                    cursor: pointer;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    transition: all var(--transition-fast);
+                }
+                
+                .panel-close:hover {
+                    background: var(--bg-quaternary);
+                    color: var(--text-primary);
+                }
+                
+                .connection-tabs {
+                    display: flex;
+                    border-bottom: 1px solid var(--border-primary);
+                }
+                
+                .tab-btn {
+                    flex: 1;
+                    padding: 10px 12px;
+                    background: none;
+                    border: none;
+                    color: var(--text-secondary);
+                    cursor: pointer;
+                    font-size: 12px;
+                    transition: all var(--transition-fast);
+                    border-bottom: 2px solid transparent;
+                }
+                
+                .tab-btn.active {
+                    color: var(--accent-primary);
+                    border-bottom-color: var(--accent-primary);
+                    background: var(--bg-tertiary);
+                }
+                
+                .tab-btn:hover:not(.active) {
+                    background: var(--bg-quaternary);
+                    color: var(--text-primary);
+                }
+                
+                .tab-content {
+                    flex: 1;
+                    padding: 16px;
+                    overflow-y: auto;
+                }
+                
+                .connection-controls {
+                    display: flex;
+                    gap: 8px;
+                    margin-bottom: 12px;
+                }
+                
+                .add-btn, .remove-btn {
+                    padding: 6px 12px;
+                    border: 1px solid var(--border-primary);
+                    background: var(--bg-tertiary);
+                    color: var(--text-primary);
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 11px;
+                    transition: all var(--transition-fast);
+                }
+                
+                .add-btn:hover {
+                    background: var(--accent-primary);
+                    border-color: var(--accent-primary);
+                    color: white;
+                }
+                
+                .remove-btn:hover {
+                    background: #dc3545;
+                    border-color: #dc3545;
+                    color: white;
+                }
+                
+                .connections-list, .signals-list, .slots-list {
+                    background: var(--bg-tertiary);
+                    border: 1px solid var(--border-primary);
+                    border-radius: 4px;
+                    min-height: 200px;
+                    padding: 8px;
+                }
+                
+                .connection-item {
+                    padding: 8px 12px;
+                    margin-bottom: 4px;
+                    background: var(--bg-quaternary);
+                    border: 1px solid var(--border-secondary);
+                    border-radius: 4px;
+                    cursor: pointer;
+                    transition: all var(--transition-fast);
+                }
+                
+                .connection-item:hover {
+                    background: var(--accent-secondary);
+                    border-color: var(--accent-primary);
+                }
+                
+                .connection-item.selected {
+                    background: var(--accent-primary);
+                    color: white;
+                    border-color: var(--accent-primary);
+                }
+                
+                .signal-item, .slot-item {
+                    padding: 6px 10px;
+                    margin-bottom: 2px;
+                    background: var(--bg-quaternary);
+                    border-radius: 3px;
+                    font-size: 11px;
+                    cursor: pointer;
+                    transition: all var(--transition-fast);
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                }
+                
+                .signal-item:hover, .slot-item:hover {
+                    background: var(--accent-secondary);
+                }
+                
+                .signal-icon, .slot-icon {
+                    width: 12px;
+                    height: 12px;
+                    border-radius: 50%;
+                    flex-shrink: 0;
+                }
+                
+                .signal-icon {
+                    background: #28a745;
+                }
+                
+                .slot-icon {
+                    background: #007bff;
+                }
+                
+                .empty-state {
+                    text-align: center;
+                    color: var(--text-muted);
+                    font-size: 12px;
+                    padding: 20px;
+                    font-style: italic;
+                }
+                
+                /* Connection Visual Lines */
+                .connection-overlay {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    pointer-events: none;
+                    z-index: 100;
+                }
+                
+                .connection-line {
+                    position: absolute;
+                    height: 2px;
+                    background: var(--accent-primary);
+                    transform-origin: left center;
+                    opacity: 0.8;
+                    transition: all var(--transition-normal);
+                }
+                
+                .connection-line::before {
+                    content: '';
+                    position: absolute;
+                    right: -6px;
+                    top: -3px;
+                    width: 0;
+                    height: 0;
+                    border-left: 8px solid var(--accent-primary);
+                    border-top: 4px solid transparent;
+                    border-bottom: 4px solid transparent;
+                }
+                
+                .connection-line.highlighted {
+                    background: #ffc107;
+                    animation: pulse 1s infinite;
+                }
+                
+                .connection-line.highlighted::before {
+                    border-left-color: #ffc107;
+                }
+                
+                /* Widget connection indicators */
+                .widget.connection-source {
+                    border: 2px solid #28a745 !important;
+                    box-shadow: 0 0 10px rgba(40, 167, 69, 0.5) !important;
+                }
+                
+                .widget.connection-target {
+                    border: 2px solid #007bff !important;
+                    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5) !important;
+                }
+                
+                .widget.connecting {
+                    border: 2px dashed var(--accent-primary) !important;
+                    animation: connectingPulse 1s infinite;
+                }
+                
+                @keyframes connectingPulse {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.6; }
+                }
+                
+                /* Connection Dialog Styles */
+                .connection-dialog-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, 0.7);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 2000;
+                }
+                
+                .connection-dialog {
+                    background: var(--bg-secondary);
+                    border: 1px solid var(--border-primary);
+                    border-radius: var(--border-radius);
+                    width: 500px;
+                    max-width: 90vw;
+                    box-shadow: var(--shadow-heavy);
+                    animation: dialogSlideIn 0.3s ease-out;
+                }
+                
+                @keyframes dialogSlideIn {
+                    from { transform: scale(0.9); opacity: 0; }
+                    to { transform: scale(1); opacity: 1; }
+                }
+                
+                .dialog-header {
+                    background: var(--bg-tertiary);
+                    padding: 16px 20px;
+                    border-bottom: 1px solid var(--border-primary);
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    border-radius: var(--border-radius) var(--border-radius) 0 0;
+                }
+                
+                .dialog-header h3 {
+                    margin: 0;
+                    color: var(--text-primary);
+                    font-size: 16px;
+                }
+                
+                .dialog-close {
+                    background: none;
+                    border: none;
+                    color: var(--text-secondary);
+                    cursor: pointer;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    font-size: 16px;
+                    transition: all var(--transition-fast);
+                }
+                
+                .dialog-close:hover {
+                    background: var(--bg-quaternary);
+                    color: var(--text-primary);
+                }
+                
+                .dialog-body {
+                    padding: 20px;
+                    display: grid;
+                    grid-template-columns: 1fr auto 1fr;
+                    gap: 20px;
+                    align-items: center;
+                }
+                
+                .connection-source, .connection-target {
+                    padding: 16px;
+                    background: var(--bg-tertiary);
+                    border-radius: 6px;
+                    border: 1px solid var(--border-primary);
+                }
+                
+                .connection-source h4, .connection-target h4 {
+                    margin: 0 0 12px 0;
+                    color: var(--text-primary);
+                    font-size: 14px;
+                }
+                
+                .connection-source label, .connection-target label {
+                    display: block;
+                    margin-bottom: 6px;
+                    color: var(--text-secondary);
+                    font-size: 12px;
+                    font-weight: 500;
+                }
+                
+                .connection-source select, .connection-target select {
+                    width: 100%;
+                    padding: 8px 12px;
+                    background: var(--bg-quaternary);
+                    border: 1px solid var(--border-primary);
+                    border-radius: 4px;
+                    color: var(--text-primary);
+                    font-size: 12px;
+                }
+                
+                .connection-arrow {
+                    font-size: 24px;
+                    color: var(--accent-primary);
+                    font-weight: bold;
+                    text-align: center;
+                }
+                
+                .dialog-footer {
+                    padding: 16px 20px;
+                    border-top: 1px solid var(--border-primary);
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 12px;
+                    background: var(--bg-tertiary);
+                    border-radius: 0 0 var(--border-radius) var(--border-radius);
+                }
+                
+                .btn-cancel, .btn-connect {
+                    padding: 8px 16px;
+                    border: 1px solid var(--border-primary);
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 13px;
+                    transition: all var(--transition-fast);
+                }
+                
+                .btn-cancel {
+                    background: var(--bg-quaternary);
+                    color: var(--text-secondary);
+                }
+                
+                .btn-cancel:hover {
+                    background: var(--bg-secondary);
+                    color: var(--text-primary);
+                }
+                
+                .btn-connect {
+                    background: var(--accent-primary);
+                    color: white;
+                    border-color: var(--accent-primary);
+                }
+                
+                .btn-connect:hover {
+                    background: #5a67d8;
+                    border-color: #5a67d8;
+                }
             </style>
         </head>
         <body>
@@ -496,8 +1016,20 @@ export class FullQtDesigner {
                     </div>
                     
                     <div class="toolbar-group">
+                        <button id="signalSlotBtn" class="mode-btn">🔗 Connect Signals</button>
+                        <button id="layoutBtn">📐 Layout</button>
+                    </div>
+                    
+                    <div class="toolbar-group">
                         <button id="previewBtn">▶️ Preview</button>
-                        <button id="codeBtn">📝 Code</button>
+                        <div class="code-dropdown">
+                            <button id="codeBtn" class="dropdown-btn">📝 Generate Code ▼</button>
+                            <div class="dropdown-content">
+                                <button id="generateQMLBtn">📄 QML Code</button>
+                                <button id="generateCppBtn">⚙️ C++ Code</button>
+                                <button id="generateBothBtn">📦 Both (QML + C++)</button>
+                            </div>
+                        </div>
                         <button id="syncBtn" class="active">🔄 Sync</button>
                     </div>
                 </div>
@@ -511,100 +1043,238 @@ export class FullQtDesigner {
             <div class="main-container">
                 <div class="widget-palette">
                     <div class="palette-header">
-                        <div class="palette-title">🎨 Widget Palette</div>
-                        <div class="palette-subtitle">Drag widgets to design area</div>
+                        <div class="palette-title">🎨 Qt Widget Palette</div>
+                        <div class="palette-subtitle">Complete Qt Component Library</div>
                     </div>
                     
-                    <div class="widget-group">
-                        <h3>📱 Display Widgets</h3>
-                        <div class="widget-item" draggable="true" data-widget="Label">
-                            <div class="widget-icon">🏷️</div>
-                            Label
-                        </div>
-                        <div class="widget-item" draggable="true" data-widget="Text">
-                            <div class="widget-icon">📝</div>
-                            Text
-                        </div>
-                        <div class="widget-item" draggable="true" data-widget="Image">
-                            <div class="widget-icon">🖼️</div>
-                            Image
-                        </div>
-                        <div class="widget-item" draggable="true" data-widget="Rectangle">
-                            <div class="widget-icon">⬜</div>
-                            Rectangle
-                        </div>
-                    </div>
+                    <input type="text" class="toolbox-search" placeholder="Search widgets..." id="widgetSearch">
                     
                     <div class="widget-group">
-                        <h3>🖱️ Input Widgets</h3>
-                        <div class="widget-item" draggable="true" data-widget="Button">
-                            <div class="widget-icon">🔘</div>
-                            Button
-                        </div>
-                        <div class="widget-item" draggable="true" data-widget="TextField">
-                            <div class="widget-icon">📄</div>
-                            TextField
-                        </div>
-                        <div class="widget-item" draggable="true" data-widget="TextArea">
-                            <div class="widget-icon">📋</div>
-                            TextArea
-                        </div>
-                        <div class="widget-item" draggable="true" data-widget="CheckBox">
-                            <div class="widget-icon">☑️</div>
-                            CheckBox
-                        </div>
-                        <div class="widget-item" draggable="true" data-widget="RadioButton">
-                            <div class="widget-icon">🔘</div>
-                            RadioButton
-                        </div>
-                        <div class="widget-item" draggable="true" data-widget="ComboBox">
-                            <div class="widget-icon">📋</div>
-                            ComboBox
-                        </div>
-                        <div class="widget-item" draggable="true" data-widget="Slider">
-                            <div class="widget-icon">🎚️</div>
-                            Slider
-                        </div>
-                        <div class="widget-item" draggable="true" data-widget="SpinBox">
-                            <div class="widget-icon">🔢</div>
-                            SpinBox
+                        <h3 class="widget-group-header" onclick="toggleGroup(this)">
+                            <span>📱 Display Widgets</span>
+                            <span class="group-toggle">▼</span>
+                        </h3>
+                        <div class="widget-group-content">
+                            <div class="widget-item" draggable="true" data-widget="QLabel" data-qml="Text">
+                                <div class="widget-icon">🏷️</div>
+                                QLabel
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QTextEdit" data-qml="TextEdit">
+                                <div class="widget-icon">📝</div>
+                                QTextEdit
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QPlainTextEdit" data-qml="ScrollView">
+                                <div class="widget-icon">�</div>
+                                QPlainTextEdit
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QProgressBar" data-qml="ProgressBar">
+                                <div class="widget-icon">📊</div>
+                                QProgressBar
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QFrame" data-qml="Rectangle">
+                                <div class="widget-icon">🖼️</div>
+                                QFrame
+                            </div>
                         </div>
                     </div>
                     
                     <div class="widget-group">
-                        <h3>📋 Container Widgets</h3>
-                        <div class="widget-item" draggable="true" data-widget="Item">
-                            <div class="widget-icon">📦</div>
-                            Item
+                        <h3 class="widget-group-header" onclick="toggleGroup(this)">
+                            <span>🖱️ Input Widgets</span>
+                            <span class="group-toggle">▼</span>
+                        </h3>
+                        <div class="widget-group-content">
+                            <div class="widget-item" draggable="true" data-widget="QPushButton" data-qml="Button">
+                                <div class="widget-icon">🔘</div>
+                                QPushButton
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QLineEdit" data-qml="TextField">
+                                <div class="widget-icon">✏️</div>
+                                QLineEdit
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QCheckBox" data-qml="CheckBox">
+                                <div class="widget-icon">☑️</div>
+                                QCheckBox
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QRadioButton" data-qml="RadioButton">
+                                <div class="widget-icon">🔘</div>
+                                QRadioButton
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QComboBox" data-qml="ComboBox">
+                                <div class="widget-icon">📋</div>
+                                QComboBox
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QSpinBox" data-qml="SpinBox">
+                                <div class="widget-icon">🔢</div>
+                                QSpinBox
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QDoubleSpinBox" data-qml="SpinBox">
+                                <div class="widget-icon">🔢</div>
+                                QDoubleSpinBox
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QSlider" data-qml="Slider">
+                                <div class="widget-icon">🎚️</div>
+                                QSlider
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QDial" data-qml="Dial">
+                                <div class="widget-icon">⚪</div>
+                                QDial
+                            </div>
                         </div>
-                        <div class="widget-item" draggable="true" data-widget="Column">
-                            <div class="widget-icon">📋</div>
-                            Column
+                    </div>
+                    
+                    <div class="widget-group">
+                        <h3 class="widget-group-header" onclick="toggleGroup(this)">
+                            <span>📋 List & Tree Widgets</span>
+                            <span class="group-toggle">▼</span>
+                        </h3>
+                        <div class="widget-group-content">
+                            <div class="widget-item" draggable="true" data-widget="QListWidget" data-qml="ListView">
+                                <div class="widget-icon">�</div>
+                                QListWidget
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QTreeWidget" data-qml="TreeView">
+                                <div class="widget-icon">🌳</div>
+                                QTreeWidget
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QTableWidget" data-qml="TableView">
+                                <div class="widget-icon">�</div>
+                                QTableWidget
+                            </div>
                         </div>
-                        <div class="widget-item" draggable="true" data-widget="Row">
-                            <div class="widget-icon">➡️</div>
-                            Row
+                    </div>
+                    
+                    <div class="widget-group">
+                        <h3 class="widget-group-header" onclick="toggleGroup(this)">
+                            <span>📅 Date & Time Widgets</span>
+                            <span class="group-toggle">▼</span>
+                        </h3>
+                        <div class="widget-group-content">
+                            <div class="widget-item" draggable="true" data-widget="QCalendarWidget" data-qml="Calendar">
+                                <div class="widget-icon">📅</div>
+                                QCalendarWidget
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QDateEdit" data-qml="SpinBox">
+                                <div class="widget-icon">📅</div>
+                                QDateEdit
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QTimeEdit" data-qml="SpinBox">
+                                <div class="widget-icon">�</div>
+                                QTimeEdit
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QDateTimeEdit" data-qml="SpinBox">
+                                <div class="widget-icon">📅</div>
+                                QDateTimeEdit
+                            </div>
                         </div>
-                        <div class="widget-item" draggable="true" data-widget="Grid">
-                            <div class="widget-icon">⬛</div>
-                            Grid
+                    </div>
+                    
+                    <div class="widget-group">
+                        <h3 class="widget-group-header" onclick="toggleGroup(this)">
+                            <span>� Container Widgets</span>
+                            <span class="group-toggle">▼</span>
+                        </h3>
+                        <div class="widget-group-content">
+                            <div class="widget-item" draggable="true" data-widget="QWidget" data-qml="Item">
+                                <div class="widget-icon">📦</div>
+                                QWidget
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QGroupBox" data-qml="GroupBox">
+                                <div class="widget-icon">📁</div>
+                                QGroupBox
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QTabWidget" data-qml="TabView">
+                                <div class="widget-icon">📑</div>
+                                QTabWidget
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QStackedWidget" data-qml="StackView">
+                                <div class="widget-icon">📚</div>
+                                QStackedWidget
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QToolBox" data-qml="StackView">
+                                <div class="widget-icon">🧰</div>
+                                QToolBox
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QScrollArea" data-qml="ScrollView">
+                                <div class="widget-icon">�</div>
+                                QScrollArea
+                            </div>
                         </div>
-                        <div class="widget-item" draggable="true" data-widget="StackLayout">
-                            <div class="widget-icon">📚</div>
-                            StackLayout
+                    </div>
+                    
+                    <div class="widget-group">
+                        <h3 class="widget-group-header" onclick="toggleGroup(this)">
+                            <span>🏠 Window Widgets</span>
+                            <span class="group-toggle">▼</span>
+                        </h3>
+                        <div class="widget-group-content">
+                            <div class="widget-item" draggable="true" data-widget="QMainWindow" data-qml="ApplicationWindow">
+                                <div class="widget-icon">🏠</div>
+                                QMainWindow
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QDialog" data-qml="Dialog">
+                                <div class="widget-icon">💬</div>
+                                QDialog
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QMenuBar" data-qml="MenuBar">
+                                <div class="widget-icon">📋</div>
+                                QMenuBar
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QStatusBar" data-qml="Rectangle">
+                                <div class="widget-icon">📊</div>
+                                QStatusBar
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QToolBar" data-qml="ToolBar">
+                                <div class="widget-icon">�</div>
+                                QToolBar
+                            </div>
                         </div>
-                        <div class="widget-item" draggable="true" data-widget="ScrollView">
-                            <div class="widget-icon">📜</div>
-                            ScrollView
+                    </div>
+                    
+                    <div class="widget-group">
+                        <h3 class="widget-group-header" onclick="toggleGroup(this)">
+                            <span>⚡ Actions & Spacers</span>
+                            <span class="group-toggle">▼</span>
+                        </h3>
+                        <div class="widget-group-content">
+                            <div class="widget-item" draggable="true" data-widget="QAction" data-qml="Action">
+                                <div class="widget-icon">⚡</div>
+                                QAction
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QSpacerItem" data-qml="Item">
+                                <div class="widget-icon">↔️</div>
+                                QSpacerItem
+                            </div>
                         </div>
-                        <div class="widget-item" draggable="true" data-widget="GroupBox">
-                            <div class="widget-icon">📦</div>
-                            GroupBox
+                    </div>
+                    
+                    <div class="widget-group">
+                        <h3 class="widget-group-header" onclick="toggleGroup(this)">
+                            <span>📐 Layout Widgets</span>
+                            <span class="group-toggle">▼</span>
+                        </h3>
+                        <div class="widget-group-content">
+                            <div class="widget-item" draggable="true" data-widget="QVBoxLayout" data-qml="Column">
+                                <div class="widget-icon">�</div>
+                                QVBoxLayout
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QHBoxLayout" data-qml="Row">
+                                <div class="widget-icon">➡️</div>
+                                QHBoxLayout
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QGridLayout" data-qml="Grid">
+                                <div class="widget-icon">⬛</div>
+                                QGridLayout
+                            </div>
+                            <div class="widget-item" draggable="true" data-widget="QFormLayout" data-qml="GridLayout">
+                                <div class="widget-icon">📋</div>
+                                QFormLayout
+                            </div>
                         </div>
-                        <div class="widget-item" draggable="true" data-widget="Frame">
-                            <div class="widget-icon">🖼️</div>
-                            Frame
-                        </div>
+                    </div>
+                </div>
+                
+                <div class="design-area-container">
                     </div>
                     
                     <div class="widget-group">
@@ -864,6 +1534,47 @@ export class FullQtDesigner {
                                 <br><small>or double-click to add a layout</small>
                             </div>
                         </div>
+                        
+                        <!-- Signal/Slot Connection Overlay -->
+                        <div class="connection-overlay" id="connectionOverlay"></div>
+                    </div>
+                </div>
+                
+                <!-- Signal/Slot Panel -->
+                <div class="signal-slot-panel" id="signalSlotPanel">
+                    <div class="panel-header">
+                        <div class="panel-title">🔗 Signal/Slot Connections</div>
+                        <button class="panel-close" id="closePanelBtn">✕</button>
+                    </div>
+                    
+                    <div class="connection-tabs">
+                        <button class="tab-btn active" data-tab="connections">Connections</button>
+                        <button class="tab-btn" data-tab="signals">Signals</button>
+                        <button class="tab-btn" data-tab="slots">Slots</button>
+                    </div>
+                    
+                    <div class="tab-content" id="connectionsTab">
+                        <div class="connection-controls">
+                            <button id="addConnectionBtn" class="add-btn">➕ Add Connection</button>
+                            <button id="removeConnectionBtn" class="remove-btn">🗑️ Remove</button>
+                        </div>
+                        <div class="connections-list" id="connectionsList">
+                            <div class="empty-state">
+                                Click "Connect Signals" mode and click on widgets to create connections
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="signalsTab" style="display:none;">
+                        <div class="signals-list" id="signalsList">
+                            <div class="empty-state">Select a widget to view available signals</div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="slotsTab" style="display:none;">
+                        <div class="slots-list" id="slotsList">
+                            <div class="empty-state">Select a widget to view available slots</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -883,6 +1594,12 @@ export class FullQtDesigner {
                 let dragOffset = { x: 0, y: 0 };
                 let isRealTimeSync = true;
                 let syncDebounceTimer = null;
+                
+                // Initialize Qt Code Generator
+                const qtCodeGenerator = new QtCodeGenerator();
+                
+                // Initialize Signal/Slot Manager
+                const signalSlotManager = new QtSignalSlotManager();
                 
                 // Enhanced widget templates with professional styling
                 const widgetTemplates = {
@@ -1370,6 +2087,173 @@ export class FullQtDesigner {
                     document.getElementById('redoBtn').addEventListener('click', () => {
                         vscode.postMessage({ command: 'redo' });
                     });
+                    
+                    // Code Generation Event Handlers
+                    document.getElementById('generateCodeBtn').addEventListener('click', () => {
+                        const dropdown = document.querySelector('#generateCodeBtn').parentElement;
+                        dropdown.classList.toggle('show');
+                    });
+                    
+                    document.getElementById('generateQMLBtn').addEventListener('click', () => {
+                        const widgets = document.querySelectorAll('.dropped-widget');
+                        const qmlCode = qtCodeGenerator.generateQMLCode(widgets);
+                        vscode.postMessage({ 
+                            command: 'showCode', 
+                            code: qmlCode, 
+                            language: 'qml',
+                            title: 'Generated QML Code' 
+                        });
+                        hideDropdown();
+                    });
+                    
+                    document.getElementById('generateCppBtn').addEventListener('click', () => {
+                        const widgets = document.querySelectorAll('.dropped-widget');
+                        const cppCode = qtCodeGenerator.generateCppCode(widgets);
+                        vscode.postMessage({ 
+                            command: 'showCode', 
+                            code: cppCode, 
+                            language: 'cpp',
+                            title: 'Generated C++ Code' 
+                        });
+                        hideDropdown();
+                    });
+                    
+                    document.getElementById('generateBothBtn').addEventListener('click', () => {
+                        const widgets = document.querySelectorAll('.dropped-widget');
+                        const qmlCode = qtCodeGenerator.generateQMLCode(widgets);
+                        const cppCode = qtCodeGenerator.generateCppCode(widgets);
+                        const combinedCode = \`// Generated QML Code
+\${qmlCode}
+
+// Generated C++ Code
+\${cppCode}\`;
+                        vscode.postMessage({ 
+                            command: 'showCode', 
+                            code: combinedCode, 
+                            language: 'mixed',
+                            title: 'Generated QML + C++ Code' 
+                        });
+                        hideDropdown();
+                    });
+                    
+                    // Close dropdown when clicking outside
+                    document.addEventListener('click', (e) => {
+                        if (!e.target.closest('.dropdown')) {
+                            hideDropdown();
+                        }
+                    });
+                    
+                    function hideDropdown() {
+                        document.querySelector('.dropdown').classList.remove('show');
+                    }
+                    
+                    // Signal/Slot System Event Handlers
+                    document.getElementById('signalSlotBtn').addEventListener('click', () => {
+                        const isConnectionMode = signalSlotManager.toggleConnectionMode();
+                        const btn = document.getElementById('signalSlotBtn');
+                        const panel = document.getElementById('signalSlotPanel');
+                        
+                        if (isConnectionMode) {
+                            btn.classList.add('active');
+                            btn.textContent = '🔗 Exit Connect Mode';
+                            panel.classList.add('show');
+                            updateSignalSlotPanel();
+                        } else {
+                            btn.classList.remove('active');
+                            btn.textContent = '🔗 Connect Signals';
+                            panel.classList.remove('show');
+                        }
+                    });
+                    
+                    document.getElementById('closePanelBtn').addEventListener('click', () => {
+                        document.getElementById('signalSlotPanel').classList.remove('show');
+                        signalSlotManager.connectionMode = false;
+                        document.getElementById('signalSlotBtn').classList.remove('active');
+                        document.getElementById('signalSlotBtn').textContent = '🔗 Connect Signals';
+                    });
+                    
+                    // Tab switching for signal/slot panel
+                    document.querySelectorAll('.tab-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const tabName = e.target.dataset.tab;
+                            
+                            // Update active tab
+                            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                            e.target.classList.add('active');
+                            
+                            // Show corresponding content
+                            document.querySelectorAll('.tab-content').forEach(content => {
+                                content.style.display = 'none';
+                            });
+                            document.getElementById(tabName + 'Tab').style.display = 'block';
+                            
+                            // Update content based on selected tab
+                            updateSignalSlotPanel();
+                        });
+                    });
+                    
+                    function updateSignalSlotPanel() {
+                        const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
+                        
+                        if (activeTab === 'signals' || activeTab === 'slots') {
+                            updateSignalsSlotsList();
+                        } else if (activeTab === 'connections') {
+                            updateConnectionsList();
+                        }
+                    }
+                    
+                    function updateSignalsSlotsList() {
+                        const signalsList = document.getElementById('signalsList');
+                        const slotsList = document.getElementById('slotsList');
+                        
+                        if (selectedWidget) {
+                            const widgetType = selectedWidget.dataset.widget;
+                            const signals = signalSlotManager.getSignalsForWidget(widgetType);
+                            const slots = signalSlotManager.getSlotsForWidget(widgetType);
+                            
+                            signalsList.innerHTML = signals.length > 0 ? 
+                                signals.map(signal => 
+                                    '<div class="signal-item"><div class="signal-icon"></div>' + 
+                                    signal.name + '<br><small>' + signal.description + '</small></div>'
+                                ).join('') :
+                                '<div class="empty-state">No signals available for ' + widgetType + '</div>';
+                                
+                            slotsList.innerHTML = slots.length > 0 ?
+                                slots.map(slot => 
+                                    '<div class="slot-item"><div class="slot-icon"></div>' + 
+                                    slot.name + '<br><small>' + slot.description + '</small></div>'
+                                ).join('') :
+                                '<div class="empty-state">No slots available for ' + widgetType + '</div>';
+                        } else {
+                            signalsList.innerHTML = '<div class="empty-state">Select a widget to view signals</div>';
+                            slotsList.innerHTML = '<div class="empty-state">Select a widget to view slots</div>';
+                        }
+                    }
+                    
+                    function updateConnectionsList() {
+                        const connectionsList = document.getElementById('connectionsList');
+                        const connections = signalSlotManager.connections;
+                        
+                        if (connections.length === 0) {
+                            connectionsList.innerHTML = '<div class="empty-state">No connections created yet</div>';
+                            return;
+                        }
+                        
+                        connectionsList.innerHTML = connections.map(conn => 
+                            '<div class="connection-item" data-connection-id="' + conn.id + '">' +
+                            '<div class="connection-info">' +
+                            '<strong>' + conn.source.widget.name + '</strong>.' + conn.source.signal + '<br>' +
+                            '→ <strong>' + conn.target.widget.name + '</strong>.' + conn.target.slot +
+                            '</div>' +
+                            '<button class="remove-connection-btn" onclick="removeConnection(\'' + conn.id + '\')">🗑️</button>' +
+                            '</div>'
+                        ).join('');
+                    }
+                    
+                    window.removeConnection = function(connectionId) {
+                        signalSlotManager.removeConnection(connectionId);
+                        updateConnectionsList();
+                    };
                 }
                 
                 function clearDesign() {
@@ -2998,5 +3882,473 @@ export class FullQtDesigner {
             command: 'loadDesign',
             widgets: defaultWidgets
         });
+    }
+}
+
+/**
+ * Comprehensive Signal/Slot management system for Qt Designer
+ * Handles signal connections, slot definitions, and visual connections
+ */
+class QtSignalSlotManager {
+    private connections: any[] = [];
+    private widgets: Map<string, any> = new Map();
+    private connectionMode: boolean = false;
+    private sourceWidget: any = null;
+    private targetWidget: any = null;
+    
+    constructor() {
+        // Initialize the manager
+    }
+    
+    /**
+     * Define signals and slots for Qt widgets
+     */
+    static getWidgetSignalsSlots() {
+        return {
+            QPushButton: {
+                signals: [
+                    { name: 'clicked()', description: 'Emitted when button is clicked' },
+                    { name: 'pressed()', description: 'Emitted when button is pressed' },
+                    { name: 'released()', description: 'Emitted when button is released' },
+                    { name: 'toggled(bool)', description: 'Emitted when toggle state changes' }
+                ],
+                slots: [
+                    { name: 'click()', description: 'Programmatically click the button' },
+                    { name: 'setEnabled(bool)', description: 'Enable/disable the button' },
+                    { name: 'setVisible(bool)', description: 'Show/hide the button' },
+                    { name: 'setText(QString)', description: 'Set button text' }
+                ]
+            },
+            QLineEdit: {
+                signals: [
+                    { name: 'textChanged(QString)', description: 'Text content changed' },
+                    { name: 'textEdited(QString)', description: 'Text edited by user' },
+                    { name: 'returnPressed()', description: 'Return key pressed' },
+                    { name: 'editingFinished()', description: 'Editing finished' }
+                ],
+                slots: [
+                    { name: 'clear()', description: 'Clear the text' },
+                    { name: 'setText(QString)', description: 'Set text content' },
+                    { name: 'selectAll()', description: 'Select all text' },
+                    { name: 'setReadOnly(bool)', description: 'Set read-only mode' }
+                ]
+            },
+            QCheckBox: {
+                signals: [
+                    { name: 'clicked()', description: 'Checkbox clicked' },
+                    { name: 'stateChanged(int)', description: 'Check state changed' },
+                    { name: 'toggled(bool)', description: 'Toggle state changed' }
+                ],
+                slots: [
+                    { name: 'setChecked(bool)', description: 'Set checked state' },
+                    { name: 'toggle()', description: 'Toggle the checkbox' },
+                    { name: 'setEnabled(bool)', description: 'Enable/disable checkbox' }
+                ]
+            },
+            QLabel: {
+                signals: [
+                    { name: 'linkActivated(QString)', description: 'Link activated' },
+                    { name: 'linkHovered(QString)', description: 'Link hovered' }
+                ],
+                slots: [
+                    { name: 'setText(QString)', description: 'Set label text' },
+                    { name: 'setPixmap(QPixmap)', description: 'Set label pixmap' },
+                    { name: 'clear()', description: 'Clear label content' }
+                ]
+            }
+        };
+    }
+    
+    /**
+     * Toggle connection mode
+     */
+    toggleConnectionMode(): boolean {
+        this.connectionMode = !this.connectionMode;
+        this.sourceWidget = null;
+        this.targetWidget = null;
+        return this.connectionMode;
+    }
+    
+    /**
+     * Add a new signal/slot connection
+     */
+    addConnection(sourceWidget: any, sourceSignal: string, targetWidget: any, targetSlot: string) {
+        const connection = {
+            id: Date.now().toString(),
+            source: {
+                widget: sourceWidget,
+                signal: sourceSignal
+            },
+            target: {
+                widget: targetWidget,
+                slot: targetSlot
+            }
+        };
+        
+        this.connections.push(connection);
+        return connection;
+    }
+    
+    /**
+     * Remove a connection
+     */
+    removeConnection(connectionId: string) {
+        this.connections = this.connections.filter(conn => conn.id !== connectionId);
+    }
+    
+    /**
+     * Get signals for a widget type
+     */
+    getSignalsForWidget(widgetType: string) {
+        const signalsSlots = QtSignalSlotManager.getWidgetSignalsSlots();
+        return (signalsSlots as any)[widgetType]?.signals || [];
+    }
+    
+    /**
+     * Get slots for a widget type
+     */
+    getSlotsForWidget(widgetType: string) {
+        const signalsSlots = QtSignalSlotManager.getWidgetSignalsSlots();
+        return (signalsSlots as any)[widgetType]?.slots || [];
+    }
+    
+    /**
+     * Generate connections code for QML
+     */
+    generateQMLConnections(): string {
+        return this.connections.map(conn => {
+            const signalName = conn.source.signal.replace('()', '');
+            return '    Connections {\n' +
+                   '        target: ' + conn.source.widget.name + '\n' +
+                   '        function on' + signalName + '() {\n' +
+                   '            ' + conn.target.widget.name + '.' + conn.target.slot + '\n' +
+                   '        }\n' +
+                   '    }';
+        }).join('\n\n');
+    }
+    
+    /**
+     * Generate connections code for C++
+     */
+    generateCppConnections(): string {
+        return this.connections.map(conn => {
+            const sourceSignal = conn.source.signal.replace('()', '');
+            const targetSlot = conn.target.slot.replace('()', '');
+            return '    connect(' + conn.source.widget.name + ', &' + this.getWidgetClass(conn.source.widget) + '::' + sourceSignal + ', ' +
+                   conn.target.widget.name + ', &' + this.getWidgetClass(conn.target.widget) + '::' + targetSlot + ');';
+        }).join('\n');
+    }
+    
+    /**
+     * Get Qt class name for widget type
+     */
+    private getWidgetClass(widget: any): string {
+        const typeMap: {[key: string]: string} = {
+            'QPushButton': 'QPushButton',
+            'QLineEdit': 'QLineEdit',
+            'QCheckBox': 'QCheckBox',
+            'QLabel': 'QLabel'
+        };
+        return typeMap[widget.type] || 'QWidget';
+    }
+}
+
+/**
+ * Multi-language code generation system for Qt components
+ * Supports QML and Qt C++ code generation
+ */
+export class QtCodeGenerator {
+    
+    /**
+     * Generate QML code from widget definitions
+     */
+    static generateQMLCode(widgets: any[]): string {
+        let qmlCode = `import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
+
+ApplicationWindow {
+    id: root
+    width: 800
+    height: 600
+    visible: true
+    title: "Qt Application"
+
+`;
+
+        widgets.forEach(widget => {
+            qmlCode += this.generateQMLWidget(widget, 1);
+        });
+
+        qmlCode += '}';
+        return qmlCode;
+    }
+
+    /**
+     * Generate Qt C++ code from widget definitions
+     */
+    static generateCppCode(widgets: any[], className: string = 'MainWindow'): { header: string, source: string } {
+        const header = this.generateCppHeader(widgets, className);
+        const source = this.generateCppSource(widgets, className);
+        return { header, source };
+    }
+
+    private static generateQMLWidget(widget: any, indentLevel: number): string {
+        const indent = '    '.repeat(indentLevel);
+        const qmlType = this.getQMLType(widget.type);
+        const props = widget.properties || {};
+        
+        let code = `${indent}${qmlType} {
+${indent}    id: ${widget.id}
+${indent}    x: ${widget.x || 0}
+${indent}    y: ${widget.y || 0}
+${indent}    width: ${widget.width || 100}
+${indent}    height: ${widget.height || 30}
+`;
+
+        // Add widget-specific properties
+        Object.entries(props).forEach(([key, value]) => {
+            if (key === 'text' && (qmlType === 'Text' || qmlType === 'Button' || qmlType === 'CheckBox')) {
+                code += `${indent}    text: "${value}"
+`;
+            } else if (key === 'placeholderText' && qmlType === 'TextField') {
+                code += `${indent}    placeholderText: "${value}"
+`;
+            } else if (key === 'checked' && (qmlType === 'CheckBox' || qmlType === 'RadioButton')) {
+                code += `${indent}    checked: ${value}
+`;
+            } else if (key === 'color') {
+                code += `${indent}    color: "${value}"
+`;
+            } else if (key === 'backgroundColor' && qmlType === 'Rectangle') {
+                code += `${indent}    color: "${value}"
+`;
+            }
+        });
+
+        code += `${indent}}
+
+`;
+        return code;
+    }
+
+    private static generateCppHeader(widgets: any[], className: string): string {
+        const includes = this.getCppIncludes(widgets);
+        const declarations = this.getCppDeclarations(widgets);
+
+        return `#ifndef ${className.toUpperCase()}_H
+#define ${className.toUpperCase()}_H
+
+${includes.join('\n')}
+
+class ${className} : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    ${className}(QWidget *parent = nullptr);
+    ~${className}();
+
+private slots:
+    void setupUI();
+    void connectSignals();
+
+private:
+${declarations.join('\n')}
+
+    void createWidgets();
+    void layoutWidgets();
+};
+
+#endif // ${className.toUpperCase()}_H
+`;
+    }
+
+    private static generateCppSource(widgets: any[], className: string): string {
+        const construction = this.getCppConstruction(widgets);
+        const layout = this.getCppLayout(widgets);
+
+        return `#include "${className.toLowerCase()}.h"
+
+${className}::${className}(QWidget *parent)
+    : QMainWindow(parent)
+{
+    setupUI();
+    connectSignals();
+}
+
+${className}::~${className}()
+{
+}
+
+void ${className}::setupUI()
+{
+    createWidgets();
+    layoutWidgets();
+}
+
+void ${className}::createWidgets()
+{
+${construction.join('\n')}
+}
+
+void ${className}::layoutWidgets()
+{
+${layout.join('\n')}
+}
+
+void ${className}::connectSignals()
+{
+    // Connect widget signals here
+}
+`;
+    }
+
+    private static getQMLType(qtType: string): string {
+        const mapping: { [key: string]: string } = {
+            'QLabel': 'Text',
+            'QPushButton': 'Button',
+            'QLineEdit': 'TextField',
+            'QTextEdit': 'TextArea',
+            'QPlainTextEdit': 'ScrollView',
+            'QCheckBox': 'CheckBox',
+            'QRadioButton': 'RadioButton',
+            'QComboBox': 'ComboBox',
+            'QListWidget': 'ListView',
+            'QTreeWidget': 'TreeView',
+            'QTableWidget': 'TableView',
+            'QSpinBox': 'SpinBox',
+            'QDoubleSpinBox': 'SpinBox',
+            'QSlider': 'Slider',
+            'QProgressBar': 'ProgressBar',
+            'QDial': 'Dial',
+            'QCalendarWidget': 'Calendar',
+            'QDateEdit': 'SpinBox',
+            'QTimeEdit': 'SpinBox',
+            'QDateTimeEdit': 'SpinBox',
+            'QFrame': 'Rectangle',
+            'QGroupBox': 'GroupBox',
+            'QTabWidget': 'TabView',
+            'QStackedWidget': 'StackView',
+            'QToolBox': 'StackView',
+            'QScrollArea': 'ScrollView',
+            'QWidget': 'Item',
+            'QMainWindow': 'ApplicationWindow',
+            'QDialog': 'Dialog',
+            'QMenuBar': 'MenuBar',
+            'QStatusBar': 'Rectangle',
+            'QToolBar': 'ToolBar',
+            'QAction': 'Action',
+            'QSpacerItem': 'Item',
+            'QVBoxLayout': 'Column',
+            'QHBoxLayout': 'Row',
+            'QGridLayout': 'Grid',
+            'QFormLayout': 'GridLayout'
+        };
+        return mapping[qtType] || 'Item';
+    }
+
+    private static getCppIncludes(widgets: any[]): string[] {
+        const includes = new Set<string>([
+            '#include <QMainWindow>',
+            '#include <QWidget>',
+            '#include <QVBoxLayout>',
+            '#include <QHBoxLayout>',
+            '#include <QGridLayout>'
+        ]);
+
+        widgets.forEach(widget => {
+            const include = this.getCppInclude(widget.type);
+            if (include) includes.add(include);
+        });
+
+        return Array.from(includes).sort();
+    }
+
+    private static getCppInclude(qtType: string): string {
+        const mapping: { [key: string]: string } = {
+            'QLabel': '#include <QLabel>',
+            'QPushButton': '#include <QPushButton>',
+            'QLineEdit': '#include <QLineEdit>',
+            'QTextEdit': '#include <QTextEdit>',
+            'QPlainTextEdit': '#include <QPlainTextEdit>',
+            'QCheckBox': '#include <QCheckBox>',
+            'QRadioButton': '#include <QRadioButton>',
+            'QComboBox': '#include <QComboBox>',
+            'QListWidget': '#include <QListWidget>',
+            'QTreeWidget': '#include <QTreeWidget>',
+            'QTableWidget': '#include <QTableWidget>',
+            'QSpinBox': '#include <QSpinBox>',
+            'QDoubleSpinBox': '#include <QDoubleSpinBox>',
+            'QSlider': '#include <QSlider>',
+            'QProgressBar': '#include <QProgressBar>',
+            'QDial': '#include <QDial>',
+            'QCalendarWidget': '#include <QCalendarWidget>',
+            'QDateEdit': '#include <QDateEdit>',
+            'QTimeEdit': '#include <QTimeEdit>',
+            'QDateTimeEdit': '#include <QDateTimeEdit>',
+            'QFrame': '#include <QFrame>',
+            'QGroupBox': '#include <QGroupBox>',
+            'QTabWidget': '#include <QTabWidget>',
+            'QStackedWidget': '#include <QStackedWidget>',
+            'QToolBox': '#include <QToolBox>',
+            'QScrollArea': '#include <QScrollArea>',
+            'QMenuBar': '#include <QMenuBar>',
+            'QStatusBar': '#include <QStatusBar>',
+            'QToolBar': '#include <QToolBar>',
+            'QAction': '#include <QAction>'
+        };
+        return mapping[qtType] || '';
+    }
+
+    private static getCppDeclarations(widgets: any[]): string[] {
+        const declarations: string[] = [];
+        
+        widgets.forEach(widget => {
+            const varName = this.toCppVariableName(widget.id);
+            declarations.push(`    ${widget.type} *${varName};`);
+        });
+
+        return declarations;
+    }
+
+    private static getCppConstruction(widgets: any[]): string[] {
+        const constructions: string[] = [];
+        
+        widgets.forEach(widget => {
+            const varName = this.toCppVariableName(widget.id);
+            const props = widget.properties || {};
+            
+            constructions.push(`    ${varName} = new ${widget.type}(this);`);
+            
+            // Set properties
+            if (props.text) {
+                constructions.push(`    ${varName}->setText("${props.text}");`);
+            }
+            if (props.checked !== undefined) {
+                constructions.push(`    ${varName}->setChecked(${props.checked});`);
+            }
+            
+            // Set geometry
+            constructions.push(`    ${varName}->setGeometry(${widget.x || 0}, ${widget.y || 0}, ${widget.width || 100}, ${widget.height || 30});`);
+        });
+
+        return constructions;
+    }
+
+    private static getCppLayout(widgets: any[]): string[] {
+        return [
+            '    // Layout setup',
+            '    QWidget *centralWidget = new QWidget(this);',
+            '    setCentralWidget(centralWidget);',
+            '',
+            '    // Add widgets to layout as needed',
+            '    // QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);'
+        ];
+    }
+
+    private static toCppVariableName(id: string): string {
+        // Convert camelCase or snake_case to valid C++ variable name
+        return id.replace(/[^a-zA-Z0-9_]/g, '_').replace(/^[0-9]/, '_$&');
     }
 }
