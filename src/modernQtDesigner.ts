@@ -1406,17 +1406,14 @@ export class ModernQtDesigner {
 
         // Generate QML code
         function generateQMLCode(widgets) {
-            let qml = \`import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Window 2.15
-
-ApplicationWindow {
-    width: 800
-    height: 600
-    visible: true
-    title: "Qt Application"
-
-\`;
+            let qml = 'import QtQuick 2.15\\n' +
+                     'import QtQuick.Controls 2.15\\n' +
+                     'import QtQuick.Window 2.15\\n\\n' +
+                     'ApplicationWindow {\\n' +
+                     '    width: 800\\n' +
+                     '    height: 600\\n' +
+                     '    visible: true\\n' +
+                     '    title: "Qt Application"\\n\\n';
 
             widgets.forEach(widget => {
                 const type = widget.dataset.widget.replace('Q', '');
@@ -1426,15 +1423,13 @@ ApplicationWindow {
                 const height = parseInt(widget.style.height);
                 const text = widget.textContent;
 
-                qml += \`    \${type} {
-        x: \${x}
-        y: \${y}
-        width: \${width}
-        height: \${height}
-        text: "\${text}"
-    }
-
-\`;
+                qml += '    ' + type + ' {\\n' +
+                      '        x: ' + x + '\\n' +
+                      '        y: ' + y + '\\n' +
+                      '        width: ' + width + '\\n' +
+                      '        height: ' + height + '\\n' +
+                      '        text: "' + text + '"\\n' +
+                      '    }\\n\\n';
             });
 
             qml += '}';
