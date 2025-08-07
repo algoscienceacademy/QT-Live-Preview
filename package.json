@@ -3,7 +3,7 @@
   "displayName": "QT Live Preview",
   "publisher": "algoscienceacademy",
   "description": "Live preview for Qt6 Widgets and QML applications with hot reload - Full Qt6 module support",
-  "version": "4.0.5",
+  "version": "4.0.6",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -76,74 +76,23 @@
         "category": "QT Live Preview"
       },
       {
-        "command": "qtUIDesigner.openDesigner",
-        "title": "Open UI Designer",
-        "category": "QT Live Preview"
-      },
-      {
-        "command": "qtUIDesigner.newDesign",
-        "title": "New UI Design",
-        "category": "QT Live Preview"
-      },
-      {
-        "command": "qtUIDesigner.openInDesigner",
-        "title": "Open in UI Designer",
-        "category": "QT Live Preview"
-      },
-      {
-        "command": "qtModernDesigner.openDesigner", 
-        "title": "🎨 Open Modern Qt Designer Studio",
+        "command": "qtVisualDesigner.openDesigner",
+        "title": "🎨 Open Qt Visual Designer",
         "category": "QT Live Preview",
-        "icon": "$(sparkle)"
+        "icon": "$(desktop-download)"
       },
       {
-        "command": "qtModernDesigner.newDesign",
-        "title": "✨ New Modern Qt Design",
+        "command": "qtVisualDesigner.newDesign",
+        "title": "✨ New Visual Design",
         "category": "QT Live Preview",
-        "icon": "$(add)"
+        "icon": "$(new-file)"
       },
       {
-        "command": "qtModernDesigner.openInDesigner",
-        "title": "🎯 Open in Modern Designer",
+        "command": "qtVisualDesigner.openInDesigner",
+        "title": "🎯 Open in Visual Designer",
         "category": "QT Live Preview",
-        "icon": "$(edit)"
-      },
-      {
-        "command": "qtUIDesigner.startRealtimeSync",
-        "title": "Start Real-time Sync",
-        "category": "QT Live Preview",
-        "icon": "$(sync)"
-      },
-      {
-        "command": "qtUIDesigner.stopRealtimeSync",
-        "title": "Stop Real-time Sync",
-        "category": "QT Live Preview",
-        "icon": "$(debug-stop)"
-      },
-      {
-        "command": "qtUIDesigner.toggleRealtimeSync",
-        "title": "Toggle Real-time Sync",
-        "category": "QT Live Preview",
-        "icon": "$(sync-ignored)"
-      },
-      {
-        "command": "qtCombinedDesigner.openDesigner",
-        "title": "Open Combined Designer + Preview",
-        "category": "QT Live Preview",
-        "icon": "$(preview)"
-      },
-      {
-        "command": "qtCombinedDesigner.newDesign",
-        "title": "New Combined Design",
-        "category": "QT Live Preview",
-        "icon": "$(add)"
-      },
-      {
-        "command": "qtCombinedDesigner.openInDesigner",
-        "title": "Open in Combined Designer",
-        "category": "QT Live Preview",
-        "icon": "$(edit)"
-      }
+        "icon": "$(open-preview)"
+      } 
     ],
     "menus": {
       "explorer/context": [
@@ -163,12 +112,7 @@
           "group": "qtpreview"
         },
         {
-          "command": "qtUIDesigner.openInDesigner",
-          "when": "resourceExtname == .qml || resourceExtname == .ui",
-          "group": "qtpreview"
-        },
-        {
-          "command": "qtModernDesigner.openInDesigner",
+          "command": "qtVisualDesigner.openInDesigner",
           "when": "resourceExtname == .qml || resourceExtname == .ui",
           "group": "qtpreview"
         }
@@ -190,12 +134,7 @@
           "group": "qtpreview"
         },
         {
-          "command": "qtUIDesigner.openInDesigner",
-          "when": "resourceExtname == .qml || resourceExtname == .ui",
-          "group": "qtpreview"
-        },
-        {
-          "command": "qtModernDesigner.openInDesigner",
+          "command": "qtVisualDesigner.openInDesigner",
           "when": "resourceExtname == .qml || resourceExtname == .ui",
           "group": "qtpreview"
         }
@@ -210,68 +149,16 @@
           "when": "true"
         },
         {
-          "command": "qtUIDesigner.openDesigner",
+          "command": "qtVisualDesigner.openDesigner",
           "when": "true"
         },
         {
-          "command": "qtModernDesigner.openDesigner",
+          "command": "qtVisualDesigner.newDesign",
           "when": "true"
         },
         {
-          "command": "qtUIDesigner.newDesign",
-          "when": "true"
-        },
-        {
-          "command": "qtUIDesigner.startRealtimeSync",
+          "command": "qtVisualDesigner.openInDesigner",
           "when": "resourceExtname == .qml"
-        },
-        {
-          "command": "qtUIDesigner.stopRealtimeSync",
-          "when": "resourceExtname == .qml"
-        },
-        {
-          "command": "qtUIDesigner.toggleRealtimeSync",
-          "when": "resourceExtname == .qml"
-        },
-        {
-          "command": "qtCombinedDesigner.openDesigner",
-          "when": "true"
-        },
-        {
-          "command": "qtCombinedDesigner.newDesign",
-          "when": "true"
-        },
-        {
-          "command": "qtCombinedDesigner.openInDesigner",
-          "when": "resourceExtname == .qml"
-        }
-      ]
-    },
-    "views": {
-      "qtDevelopment": [
-        {
-          "id": "qtLivePreview.preview",
-          "name": "Live Preview",
-          "type": "webview"
-        },
-        {
-          "id": "qtUIDesigner.designer",
-          "name": "UI Designer",
-          "type": "webview"
-        },
-        {
-          "id": "qtCombinedDesigner.designer",
-          "name": "Designer + Preview",
-          "type": "webview"
-        }
-      ]
-    },
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "qtDevelopment",
-          "title": "Qt Development",
-          "icon": "$(preview)"
         }
       ]
     },
@@ -337,26 +224,24 @@
           "contextualTitle": "Qt6 Project Explorer"
         }
       ],
-      "qtLivePreview": [
+      "qtDevelopment": [
         {
-          "type": "webview",
           "id": "qtLivePreview.preview",
           "name": "Live Preview",
-          "when": "true"
+          "type": "webview"
         },
         {
-          "type": "webview",
-          "id": "qtUIDesigner.designer",
-          "name": "UI Designer",
-          "when": "true"
+          "id": "qtVisualDesigner.designer",
+          "name": "Visual Designer",
+          "type": "webview"
         }
       ]
     },
     "viewsContainers": {
-      "panel": [
+      "activitybar": [
         {
-          "id": "qtLivePreview",
-          "title": "Qt6 Live Preview",
+          "id": "qtDevelopment",
+          "title": "Qt Development",
           "icon": "$(preview)"
         }
       ]

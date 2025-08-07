@@ -7,9 +7,13 @@ export class QMLSyncEngine {
     private _designerPanels: vscode.WebviewPanel[] = [];
     private _previewPanels: vscode.WebviewPanel[] = [];
     private _propertyPanels: vscode.WebviewPanel[] = [];
+    private _toolboxPanels: vscode.WebviewPanel[] = [];
     private _activeDocument: vscode.TextDocument | undefined;
     private _syncEnabled: boolean = true;
     private _updateInProgress: boolean = false;
+    private _selectedWidget: string | null = null;
+    private _designHistory: string[] = [];
+    private _currentHistoryIndex: number = -1;
 
     constructor() {
         // Watch for active text editor changes
@@ -62,6 +66,126 @@ export class QMLSyncEngine {
                 this._previewPanels.splice(index, 1);
             }
         });
+    }
+
+    public registerToolboxPanel(panel: vscode.WebviewPanel) {
+        this._toolboxPanels.push(panel);
+        panel.onDidDispose(() => {
+            const index = this._toolboxPanels.indexOf(panel);
+            if (index > -1) {
+                this._toolboxPanels.splice(index, 1);
+            }
+        });
+    }
+
+    public setSelectedWidget(widgetId: string) {
+        this._selectedWidget = widgetId;
+        // Notify all panels about selection change
+        this.broadcastMessage({
+            command: 'widgetSelected',
+            widgetId
+        });
+    }
+
+    public getSelectedWidget(): string | null {
+        return this._selectedWidget;
+    }
+
+    public addWidgetToDesign(widgetType: string, position: { x: number, y: number }) {
+        const newWidget = {
+            id: `${widgetType.toLowerCase()}_${Date.now()}`,
+            type: widgetType,
+            position: {
+                x: position.x,
+                y: position.y,
+                width: this.getDefaultSize(widgetType).width,
+                height: this.getDefaultSize(widgetType).height
+            },
+            properties: this.getDefaultProperties(widgetType)
+        };
+
+        // Broadcast to all designer panels
+        this._designerPanels.forEach(panel => {
+            panel.webview.postMessage({
+                command: 'addWidget',
+                widget: newWidget
+            });
+        });
+
+        return newWidget;
+    }
+
+    private getDefaultSize(widgetType: string): { width: number, height: number } {
+        const sizes: { [key: string]: { width: number, height: number } } = {
+            'Button': { width: 100, height: 30 },
+            'Label': { width: 80, height: 25 },
+            'TextField': { width: 120, height: 25 },
+            'TextArea': { width: 200, height: 100 },
+            'CheckBox': { width: 100, height: 25 },
+            'RadioButton': { width: 100, height: 25 },
+            'ComboBox': { width: 120, height: 25 },
+            'Slider': { width: 200, height: 25 },
+            'ProgressBar': { width: 200, height: 25 },
+            'Image': { width: 100, height: 100 },
+            'Rectangle': { width: 100, height: 100 },
+            'Text': { width: 100, height: 25 }
+        };
+        return sizes[widgetType] || { width: 100, height: 100 };
+    }
+
+    private getDefaultProperties(widgetType: string): any {
+        const properties: { [key: string]: any } = {
+            'Button': { text: 'Button' },
+            'Label': { text: 'Label' },
+            'TextField': { placeholderText: 'Enter text...' },
+            'TextArea': { placeholderText: 'Enter text...', wrapMode: 'Text.WordWrap' },
+            'CheckBox': { text: 'CheckBox', checked: false },
+            'RadioButton': { text: 'RadioButton', checked: false },
+            'ComboBox': { model: '["Option 1", "Option 2", "Option 3"]' },
+            'Slider': { from: 0, to: 100, value: 50 },
+            'ProgressBar': { from: 0, to: 100, value: 50 },
+            'Text': { text: 'Text', color: 'black' },
+            'Rectangle': { color: 'lightgray' }
+        };
+        return properties[widgetType] || {};
+    }
+
+    private broadcastMessage(message: any) {
+        [...this._designerPanels, ...this._previewPanels, ...this._propertyPanels, ...this._toolboxPanels]
+            .forEach(panel => {
+                panel.webview.postMessage(message);
+            });
+    }
+
+    public saveToHistory(qmlContent: string) {
+        // Remove any history entries after current index
+        this._designHistory = this._designHistory.slice(0, this._currentHistoryIndex + 1);
+        
+        // Add new entry
+        this._designHistory.push(qmlContent);
+        this._currentHistoryIndex = this._designHistory.length - 1;
+        
+        // Limit history size
+        if (this._designHistory.length > 50) {
+            this._designHistory.shift();
+            this._currentHistoryIndex--;
+        }
+    }
+
+    public undo(): string | null {
+        if (this._currentHistoryIndex > 0) {
+            this._currentHistoryIndex--;
+            return this._designHistory[this._currentHistoryIndex];
+        }
+        return null;
+    }
+
+    public redo(): string | null {
+        if (this._currentHistoryIndex < this._designHistory.length - 1) {
+            this._currentHistoryIndex++;
+            return this._designHistory[this._currentHistoryIndex];
+        }
+        return null;
     }
 
     public registerPropertyPanel(panel: vscode.WebviewPanel) {

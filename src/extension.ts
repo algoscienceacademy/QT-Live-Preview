@@ -6,9 +6,7 @@ import { ErrorReporter } from './errorReporter';
 import { BuildManager } from './buildManager';
 import { QMLErrorDetector } from './qmlErrorDetector';
 import { QMLCodeActionProvider } from './qmlCodeActionProvider';
-import { QtUIDesigner } from './qtUIDesigner';
-import { CombinedDesignerPreview } from './combinedDesignerPreview';
-import { ModernQtDesigner } from './modernQtDesigner';
+import { QtVisualDesigner } from './qtVisualDesigner';
 import { QMLSyncEngine } from './qmlSyncEngine';
 
 let projectManager: QTProjectManager;
@@ -18,9 +16,8 @@ let errorReporter: ErrorReporter;
 let buildManager: BuildManager;
 let qmlErrorDetector: QMLErrorDetector;
 let qmlCodeActionProvider: QMLCodeActionProvider;
-let qtUIDesigner: QtUIDesigner;
-let combinedDesigner: CombinedDesignerPreview;
-let modernQtDesigner: ModernQtDesigner;
+let qtVisualDesigner: QtVisualDesigner;
+ 
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('QT Live Preview extension is now active!');
@@ -32,15 +29,13 @@ export function activate(context: vscode.ExtensionContext) {
     buildManager = new BuildManager();
     qmlErrorDetector = new QMLErrorDetector();
     qmlCodeActionProvider = new QMLCodeActionProvider();
-    qtUIDesigner = new QtUIDesigner(context.extensionUri);
-    combinedDesigner = new CombinedDesignerPreview(context.extensionUri);
+    qtVisualDesigner = new QtVisualDesigner(context.extensionUri);
 
     // Connect components
     previewProvider.setBuildManager(buildManager);
     hotReloadManager.setBuildManager(buildManager);
 
-    // Initialize modern Qt Designer
-    modernQtDesigner = new ModernQtDesigner(context.extensionUri);
+     
 
     // Register commands
     const createProjectCmd = vscode.commands.registerCommand('qtLivePreview.createProject', () => {
@@ -88,64 +83,19 @@ export function activate(context: vscode.ExtensionContext) {
         buildManager.stopApplication();
     });
 
-    // UI Designer commands
-    const openDesignerCmd = vscode.commands.registerCommand('qtUIDesigner.openDesigner', () => {
-        qtUIDesigner.openDesigner();
+    // Visual Designer commands
+    const openVisualDesignerCmd = vscode.commands.registerCommand('qtVisualDesigner.openDesigner', (uri?: vscode.Uri) => {
+        qtVisualDesigner.openDesigner(uri);
     });
 
-    const newDesignCmd = vscode.commands.registerCommand('qtUIDesigner.newDesign', () => {
-        qtUIDesigner.openDesigner();
+    const newVisualDesignCmd = vscode.commands.registerCommand('qtVisualDesigner.newDesign', () => {
+        qtVisualDesigner.openDesigner();
     });
 
-    const openInDesignerCmd = vscode.commands.registerCommand('qtUIDesigner.openInDesigner', (uri?: vscode.Uri) => {
+    const openInVisualDesignerCmd = vscode.commands.registerCommand('qtVisualDesigner.openInDesigner', (uri?: vscode.Uri) => {
         const targetUri = uri || vscode.window.activeTextEditor?.document.uri;
         if (targetUri) {
-            qtUIDesigner.openDesigner(targetUri);
-        }
-    });
-
-    // Real-time sync commands
-    const startSyncCmd = vscode.commands.registerCommand('qtUIDesigner.startRealtimeSync', () => {
-        qtUIDesigner.startRealtimeSync();
-    });
-
-    const stopSyncCmd = vscode.commands.registerCommand('qtUIDesigner.stopRealtimeSync', () => {
-        qtUIDesigner.stopRealtimeSync();
-    });
-
-    const toggleSyncCmd = vscode.commands.registerCommand('qtUIDesigner.toggleRealtimeSync', () => {
-        qtUIDesigner.toggleRealtimeSync();
-    });
-
-    // Combined Designer + Preview commands
-    const openCombinedDesignerCmd = vscode.commands.registerCommand('qtCombinedDesigner.openDesigner', () => {
-        combinedDesigner.openDesigner();
-    });
-
-    // Modern Qt Designer commands
-    const openModernDesignerCmd = vscode.commands.registerCommand('qtModernDesigner.openDesigner', () => {
-        modernQtDesigner.openDesigner();
-    });
-
-    const newModernDesignCmd = vscode.commands.registerCommand('qtModernDesigner.newDesign', () => {
-        modernQtDesigner.openDesigner();
-    });
-
-    const openInModernDesignerCmd = vscode.commands.registerCommand('qtModernDesigner.openInDesigner', (uri?: vscode.Uri) => {
-        const targetUri = uri || vscode.window.activeTextEditor?.document.uri;
-        if (targetUri) {
-            modernQtDesigner.openDesigner(targetUri);
-        }
-    });
-
-    const newCombinedDesignCmd = vscode.commands.registerCommand('qtCombinedDesigner.newDesign', () => {
-        combinedDesigner.openDesigner();
-    });
-
-    const openInCombinedDesignerCmd = vscode.commands.registerCommand('qtCombinedDesigner.openInDesigner', (uri?: vscode.Uri) => {
-        const targetUri = uri || vscode.window.activeTextEditor?.document.uri;
-        if (targetUri) {
-            combinedDesigner.openDesigner(targetUri);
+            qtVisualDesigner.openDesigner(targetUri);
         }
     });
 
@@ -177,8 +127,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Register webview provider and setup handling
     const webviewProvider = vscode.window.registerWebviewViewProvider('qtLivePreview.preview', previewProvider);
-    const uiDesignerProvider = vscode.window.registerWebviewViewProvider('qtUIDesigner.designer', qtUIDesigner);
-    const combinedDesignerProvider = vscode.window.registerWebviewViewProvider('qtCombinedDesigner.designer', combinedDesigner);
+    const visualDesignerProvider = vscode.window.registerWebviewViewProvider('qtVisualDesigner.designer', qtVisualDesigner);
     
     // Setup webview handling after a delay to ensure provider is ready
     setTimeout(setupWebviewHandling, 1000);
@@ -186,8 +135,7 @@ export function activate(context: vscode.ExtensionContext) {
     // Register all commands
     context.subscriptions.push(
         webviewProvider,
-        uiDesignerProvider,
-        combinedDesignerProvider,
+        visualDesignerProvider,
         createProjectCmd,
         createModuleProjectCmd,
         startPreviewCmd,
@@ -198,18 +146,10 @@ export function activate(context: vscode.ExtensionContext) {
         debugProjectCmd,
         configureQtCmd,
         stopProjectCmd,
-        openDesignerCmd,
-        newDesignCmd,
-        openInDesignerCmd,
-        startSyncCmd,
-        stopSyncCmd,
-        toggleSyncCmd,
-        openCombinedDesignerCmd,
-        newCombinedDesignCmd,
-        openInCombinedDesignerCmd,
-        openModernDesignerCmd,
-        newModernDesignCmd,
-        openInModernDesignerCmd
+        openVisualDesignerCmd,
+        newVisualDesignCmd,
+        openInVisualDesignerCmd,
+       
     );
 
     // Register QML language features
@@ -301,5 +241,8 @@ export function deactivate() {
     }
     if (qmlErrorDetector) {
         qmlErrorDetector.dispose();
+    }
+    if (qtVisualDesigner) {
+        qtVisualDesigner.dispose();
     }
 }
